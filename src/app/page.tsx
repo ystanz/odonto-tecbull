@@ -1,6 +1,7 @@
 import React from 'react';
 import Navigation from '@/components/Navigation';
-import { supabase } from '@/lib/supabase';
+import { db, schema } from '@/lib/supabase';
+import { eq } from 'drizzle-orm';
 import Link from 'next/link';
 
 // Mock data as fallback
@@ -22,61 +23,63 @@ const mockAlerts = [
     id: 'STER-105',
     name: 'Autoclave Filter Replacement',
     location: 'Clinic Beta - Sterilization Room',
-    status: 'PENDING'
+    status: 'DUE SOON'
   },
   {
-    id: 'CHAIR-88',
+    id: 'CH-2021-442',
     name: 'Dental Chair Hydraulics Check',
     location: 'Clinic Gamma - Room 3',
     status: 'PENDING'
   }
 ];
 
-export const revalidate = 0; // Disable caching to get fresh data from Supabase
+export const revalidate = 0; // Disable caching to get fresh data from D1
 
 export default async function DashboardPage() {
-  let stats = { ...mockStats };
+  const stats = { ...mockStats };
   let alerts = [...mockAlerts];
-  let isFromSupabase = false;
+  let isDemoMode = true;
 
   try {
-    // Check if Supabase variables are set by attempting a quick fetch
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (typeof process !== 'undefined' && (process.env as Record<string, unknown>).DB) {
       // Fetch total work orders
-      const { data: workOrders, error: woError } = await supabase
-        .from('work_orders')
-        .select('*');
-
-      if (!woError && workOrders) {
-        isFromSupabase = true;
-        
-        const open = workOrders.filter(wo => wo.status === 'ABERTA').length;
-        const inProgress = workOrders.filter(wo => wo.status === 'EM ANDAMENTO').length;
-        const completed = workOrders.filter(wo => wo.status === 'CONCLUÍDA').length;
-        
-        stats.todayServices = workOrders.length; // Total registered
-        stats.pendingServices = open;
-        stats.inMaintenance = inProgress;
-        stats.revenue = `R$ ${(completed * 1.4).toFixed(1)}k`; // Estimated based on completed
-      }
+      const workOrders = await db.select().from(schema.workOrders);
+      isDemoMode = false;
+      
+      const open = workOrders.filter(wo => wo.status === 'ABERTA').length;
+      const inProgress = workOrders.filter(wo => wo.status === 'EM ANDAMENTO').length;
+      const completed = workOrders.filter(wo => wo.status === 'CONCLUÍDA').length;
+      
+      stats.todayServices = workOrders.length; // Total registered
+      stats.pendingServices = open;
+      stats.inMaintenance = inProgress;
+      stats.revenue = `R$ ${(completed * 1.4).toFixed(1)}k`; // Estimated based on completed
 
       // Fetch equipment alerts (status = 'Pendente')
-      const { data: dbEquipments, error: eqError } = await supabase
-        .from('equipments')
-        .select('*, locations(name, room)')
-        .eq('status', 'Pendente');
+      const dbEquipments = await db
+        .select({
+          id: schema.equipments.id,
+          code: schema.equipments.code,
+          name: schema.equipments.name,
+          status: schema.equipments.status,
+          locationName: schema.locations.name,
+          locationRoom: schema.locations.room
+        })
+        .from(schema.equipments)
+        .leftJoin(schema.locations, eq(schema.equipments.locationId, schema.locations.id))
+        .where(eq(schema.equipments.status, 'Pendente'));
 
-      if (!eqError && dbEquipments && dbEquipments.length > 0) {
-        alerts = dbEquipments.map((eq: any) => ({
-          id: eq.code,
-          name: eq.name,
-          location: eq.locations ? `${eq.locations.name} - ${eq.locations.room || ''}` : 'Unidade Geral',
+      if (dbEquipments && dbEquipments.length > 0) {
+        alerts = dbEquipments.map((eqData) => ({
+          id: eqData.code,
+          name: eqData.name,
+          location: eqData.locationName ? `${eqData.locationName} - ${eqData.locationRoom || ''}` : 'Unidade Geral',
           status: 'PENDING'
         }));
       }
     }
   } catch (e) {
-    console.error('Erro ao conectar com o Supabase, utilizando dados simulados:', e);
+    console.error('Erro ao conectar com o D1, utilizando dados simulados:', e);
   }
 
   const currentDate = new Date().toLocaleDateString('pt-BR', {
@@ -87,18 +90,51 @@ export default async function DashboardPage() {
 
   return (
     <Navigation currentTab="dashboard">
-      <main className="p-md md:p-lg max-w-7xl mx-auto space-y-lg">
-        {/* Header Section */}
-        <section className="flex flex-col md:flex-row md:items-center md:justify-between mb-lg space-y-4 md:space-y-0">
+      <main className="flex-grow pb-32 pt-lg px-md w-full max-w-[800px] mx-auto md:px-xl animate-fade-in">
+        
+        {/* Banner de Demonstração */}
+        {isDemoMode && (
+          <div className="mb-md bg-secondary-container/15 border border-secondary/20 text-secondary p-sm rounded-xl flex items-center gap-sm">
+            <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: '"FILL" 1' }}>info</span>
+            <div className="font-body-md text-body-md">
+              <strong>Painel de Demonstração Ativo</strong>: Cloudflare D1 não configurado. Exibindo estatísticas e alertas simulados.
+            </div>
+          </div>
+        )}
+
+        {/* Tech and Date Header */}
+        <header className="mb-xl flex items-center justify-between border-b border-outline-variant/30 pb-md">
           <div>
-            <h2 className="font-headline-lg text-headline-lg text-primary">Olá, Marcelo</h2>
-            <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-              {currentDate} {isFromSupabase && <span className="text-xs text-tertiary-container font-semibold ml-2">(Supabase Conectado)</span>}
+            <span className="font-label-caps text-label-caps text-on-surface-variant tracking-wider">
+              TÉCNICO PARCEIRO
+            </span>
+            <h2 className="font-headline-lg text-headline-lg text-on-background mt-xs font-semibold">
+              Marcelo T.
+            </h2>
+          </div>
+          <div className="text-right">
+            <span className="font-label-caps text-label-caps text-on-surface-variant block tracking-wider">
+              DATA DE HOJE
+            </span>
+            <span className="font-headline-sm text-headline-sm text-primary font-bold mt-xs block">
+              {currentDate}
+            </span>
+          </div>
+        </header>
+
+        {/* Hero Section / Mobile Quick Actions */}
+        <section className="mb-xl flex flex-col md:flex-row gap-md items-center justify-between bg-surface-container-low rounded-2xl p-lg border border-outline/10 shadow-level-1">
+          <div className="flex-grow text-center md:text-left mb-sm md:mb-0">
+            <h3 className="font-headline-md text-headline-md text-on-surface font-bold">
+              Bem-vindo ao OdontoService
+            </h3>
+            <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
+              Acesse e gerencie chamados, clientes e equipamentos clínicos em campo.
             </p>
           </div>
           {/* Mobile FAB Alternative */}
           <Link 
-            href="/ordens-servico/nova"
+            href="/os/nova"
             className="md:hidden w-full h-touch-target bg-primary text-on-primary font-headline-sm text-headline-sm rounded-lg shadow-sm active:scale-95 transition-transform flex items-center justify-center space-x-2"
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>add</span>
@@ -135,59 +171,59 @@ export default async function DashboardPage() {
           {/* Stat 3 */}
           <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
             <div className="flex items-center space-x-2 text-tertiary-container">
-              <span className="material-symbols-outlined text-xl">build</span>
-              <span className="font-label-caps text-label-caps">EM MANUT.</span>
+              <span className="material-symbols-outlined text-xl">engineering</span>
+              <span className="font-label-caps text-label-caps">EM MANUTENÇÃO</span>
             </div>
             <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-on-surface">
+              <span className="font-headline-lg text-headline-lg text-tertiary">
                 {String(stats.inMaintenance).padStart(2, '0')}
               </span>
             </div>
           </div>
           {/* Stat 4 */}
           <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-center space-x-2 text-primary-container">
+            <div className="flex items-center space-x-2 text-on-surface-variant">
               <span className="material-symbols-outlined text-xl">payments</span>
-              <span className="font-label-caps text-label-caps">FATURAMENTO</span>
+              <span className="font-label-caps text-label-caps">Faturamento</span>
             </div>
             <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-primary">
+              <span className="font-headline-lg text-headline-lg text-on-surface font-semibold">
                 {stats.revenue}
               </span>
             </div>
           </div>
         </section>
 
-        {/* Preventive Maintenance Alert List */}
-        <section className="mt-lg bg-surface-container-lowest rounded-xl shadow-level-1 border border-outline/10 overflow-hidden">
-          <div className="p-md border-b border-outline/10 flex items-center space-x-3 bg-surface-container/50">
-            <span className="material-symbols-outlined text-secondary-container" style={{ fontVariationSettings: '"FILL" 1' }}>warning</span>
-            <h3 className="font-headline-sm text-headline-sm text-on-surface">Alertas de Manutenção Preventiva</h3>
+        {/* Dynamic Alerts Section */}
+        <section className="mt-xl">
+          <div className="mb-md flex items-center space-x-2">
+            <span className="material-symbols-outlined text-error">notification_important</span>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+              Manutenções e Alertas Urgentes
+            </h3>
           </div>
-          <div className="p-md space-y-4">
-            {alerts.map((alert, index) => (
-              <div key={alert.id} className="flex items-start space-x-4 relative">
-                {index < alerts.length - 1 && (
-                  <div className="absolute left-4 top-8 bottom-[-16px] w-[2px] bg-outline/15 z-0"></div>
-                )}
-                <div className="w-8 h-8 rounded-full bg-secondary-container/15 flex items-center justify-center z-10 shrink-0">
-                  <span className="material-symbols-outlined text-secondary text-sm">notifications</span>
-                </div>
-                <div className="flex-1 bg-surface-container-low p-sm rounded-lg border border-outline/10">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-technical-code text-technical-code text-on-surface-variant">
-                      ID: {alert.id}
-                    </span>
-                    <span className="font-label-caps text-label-caps bg-secondary-container/15 text-secondary px-2 py-1 rounded">
-                      {alert.status}
-                    </span>
-                  </div>
-                  <h4 className="font-headline-sm text-headline-sm text-primary mb-1">
+          
+          <div className="space-y-sm">
+            {alerts.map((alert) => (
+              <div 
+                key={alert.id}
+                className="bg-surface-container-lowest border-l-4 border-error rounded-xl p-md shadow-level-1 border-y border-r border-outline/10 flex items-center justify-between"
+              >
+                <div className="pr-xs">
+                  <h4 className="font-headline-xs text-headline-xs text-on-surface font-semibold">
                     {alert.name}
                   </h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant">
+                  <p className="font-body-md text-body-md text-on-surface-variant mt-[2px]">
                     {alert.location}
                   </p>
+                  <span className="font-technical-code text-technical-code text-outline mt-1 inline-block">
+                    Código: {alert.id}
+                  </span>
+                </div>
+                <div>
+                  <span className="px-sm py-1 rounded bg-error/15 text-error font-label-caps text-label-caps whitespace-nowrap">
+                    {alert.status}
+                  </span>
                 </div>
               </div>
             ))}

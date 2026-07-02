@@ -1,0 +1,5 @@
+[[d1_databases]]
+binding = "DB"
+database_name = "odonto-service-db"
+database_id = "f0a8274d-cc8d-4a11-89e4-7d87bc6e082f"
+migrations_dir = "drizzle"

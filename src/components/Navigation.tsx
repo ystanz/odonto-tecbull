@@ -84,7 +84,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
           </Link>
 
           <Link 
-            href="/equipamentos/114b5f88-bad1-001f-2a13-4d619bcee6ff"
+            href="/equipamentos"
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${
               currentTab === 'equipment' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
             }`}
@@ -106,7 +106,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
 
         <div className="mt-auto pt-lg">
           <Link 
-            href="/ordens-servico/nova"
+            href="/os/nova"
             className="w-full h-touch-target bg-primary text-on-primary font-headline-sm text-headline-sm rounded-lg shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center space-x-2"
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>add_circle</span>
@@ -153,7 +153,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         </Link>
 
         <Link 
-          href="/equipamentos/114b5f88-bad1-001f-2a13-4d619bcee6ff"
+          href="/equipamentos"
           className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
             currentTab === 'equipment' 
               ? 'bg-secondary-container text-on-secondary-container rounded-full' 

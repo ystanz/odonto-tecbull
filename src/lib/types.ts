@@ -1,0 +1,47 @@
+export interface DBClient {
+  id: string;
+  name: string;
+  created_at?: string;
+}
+
+export interface DBLocation {
+  id: string;
+  client_id: string;
+  name: string;
+  room: string | null;
+  created_at?: string;
+  clients?: DBClient; // Para joins do Supabase
+}
+
+export interface DBEquipment {
+  id: string;
+  code: string;
+  name: string;
+  location_id: string;
+  serial_number: string | null;
+  installation_date: string | null;
+  manufacturer: string | null;
+  warranty_until: string | null;
+  status: string; // 'Ativo' | 'Pendente' | 'Inativo' etc
+  next_service_date: string | null;
+  created_at?: string;
+  locations?: DBLocation; // Para joins do Supabase
+}
+
+export interface DBWorkOrder {
+  id: string;
+  code: string;
+  client_id: string;
+  equipment_id: string;
+  status: 'ABERTA' | 'EM ANDAMENTO' | 'CONCLUÍDA';
+  priority: 'NORMAL' | 'CRÍTICO';
+  defect_reported: string;
+  parts_used?: string | null;
+  work_notes?: string | null;
+  image_url?: string | null;
+  service_date: string | null;
+  technician_name: string | null;
+  created_at?: string;
+  clients?: DBClient;
+  equipments?: DBEquipment;
+}

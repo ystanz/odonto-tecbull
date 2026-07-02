@@ -1,6 +1,7 @@
 import React from 'react';
 import Navigation from '@/components/Navigation';
-import { supabase } from '@/lib/supabase';
+import { db, schema } from '@/lib/supabase';
+import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 
 interface EquipmentSpecs {
@@ -72,61 +73,77 @@ interface PageProps {
 export default async function EquipmentDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  let eq = { ...mockEquipment };
+  let equipment = { ...mockEquipment };
   let timeline = [...mockTimeline];
-  let isFromSupabase = false;
+  let isDemoMode = true;
 
   try {
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      // Fetch equipment
-      const { data: dbEq, error: eqError } = await supabase
-        .from('equipments')
-        .select('*, locations(name, room, clients(name))')
-        .eq('id', id)
-        .single();
+    if (typeof process !== 'undefined' && (process.env as Record<string, unknown>).DB) {
+      // Fetch equipment with locations and clients using Drizzle join
+      const rows = await db
+        .select({
+          id: schema.equipments.id,
+          code: schema.equipments.code,
+          name: schema.equipments.name,
+          serialNumber: schema.equipments.serialNumber,
+          installationDate: schema.equipments.installationDate,
+          manufacturer: schema.equipments.manufacturer,
+          warrantyUntil: schema.equipments.warrantyUntil,
+          status: schema.equipments.status,
+          nextServiceDate: schema.equipments.nextServiceDate,
+          locationName: schema.locations.name,
+          locationRoom: schema.locations.room,
+          clientName: schema.clients.name
+        })
+        .from(schema.equipments)
+        .leftJoin(schema.locations, eq(schema.equipments.locationId, schema.locations.id))
+        .leftJoin(schema.clients, eq(schema.locations.clientId, schema.clients.id))
+        .where(eq(schema.equipments.id, id))
+        .limit(1);
 
-      if (!eqError && dbEq) {
-        isFromSupabase = true;
+      const dbEq = rows[0];
 
-        const locationPath = dbEq.locations 
-          ? `${dbEq.locations.clients?.name || ''} > ${dbEq.locations.name}`
+      if (dbEq) {
+        isDemoMode = false;
+        const locationPath = dbEq.locationName 
+          ? `${dbEq.clientName || ''} > ${dbEq.locationName}${dbEq.locationRoom ? ` - ${dbEq.locationRoom}` : ''}`
           : 'Unidade Geral';
 
         // Calculate days to next service
         let days = 0;
-        if (dbEq.next_service_date) {
-          const serviceDate = new Date(dbEq.next_service_date);
+        if (dbEq.nextServiceDate) {
+          const serviceDate = new Date(dbEq.nextServiceDate);
           const today = new Date();
           const diffTime = serviceDate.getTime() - today.getTime();
           days = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
         }
 
-        eq = {
+        equipment = {
           code: dbEq.code,
           name: dbEq.name,
           locationName: locationPath,
-          serialNumber: dbEq.serial_number || 'N/A',
-          installationDate: dbEq.installation_date || 'N/A',
+          serialNumber: dbEq.serialNumber || 'N/A',
+          installationDate: dbEq.installationDate || 'N/A',
           manufacturer: dbEq.manufacturer || 'N/A',
-          warrantyUntil: dbEq.warranty_until || 'N/A',
+          warrantyUntil: dbEq.warrantyUntil || 'N/A',
           status: dbEq.status,
-          nextServiceDate: dbEq.next_service_date || 'N/A',
+          nextServiceDate: dbEq.nextServiceDate || 'N/A',
           nextServiceDays: days
         };
 
         // Fetch completed work orders for this equipment as history
-        const { data: dbWos, error: woError } = await supabase
-          .from('work_orders')
-          .select('*')
-          .eq('equipment_id', id)
-          .order('service_date', { ascending: false });
+        const dbWos = await db
+          .select()
+          .from(schema.workOrders)
+          .where(eq(schema.workOrders.equipmentId, id))
+          .orderBy(desc(schema.workOrders.serviceDate));
 
-        if (!woError && dbWos && dbWos.length > 0) {
-          timeline = dbWos.map((wo: any) => ({
-            date: wo.service_date || wo.created_at?.split('T')[0] || 'N/A',
+        if (dbWos && dbWos.length > 0) {
+          timeline = dbWos.map((wo) => ({
+            date: wo.serviceDate || wo.createdAt?.split('T')[0] || 'N/A',
             title: wo.status === 'CONCLUÍDA' ? 'Manutenção Corretiva' : 'Solicitação de Reparo',
-            description: wo.defect_reported,
-            technician: wo.technician_name || 'Técnico Não Definido',
+            description: wo.defectReported,
+            technician: wo.technicianName || 'Técnico Não Definido',
             status: wo.status,
             icon: wo.status === 'CONCLUÍDA' ? 'check_circle' : 'build'
           }));
@@ -134,12 +151,23 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
       }
     }
   } catch (e) {
-    console.error('Erro ao conectar Supabase nos equipamentos, usando fallback:', e);
+    console.error('Erro ao conectar D1 nos equipamentos, usando fallback:', e);
   }
 
   return (
     <Navigation currentTab="equipment">
       <main className="px-md py-lg max-w-3xl mx-auto space-y-lg">
+        
+        {/* Banner de Demonstração */}
+        {isDemoMode && (
+          <div className="mb-md bg-secondary-container/15 border border-secondary/20 text-secondary p-sm rounded-xl flex items-center gap-sm">
+            <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: '"FILL" 1' }}>info</span>
+            <div className="font-body-md text-body-md">
+              <strong>Modo de Demonstração Ativo</strong>: Cloudflare D1 não configurado. Exibindo especificações e histórico simulados.
+            </div>
+          </div>
+        )}
+
         {/* Header Navigation link back */}
         <div className="flex items-center space-x-2 text-on-surface-variant font-body-md mb-xs">
           <Link href="/clientes" className="hover:text-primary flex items-center">
@@ -155,17 +183,17 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           </div>
           <div className="flex flex-col justify-center py-xs">
             <div className={`inline-flex items-center px-sm py-base rounded-full ${
-              eq.status === 'Ativo' ? 'bg-tertiary/15 text-tertiary' : 'bg-secondary-container/15 text-secondary'
+              equipment.status === 'Ativo' ? 'bg-tertiary/15 text-tertiary' : 'bg-secondary-container/15 text-secondary'
             } mb-xs w-max`}>
-              <span className={`w-2 h-2 rounded-full ${eq.status === 'Ativo' ? 'bg-tertiary' : 'bg-secondary'} mr-2`}></span>
-              <span className="font-label-caps text-label-caps">{eq.status}</span>
+              <span className={`w-2 h-2 rounded-full ${equipment.status === 'Ativo' ? 'bg-tertiary' : 'bg-secondary'} mr-2`}></span>
+              <span className="font-label-caps text-label-caps">{equipment.status}</span>
             </div>
             <h1 className="font-headline-sm text-headline-sm text-on-surface mb-1">
-              {eq.name}
+              {equipment.name}
             </h1>
             <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px]">location_on</span>
-              {eq.locationName}
+              {equipment.locationName}
             </p>
           </div>
         </div>
@@ -176,19 +204,19 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           <div className="grid grid-cols-2 gap-sm">
             <div>
               <span className="block font-label-caps text-label-caps text-outline mb-1">Serial Number</span>
-              <span className="block font-technical-code text-technical-code text-on-surface">{eq.serialNumber}</span>
+              <span className="block font-technical-code text-technical-code text-on-surface">{equipment.serialNumber}</span>
             </div>
             <div>
               <span className="block font-label-caps text-label-caps text-outline mb-1">Data da Instalação</span>
-              <span className="block font-technical-code text-technical-code text-on-surface">{eq.installationDate}</span>
+              <span className="block font-technical-code text-technical-code text-on-surface">{equipment.installationDate}</span>
             </div>
             <div>
               <span className="block font-label-caps text-label-caps text-outline mb-1">Fabricante</span>
-              <span className="block font-body-md text-body-md text-on-surface">{eq.manufacturer}</span>
+              <span className="block font-body-md text-body-md text-on-surface">{equipment.manufacturer}</span>
             </div>
             <div>
               <span className="block font-label-caps text-label-caps text-outline mb-1">Garantia</span>
-              <span className="block font-technical-code text-technical-code text-on-surface">{eq.warrantyUntil}</span>
+              <span className="block font-technical-code text-technical-code text-on-surface">{equipment.warrantyUntil}</span>
             </div>
           </div>
         </div>
@@ -200,8 +228,8 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           </div>
           <h2 className="font-label-caps text-label-caps text-on-surface-variant mb-sm">Próxima Preventiva</h2>
           <div className="flex items-end justify-between mb-2">
-            <span className="font-headline-md text-headline-md text-on-surface">{eq.nextServiceDays} Dias</span>
-            <span className="font-technical-code text-technical-code text-secondary">{eq.nextServiceDate}</span>
+            <span className="font-headline-md text-headline-md text-on-surface">{equipment.nextServiceDays} Dias</span>
+            <span className="font-technical-code text-technical-code text-secondary">{equipment.nextServiceDate}</span>
           </div>
           <div className="w-full bg-surface-variant rounded-full h-2 mt-sm overflow-hidden">
             <div className="bg-secondary h-2 rounded-full" style={{ width: '85%' }}></div>
@@ -244,7 +272,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
       {/* FAB Mobile Only */}
       <div className="fixed bottom-[88px] right-md z-40 md:hidden">
         <Link 
-          href="/ordens-servico/nova"
+          href="/os/nova"
           className="bg-primary text-on-primary rounded-xl h-[56px] px-lg flex items-center gap-sm shadow-[0_8px_24px_rgba(30,42,45,0.12)] hover:bg-primary/90 active:scale-95 transition-all"
         >
           <span className="material-symbols-outlined">add</span>
