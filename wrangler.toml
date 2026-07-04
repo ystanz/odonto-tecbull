@@ -1,5 +1,5 @@
 [[d1_databases]]
-binding = "DB"
-database_name = "odonto-service-db"
-database_id = "f0a8274d-cc8d-4a11-89e4-7d87bc6e082f"
+binding = "tecbull_db_prod"
+database_name = "tecbull-db-prod"
+database_id = "f62dd20f-5111-405c-9503-3b81f3632d67"
 migrations_dir = "drizzle"
