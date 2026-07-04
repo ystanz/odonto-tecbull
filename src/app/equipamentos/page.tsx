@@ -98,7 +98,7 @@ export default function EquipamentosPage() {
         // Format equipments to include Location Path (Client Name > Location Name)
         const formatted: FormattedEquipment[] = rawEquipments.map((eq) => {
           let locationPath = 'Unidade Geral';
-          
+
           // Find location info in raw list or from Supabase join
           const loc = rawLocations.find((l) => l.id === eq.location_id) || eq.locations;
           if (loc) {
@@ -213,9 +213,8 @@ export default function EquipamentosPage() {
         {/* Toast Alert */}
         {toast && (
           <div
-            className={`fixed top-4 right-4 z-[100] px-md py-sm rounded-lg shadow-lg text-white font-body-md animate-fade-in flex items-center gap-xs ${
-              toast.type === 'error' ? 'bg-error' : 'bg-tertiary'
-            }`}
+            className={`fixed top-4 right-4 z-[100] px-md py-sm rounded-lg shadow-lg text-white font-body-md animate-fade-in flex items-center gap-xs ${toast.type === 'error' ? 'bg-error' : 'bg-tertiary'
+              }`}
           >
             <span className="material-symbols-outlined">
               {toast.type === 'error' ? 'error' : 'check_circle'}
@@ -320,7 +319,7 @@ export default function EquipamentosPage() {
                         <span className="material-symbols-outlined text-[16px] text-outline">location_on</span>
                         {eq.locationPath}
                       </p>
-                      
+
                       {eq.serialNumber && eq.serialNumber !== 'N/A' && (
                         <p className="font-technical-code text-technical-code text-outline mt-base flex items-center gap-xs">
                           <span className="material-symbols-outlined text-[14px]">barcode_scanner</span>
@@ -355,237 +354,238 @@ export default function EquipamentosPage() {
 
         {/* Modal Form: Cadastrar Novo Equipamento */}
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-md">
-            <div
-              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
-              onClick={() => setIsModalOpen(false)}
-            />
-            <div className="relative bg-surface-container-lowest rounded-2xl w-full max-w-lg p-md shadow-2xl border border-outline/10 z-10 flex flex-col gap-md max-h-[90vh] overflow-y-auto animate-scale-up">
-              <div className="flex justify-between items-center">
-                <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                  Cadastrar Novo Equipamento
-                </h3>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-sm text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer"
-                >
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onClick={() => setIsModalOpen(false)}>
+            <div className="bg-white w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6 overflow-y-auto flex flex-col gap-4">
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-md">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-                  {/* Code */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-code" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Código do Ativo (Único)*
-                    </label>
-                    <input
-                      id="eq-code"
-                      type="text"
-                      required
-                      placeholder="Ex: CD001, COMP-402"
-                      className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Name */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-name" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Nome do Equipamento*
-                    </label>
-                    <input
-                      id="eq-name"
-                      type="text"
-                      required
-                      placeholder="Ex: Cadeira Gnatus G3"
-                      className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-                  {/* Client Dropdown */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-client" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Clínica Cliente*
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="eq-client"
-                        required
-                        className="w-full h-touch-target px-md bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
-                        value={selectedClientId}
-                        onChange={(e) => {
-                          setSelectedClientId(e.target.value);
-                          setSelectedLocationId('');
-                        }}
-                      >
-                        <option value="">Selecione uma clínica...</option>
-                        {clients.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
-                      <span className="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
-                        arrow_drop_down
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Location Dropdown */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-location" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Unidade / Local*
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="eq-location"
-                        required
-                        disabled={!selectedClientId}
-                        className="w-full h-touch-target px-md bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        value={selectedLocationId}
-                        onChange={(e) => setSelectedLocationId(e.target.value)}
-                      >
-                        <option value="">Selecione o local...</option>
-                        {filteredLocations.map((l) => (
-                          <option key={l.id} value={l.id}>
-                            {l.name} {l.room ? `(${l.room})` : ''}
-                          </option>
-                        ))}
-                      </select>
-                      <span className="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
-                        arrow_drop_down
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-                  {/* Serial Number */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-serial" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Número de Série
-                    </label>
-                    <input
-                      id="eq-serial"
-                      type="text"
-                      placeholder="Ex: GN-2023-8942A"
-                      className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={serialNumber}
-                      onChange={(e) => setSerialNumber(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Manufacturer */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-manufacturer" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Fabricante
-                    </label>
-                    <input
-                      id="eq-manufacturer"
-                      type="text"
-                      placeholder="Ex: Gnatus, Schulz"
-                      className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={manufacturer}
-                      onChange={(e) => setManufacturer(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
-                  {/* Installation Date */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-install" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Data de Instalação
-                    </label>
-                    <input
-                      id="eq-install"
-                      type="date"
-                      className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={installationDate}
-                      onChange={(e) => setInstallationDate(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Warranty Date */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-warranty" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Garantia Até
-                    </label>
-                    <input
-                      id="eq-warranty"
-                      type="date"
-                      className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={warrantyUntil}
-                      onChange={(e) => setWarrantyUntil(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Next Service Date */}
-                  <div className="flex flex-col gap-xs">
-                    <label htmlFor="eq-service" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Próxima Preventiva
-                    </label>
-                    <input
-                      id="eq-service"
-                      type="date"
-                      className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={nextServiceDate}
-                      onChange={(e) => setNextServiceDate(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Status Selection */}
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-caps text-label-caps text-on-surface-variant">
-                    Status do Ativo
-                  </label>
-                  <div className="flex gap-md">
-                    {['Ativo', 'Pendente', 'Inativo'].map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setStatus(s)}
-                        className={`flex-1 h-touch-target rounded-lg font-label-caps text-label-caps border transition-all flex items-center justify-center gap-xs cursor-pointer ${
-                          status === s
-                            ? s === 'Ativo'
-                              ? 'bg-tertiary/15 text-tertiary border-tertiary font-bold'
-                              : s === 'Pendente'
-                              ? 'bg-secondary/15 text-secondary border-secondary font-bold'
-                              : 'bg-error/15 text-error border-error font-bold'
-                            : 'bg-surface-container-lowest text-on-surface-variant border-outline/20 hover:bg-surface-container-low'
-                        }`}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-sm mt-sm">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                    Cadastrar Novo Equipamento
+                  </h3>
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="h-touch-target px-md rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer transition-colors"
                   >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="h-touch-target px-lg rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    {submitting ? 'Salvando...' : 'Cadastrar'}
+                    <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
-              </form>
+
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Code */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-code" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Código do Ativo (Único)*
+                      </label>
+                      <input
+                        id="eq-code"
+                        type="text"
+                        required
+                        placeholder="Ex: CD001, COMP-402"
+                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Name */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-name" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Nome do Equipamento*
+                      </label>
+                      <input
+                        id="eq-name"
+                        type="text"
+                        required
+                        placeholder="Ex: Cadeira Gnatus G3"
+                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Client Dropdown */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-client" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Clínica Cliente*
+                      </label>
+                      <div className="relative w-full">
+                        <select
+                          id="eq-client"
+                          required
+                          className="w-full h-12 px-4 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+                          value={selectedClientId}
+                          onChange={(e) => {
+                            setSelectedClientId(e.target.value);
+                            setSelectedLocationId('');
+                          }}
+                        >
+                          <option value="">Selecione uma clínica...</option>
+                          {clients.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
+                          arrow_drop_down
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Location Dropdown */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-location" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Unidade / Local*
+                      </label>
+                      <div className="relative w-full">
+                        <select
+                          id="eq-location"
+                          required
+                          disabled={!selectedClientId}
+                          className="w-full h-12 px-4 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          value={selectedLocationId}
+                          onChange={(e) => setSelectedLocationId(e.target.value)}
+                        >
+                          <option value="">Selecione o local...</option>
+                          {filteredLocations.map((l) => (
+                            <option key={l.id} value={l.id}>
+                              {l.name} {l.room ? `(${l.room})` : ''}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
+                          arrow_drop_down
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Serial Number */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-serial" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Número de Série
+                      </label>
+                      <input
+                        id="eq-serial"
+                        type="text"
+                        placeholder="Ex: GN-2023-8942A"
+                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        value={serialNumber}
+                        onChange={(e) => setSerialNumber(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Manufacturer */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-manufacturer" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Fabricante
+                      </label>
+                      <input
+                        id="eq-manufacturer"
+                        type="text"
+                        placeholder="Ex: Gnatus, Schulz"
+                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        value={manufacturer}
+                        onChange={(e) => setManufacturer(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Installation Date */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-install" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Data de Instalação
+                      </label>
+                      <input
+                        id="eq-install"
+                        type="date"
+                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        value={installationDate}
+                        onChange={(e) => setInstallationDate(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Warranty Date */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-warranty" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Garantia Até
+                      </label>
+                      <input
+                        id="eq-warranty"
+                        type="date"
+                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        value={warrantyUntil}
+                        onChange={(e) => setWarrantyUntil(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Next Service Date */}
+                    <div className="flex flex-col gap-1">
+                      <label htmlFor="eq-service" className="font-label-caps text-label-caps text-on-surface-variant">
+                        Próxima Preventiva
+                      </label>
+                      <input
+                        id="eq-service"
+                        type="date"
+                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        value={nextServiceDate}
+                        onChange={(e) => setNextServiceDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Status Selection */}
+                  <div className="flex flex-col gap-1">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant">
+                      Status do Ativo
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['Ativo', 'Pendente', 'Inativo'].map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setStatus(s)}
+                          className={`h-12 rounded-lg font-label-caps text-label-caps border transition-all flex items-center justify-center cursor-pointer ${status === s
+                            ? s === 'Ativo'
+                              ? 'bg-tertiary/15 text-tertiary border-tertiary font-bold shadow-sm'
+                              : s === 'Pendente'
+                                ? 'bg-secondary/15 text-secondary border-secondary font-bold shadow-sm'
+                                : 'bg-error/15 text-error border-error font-bold shadow-sm'
+                            : 'bg-surface-container-lowest text-on-surface-variant border-outline/20 hover:bg-surface-container-low'
+                            }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      {submitting ? 'Salvando...' : 'Cadastrar'}
+                    </button>
+                  </div>
+
+                </form>
+              </div>
             </div>
           </div>
         )}

@@ -232,9 +232,8 @@ export default function ClientesPage() {
         {/* Toast Notification */}
         {toast && (
           <div
-            className={`fixed top-4 right-4 z-[100] px-md py-sm rounded-lg shadow-lg text-white font-body-md animate-fade-in flex items-center gap-xs ${
-              toast.type === 'error' ? 'bg-error' : 'bg-tertiary'
-            }`}
+            className={`fixed top-4 right-4 z-[100] px-md py-sm rounded-lg shadow-lg text-white font-body-md animate-fade-in flex items-center gap-xs ${toast.type === 'error' ? 'bg-error' : 'bg-tertiary'
+              }`}
           >
             <span className="material-symbols-outlined">
               {toast.type === 'error' ? 'error' : 'check_circle'}
@@ -388,153 +387,155 @@ export default function ClientesPage() {
 
         {/* MODAL 1: Cadastrar Nova Clínica */}
         {isClientModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-md">
-            <div
-              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
-              onClick={() => setIsClientModalOpen(false)}
-            />
-            <div className="relative bg-surface-container-lowest rounded-2xl w-full max-w-md p-md shadow-2xl border border-outline/10 z-10 flex flex-col gap-md animate-scale-up">
-              <div className="flex justify-between items-center">
-                <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                  Nova Clínica Cliente
-                </h3>
-                <button
-                  onClick={() => setIsClientModalOpen(false)}
-                  className="p-sm text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer"
-                >
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onClick={() => setIsClientModalOpen(false)}>
+            <div className="bg-white w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6 overflow-y-auto flex flex-col gap-4">
 
-              <form onSubmit={handleAddClient} className="flex flex-col gap-md">
-                <div className="flex flex-col gap-xs">
-                  <label htmlFor="client-name" className="font-label-caps text-label-caps text-on-surface-variant">
-                    Nome da Clínica
-                  </label>
-                  <input
-                    id="client-name"
-                    type="text"
-                    required
-                    placeholder="Ex: Clínica OdontoVida"
-                    className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                    value={newClientName}
-                    onChange={(e) => setNewClientName(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex justify-end gap-sm mt-sm">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                    Nova Clínica Cliente
+                  </h3>
                   <button
                     type="button"
                     onClick={() => setIsClientModalOpen(false)}
-                    className="h-touch-target px-md rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer transition-colors"
                   >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submittingClient || !newClientName.trim()}
-                    className="h-touch-target px-lg rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    {submittingClient ? 'Salvando...' : 'Salvar'}
+                    <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
-              </form>
+
+                <form onSubmit={handleAddClient} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="client-name" className="font-label-caps text-label-caps text-on-surface-variant">
+                      Nome da Clínica
+                    </label>
+                    <input
+                      id="client-name"
+                      type="text"
+                      required
+                      placeholder="Ex: Clínica OdontoVida"
+                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      value={newClientName}
+                      onChange={(e) => setNewClientName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsClientModalOpen(false)}
+                      className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submittingClient || !newClientName.trim()}
+                      className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      {submittingClient ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
+                </form>
+
+              </div>
             </div>
           </div>
         )}
 
         {/* MODAL 2: Cadastrar Nova Unidade / Local */}
         {isLocationModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-md">
-            <div
-              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
-              onClick={() => setIsLocationModalOpen(false)}
-            />
-            <div className="relative bg-surface-container-lowest rounded-2xl w-full max-w-md p-md shadow-2xl border border-outline/10 z-10 flex flex-col gap-md animate-scale-up">
-              <div className="flex justify-between items-center">
-                <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                  Nova Unidade / Local
-                </h3>
-                <button
-                  onClick={() => setIsLocationModalOpen(false)}
-                  className="p-sm text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer"
-                >
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onClick={() => setIsLocationModalOpen(false)}>
+            <div className="bg-white w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6 overflow-y-auto flex flex-col gap-4">
 
-              <form onSubmit={handleAddLocation} className="flex flex-col gap-md">
-                <div className="flex flex-col gap-xs">
-                  <label htmlFor="location-client" className="font-label-caps text-label-caps text-on-surface-variant">
-                    Clínica Cliente
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="location-client"
-                      required
-                      className="w-full h-touch-target px-md bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
-                      value={newLocationClientId}
-                      onChange={(e) => setNewLocationClientId(e.target.value)}
-                    >
-                      <option value="">Selecione uma clínica...</option>
-                      {clients.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
-                      arrow_drop_down
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-xs">
-                  <label htmlFor="location-name" className="font-label-caps text-label-caps text-on-surface-variant">
-                    Nome da Unidade / Prédio
-                  </label>
-                  <input
-                    id="location-name"
-                    type="text"
-                    required
-                    placeholder="Ex: Unidade Centro, Bloco B"
-                    className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                    value={newLocationName}
-                    onChange={(e) => setNewLocationName(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-xs">
-                  <label htmlFor="location-room" className="font-label-caps text-label-caps text-on-surface-variant">
-                    Sala / Consultório (Opcional)
-                  </label>
-                  <input
-                    id="location-room"
-                    type="text"
-                    placeholder="Ex: Consultório 1, Esterilização"
-                    className="w-full px-md h-touch-target bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                    value={newLocationRoom}
-                    onChange={(e) => setNewLocationRoom(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex justify-end gap-sm mt-sm">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                    Nova Unidade / Local
+                  </h3>
                   <button
                     type="button"
                     onClick={() => setIsLocationModalOpen(false)}
-                    className="h-touch-target px-md rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer transition-colors"
                   >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submittingLocation || !newLocationClientId || !newLocationName.trim()}
-                    className="h-touch-target px-lg rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    {submittingLocation ? 'Salvando...' : 'Salvar'}
+                    <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
-              </form>
+
+                <form onSubmit={handleAddLocation} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="location-client" className="font-label-caps text-label-caps text-on-surface-variant">
+                      Clínica Cliente
+                    </label>
+                    <div className="relative w-full">
+                      <select
+                        id="location-client"
+                        required
+                        className="w-full h-12 px-4 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+                        value={newLocationClientId}
+                        onChange={(e) => setNewLocationClientId(e.target.value)}
+                      >
+                        <option value="">Selecione uma clínica...</option>
+                        {clients.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
+                        arrow_drop_down
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="location-name" className="font-label-caps text-label-caps text-on-surface-variant">
+                      Nome da Unidade / Prédio
+                    </label>
+                    <input
+                      id="location-name"
+                      type="text"
+                      required
+                      placeholder="Ex: Unidade Centro, Bloco B"
+                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      value={newLocationName}
+                      onChange={(e) => setNewLocationName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="location-room" className="font-label-caps text-label-caps text-on-surface-variant">
+                      Sala / Consultório (Opcional)
+                    </label>
+                    <input
+                      id="location-room"
+                      type="text"
+                      placeholder="Ex: Consultório 1, Esterilização"
+                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      value={newLocationRoom}
+                      onChange={(e) => setNewLocationRoom(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsLocationModalOpen(false)}
+                      className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submittingLocation || !newLocationClientId || !newLocationName.trim()}
+                      className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      {submittingLocation ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
+                </form>
+
+              </div>
             </div>
           </div>
         )}
