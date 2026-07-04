@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { db, schema } from '@/lib/supabase';
@@ -21,11 +22,11 @@ export default async function DashboardPage() {
     if (typeof process !== 'undefined' && (process.env as Record<string, unknown>).DB) {
       // Fetch total work orders
       const workOrders = await db.select().from(schema.workOrders);
-      
+
       const open = workOrders.filter(wo => wo.status === 'ABERTA').length;
       const inProgress = workOrders.filter(wo => wo.status === 'EM ANDAMENTO').length;
       const completed = workOrders.filter(wo => wo.status === 'CONCLUÍDA').length;
-      
+
       stats.todayServices = workOrders.length; // Total registered
       stats.pendingServices = open;
       stats.inMaintenance = inProgress;
@@ -99,7 +100,7 @@ export default async function DashboardPage() {
             </p>
           </div>
           {/* Mobile FAB Alternative */}
-          <Link 
+          <Link
             href="/os/nova"
             className="md:hidden w-full h-touch-target bg-primary text-on-primary font-headline-sm text-headline-sm rounded-lg shadow-sm active:scale-95 transition-transform flex items-center justify-center space-x-2"
           >
@@ -168,10 +169,10 @@ export default async function DashboardPage() {
               Manutenções e Alertas Urgentes
             </h3>
           </div>
-          
+
           <div className="space-y-sm">
             {alerts.map((alert) => (
-              <div 
+              <div
                 key={alert.id}
                 className="bg-surface-container-lowest border-l-4 border-error rounded-xl p-md shadow-level-1 border-y border-r border-outline/10 flex items-center justify-between"
               >

@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { db, schema } from '@/lib/supabase';
@@ -82,7 +83,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
       dbEq = rows[0];
 
       if (dbEq) {
-        const locationPath = dbEq.locationName 
+        const locationPath = dbEq.locationName
           ? `${dbEq.clientName || ''} > ${dbEq.locationName}${dbEq.locationRoom ? ` - ${dbEq.locationRoom}` : ''}`
           : 'Unidade Geral';
 
@@ -188,9 +189,8 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
               <span className="material-symbols-outlined text-4xl">precision_manufacturing</span>
             </div>
             <div className="flex flex-col justify-center py-xs">
-              <div className={`inline-flex items-center px-sm py-base rounded-full ${
-                equipment.status === 'Ativo' ? 'bg-tertiary/15 text-tertiary' : 'bg-secondary-container/15 text-secondary'
-              } mb-xs w-max`}>
+              <div className={`inline-flex items-center px-sm py-base rounded-full ${equipment.status === 'Ativo' ? 'bg-tertiary/15 text-tertiary' : 'bg-secondary-container/15 text-secondary'
+                } mb-xs w-max`}>
                 <span className={`w-2 h-2 rounded-full ${equipment.status === 'Ativo' ? 'bg-tertiary' : 'bg-secondary'} mr-2`}></span>
                 <span className="font-label-caps text-label-caps">{equipment.status}</span>
               </div>
@@ -205,7 +205,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           </div>
 
           <div className="flex flex-wrap gap-2 self-stretch sm:self-auto justify-end mt-xs sm:mt-0">
-            <Link 
+            <Link
               href={`/os/nova?eqId=${id}`}
               className="h-10 px-4 bg-primary text-on-primary hover:bg-primary/95 font-label-caps text-label-caps rounded-xl transition-colors flex items-center justify-center gap-1 cursor-pointer font-semibold shadow-sm text-sm"
             >
@@ -213,7 +213,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
               <span>Registrar Atendimento</span>
             </Link>
 
-            <EditEquipmentButton 
+            <EditEquipmentButton
               equipment={editEqData}
               clients={clientsList}
               locations={locationsList}
@@ -300,7 +300,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
 
       {/* FAB Mobile Only */}
       <div className="fixed bottom-[88px] right-md z-40 md:hidden">
-        <Link 
+        <Link
           href={`/os/nova?eqId=${id}`}
           className="bg-primary text-on-primary rounded-xl h-[56px] px-lg flex items-center gap-sm shadow-[0_8px_24px_rgba(30,42,45,0.12)] hover:bg-primary/90 active:scale-95 transition-all"
         >
