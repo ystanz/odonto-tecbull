@@ -16,7 +16,7 @@ export const locations = sqliteTable('locations', {
 
 export const equipments = sqliteTable('equipments', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  code: text('code').notNull().unique(),
+  code: text('code').unique(),
   name: text('name').notNull(),
   locationId: text('location_id').references(() => locations.id, { onDelete: 'set null' }),
   serialNumber: text('serial_number'),

@@ -6,17 +6,12 @@ import Link from 'next/link';
 import {
   getClientsAction,
   createClientAction,
+  updateClientAction,
   getLocationsAction,
   createLocationAction,
   getEquipmentsAction,
 } from '@/app/actions';
-import {
-  getLocalClients,
-  saveLocalClient,
-  getLocalLocations,
-  saveLocalLocation,
-  getLocalEquipments,
-} from '@/lib/localDb';
+import { DBLocation, DBEquipment, DBClient } from '@/lib/types';
 
 interface Location {
   id: string;
@@ -38,11 +33,12 @@ export default function ClientesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modal States
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<ClientData | null>(null);
+  const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   // Form Fields
@@ -70,10 +66,9 @@ export default function ClientesPage() {
     async function fetchData() {
       try {
         setLoading(true);
-        let rawClients = [];
-        let rawLocations = [];
-        let rawEquipments = [];
-        let isOffline = false;
+        let rawClients: DBClient[] = [];
+        let rawLocations: DBLocation[] = [];
+        let rawEquipments: DBEquipment[] = [];
 
         const resClients = await getClientsAction();
         if (resClients.success) {
@@ -83,15 +78,10 @@ export default function ClientesPage() {
           const resEquips = await getEquipmentsAction();
           rawEquipments = resEquips.success ? resEquips.data || [] : [];
         } else {
-          isOffline = true;
-          rawClients = getLocalClients();
-          rawLocations = getLocalLocations();
-          rawEquipments = getLocalEquipments();
+          showToast('Erro ao carregar dados do banco de dados.', 'error');
         }
 
         if (!active) return;
-
-        setIsDemoMode(isOffline);
 
         const formattedClients: ClientData[] = rawClients.map((client) => {
           const clientLocs = rawLocations.filter((l) => l.client_id === client.id);
@@ -137,7 +127,7 @@ export default function ClientesPage() {
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
         if (active) {
-          showToast('Erro ao buscar dados. Usando dados locais.', 'error');
+          showToast('Erro ao buscar dados do servidor.', 'error');
         }
       } finally {
         if (active) {
@@ -166,16 +156,11 @@ export default function ClientesPage() {
 
     try {
       setSubmittingClient(true);
-      if (isDemoMode) {
-        saveLocalClient(newClientName);
-        showToast('Clínica cadastrada localmente com sucesso!');
+      const res = await createClientAction(newClientName);
+      if (res.success) {
+        showToast('Clínica cadastrada com sucesso!');
       } else {
-        const res = await createClientAction(newClientName);
-        if (res.success) {
-          showToast('Clínica cadastrada com sucesso!');
-        } else {
-          throw new Error(res.error);
-        }
+        throw new Error(res.error);
       }
       setNewClientName('');
       setIsClientModalOpen(false);
@@ -194,16 +179,11 @@ export default function ClientesPage() {
 
     try {
       setSubmittingLocation(true);
-      if (isDemoMode) {
-        saveLocalLocation(newLocationClientId, newLocationName, newLocationRoom || null);
-        showToast('Unidade cadastrada localmente com sucesso!');
+      const res = await createLocationAction(newLocationClientId, newLocationName, newLocationRoom || undefined);
+      if (res.success) {
+        showToast('Unidade cadastrada com sucesso!');
       } else {
-        const res = await createLocationAction(newLocationClientId, newLocationName, newLocationRoom || undefined);
-        if (res.success) {
-          showToast('Unidade cadastrada com sucesso!');
-        } else {
-          throw new Error(res.error);
-        }
+        throw new Error(res.error);
       }
       setNewLocationClientId('');
       setNewLocationName('');
@@ -215,6 +195,30 @@ export default function ClientesPage() {
       showToast(`Erro ao criar unidade: ${msg}`, 'error');
     } finally {
       setSubmittingLocation(false);
+    }
+  };
+
+  const handleEditClientSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingClient || !newClientName.trim()) return;
+
+    try {
+      setSubmittingClient(true);
+      const res = await updateClientAction(editingClient.id, newClientName);
+      if (res.success) {
+        showToast('Clínica atualizada com sucesso!');
+      } else {
+        throw new Error(res.error);
+      }
+      setNewClientName('');
+      setIsEditClientModalOpen(false);
+      setEditingClient(null);
+      setRefreshTrigger((prev) => prev + 1);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erro desconhecido';
+      showToast(`Erro ao editar clínica: ${msg}`, 'error');
+    } finally {
+      setSubmittingClient(false);
     }
   };
 
@@ -239,16 +243,6 @@ export default function ClientesPage() {
               {toast.type === 'error' ? 'error' : 'check_circle'}
             </span>
             <span>{toast.message}</span>
-          </div>
-        )}
-
-        {/* Demo Mode Alert Banner */}
-        {isDemoMode && !loading && (
-          <div className="mb-md bg-secondary-container/15 border border-secondary/20 text-secondary p-sm rounded-xl flex items-center gap-sm">
-            <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: '"FILL" 1' }}>info</span>
-            <div className="font-body-md text-body-md">
-              <strong>Modo de Demonstração Ativo</strong>: Supabase não configurado ou inacessível. As alterações serão salvas localmente no navegador.
-            </div>
           </div>
         )}
 
@@ -318,9 +312,24 @@ export default function ClientesPage() {
                     onClick={() => toggleSection(client.id)}
                   >
                     <div>
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                        {client.name}
-                      </h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                          {client.name}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingClient(client);
+                            setNewClientName(client.name);
+                            setIsEditClientModalOpen(true);
+                          }}
+                          className="text-primary hover:text-primary-container p-1 rounded-full cursor-pointer hover:bg-surface-container-high transition-colors"
+                          title="Editar Clínica"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                      </div>
                       <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs mt-xs">
                         <span className="material-symbols-outlined text-[16px]">precision_manufacturing</span>
                         {client.totalAssets} {client.totalAssets === 1 ? 'Equipamento' : 'Equipamentos'} no Total
@@ -355,7 +364,7 @@ export default function ClientesPage() {
                                 {loc.statusText}
                               </p>
                             </div>
-                            <Link href="/ordens-servico">
+                            <Link href={`/equipamentos?q=${encodeURIComponent(loc.name)}`}>
                               <span className="material-symbols-outlined text-primary hover:scale-115 transition-transform p-sm">
                                 chevron_right
                               </span>
@@ -535,6 +544,60 @@ export default function ClientesPage() {
                   </div>
                 </form>
 
+              </div>
+            </div>
+          </div>
+        )}
+        {/* MODAL EDIT: Editar Clínica Cliente */}
+        {isEditClientModalOpen && editingClient && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onClick={() => setIsEditClientModalOpen(false)}>
+            <div className="bg-white w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6 overflow-y-auto flex flex-col gap-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                    Editar Clínica Cliente
+                  </h3>
+                  <button
+                    onClick={() => setIsEditClientModalOpen(false)}
+                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer transition-colors"
+                  >
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+
+                <form onSubmit={handleEditClientSubmit} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="edit-client-name" className="font-label-caps text-label-caps text-on-surface-variant">
+                      Nome da Clínica
+                    </label>
+                    <input
+                      id="edit-client-name"
+                      type="text"
+                      required
+                      placeholder="Ex: Clínica OdontoVida"
+                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      value={newClientName}
+                      onChange={(e) => setNewClientName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditClientModalOpen(false)}
+                      className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submittingClient || !newClientName.trim()}
+                      className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      {submittingClient ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

@@ -10,19 +10,12 @@ import {
   getClientsAction,
   createWorkOrderAction,
 } from '@/app/actions';
-import {
-  getLocalLocations,
-  getLocalEquipments,
-  getLocalClients,
-  saveLocalWorkOrder,
-} from '@/lib/localDb';
 import { DBLocation, DBEquipment, DBClient } from '@/lib/types';
 // Supabase uninstalled - database migrated to Cloudflare D1 with Drizzle ORM
 
 export default function NovaOSPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // Data lists
@@ -58,12 +51,11 @@ export default function NovaOSPage() {
     let active = true;
     async function loadData() {
       try {
-        setLoading(true);
         let rawLocations: DBLocation[] = [];
         let rawEquipments: DBEquipment[] = [];
         let rawClients: DBClient[] = [];
-        let isOffline = false;
-
+        setLoading(true);
+        // Fetch from Drizzle actions
         const resLocs = await getLocationsAction();
         if (resLocs.success) {
           rawLocations = resLocs.data || [];
@@ -72,15 +64,10 @@ export default function NovaOSPage() {
           const resClients = await getClientsAction();
           rawClients = resClients.success ? resClients.data || [] : [];
         } else {
-          isOffline = true;
-          rawLocations = getLocalLocations();
-          rawEquipments = getLocalEquipments();
-          rawClients = getLocalClients();
+          showToast('Erro ao carregar dados do banco de dados.', 'error');
         }
 
         if (!active) return;
-
-        setIsDemoMode(isOffline);
         setLocations(rawLocations);
         setEquipments(rawEquipments);
         setClients(rawClients);
@@ -101,6 +88,23 @@ export default function NovaOSPage() {
       active = false;
     };
   }, [showToast]);
+
+  // Read eqId query parameter on mount to pre-fill location and equipment selection
+  useEffect(() => {
+    if (loading || equipments.length === 0) return;
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const eqId = params.get('eqId');
+      if (eqId) {
+        const foundEquip = equipments.find((e) => e.id === eqId);
+        if (foundEquip) {
+          setSelectedLocationId(foundEquip.location_id);
+          setSelectedEquipmentId(eqId);
+        }
+      }
+    }
+  }, [loading, equipments]);
 
   // Dynamic Equipments list filtered by location
   const filteredEquipments = equipments.filter((eq) => eq.location_id === selectedLocationId);
@@ -184,21 +188,16 @@ export default function NovaOSPage() {
       };
 
       // 5. Insert Record
-      if (isDemoMode) {
-        saveLocalWorkOrder(workOrderRecord);
-        showToast('Ordem de Serviço criada localmente com sucesso!');
+      const res = await createWorkOrderAction(workOrderRecord);
+      if (res.success) {
+        showToast('Ordem de Serviço aberta com sucesso!');
       } else {
-        const res = await createWorkOrderAction(workOrderRecord);
-        if (res.success) {
-          showToast('Ordem de Serviço aberta com sucesso!');
-        } else {
-          throw new Error(res.error);
-        }
+        throw new Error(res.error);
       }
 
-      // Redirect to work orders list
+      // Redirect to equipment detail page
       setTimeout(() => {
-        router.push('/ordens-servico');
+        router.push(`/equipamentos/${selectedEquipmentId}`);
       }, 1500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erro de conexão com o banco.';
@@ -227,15 +226,7 @@ export default function NovaOSPage() {
           </div>
         )}
 
-        {/* Demo Mode Alert Banner */}
-        {isDemoMode && !loading && (
-          <div className="mb-md bg-secondary-container/15 border border-secondary/20 text-secondary p-sm rounded-xl flex items-center gap-sm">
-            <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: '"FILL" 1' }}>info</span>
-            <div className="font-body-md text-body-md">
-              <strong>Modo de Demonstração Ativo</strong>: Supabase não configurado ou inacessível. A OS será salva localmente no navegador.
-            </div>
-          </div>
-        )}
+        {/* Header */}
 
         {/* Header */}
         <div className="mb-lg">

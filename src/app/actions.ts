@@ -170,7 +170,7 @@ export async function getEquipmentsAction() {
 }
 
 export async function createEquipmentAction(equipmentData: {
-  code: string;
+  code?: string | null;
   name: string;
   location_id: string;
   serial_number?: string | null;
@@ -188,7 +188,7 @@ export async function createEquipmentAction(equipmentData: {
     const [data] = await db
       .insert(schema.equipments)
       .values({
-        code: equipmentData.code,
+        code: equipmentData.code || null,
         name: equipmentData.name,
         locationId: equipmentData.location_id,
         serialNumber: equipmentData.serial_number || null,
@@ -451,7 +451,7 @@ export async function deleteLocationAction(id: string) {
 export async function updateEquipmentAction(
   id: string,
   equipmentData: {
-    code: string;
+    code?: string | null;
     name: string;
     location_id: string;
     serial_number?: string | null;
@@ -470,7 +470,7 @@ export async function updateEquipmentAction(
     const [data] = await db
       .update(schema.equipments)
       .set({
-        code: equipmentData.code,
+        code: equipmentData.code || null,
         name: equipmentData.name,
         locationId: equipmentData.location_id,
         serialNumber: equipmentData.serial_number || null,

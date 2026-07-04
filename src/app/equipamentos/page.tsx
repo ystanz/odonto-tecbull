@@ -9,17 +9,11 @@ import {
   getClientsAction,
   getLocationsAction,
 } from '@/app/actions';
-import {
-  getLocalEquipments,
-  saveLocalEquipment,
-  getLocalClients,
-  getLocalLocations,
-} from '@/lib/localDb';
 import { DBEquipment, DBClient, DBLocation } from '@/lib/types';
 
 interface FormattedEquipment {
   id: string;
-  code: string;
+  code: string | null;
   name: string;
   locationPath: string;
   serialNumber: string;
@@ -35,11 +29,21 @@ export default function EquipamentosPage() {
   const [locations, setLocations] = useState<DBLocation[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Read search query parameter from URL on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q');
+      if (q) {
+        setSearchQuery(q);
+      }
+    }
+  }, []);
 
   // Form Fields State
   const [code, setCode] = useState('');
@@ -74,7 +78,7 @@ export default function EquipamentosPage() {
         let rawLocations: DBLocation[] = [];
         let isOffline = false;
 
-        // Try fetching from actions
+        // Fetch from actions
         const resEquips = await getEquipmentsAction();
         if (resEquips.success) {
           rawEquipments = resEquips.data || [];
@@ -83,15 +87,10 @@ export default function EquipamentosPage() {
           const resLocs = await getLocationsAction();
           rawLocations = resLocs.success ? resLocs.data || [] : [];
         } else {
-          isOffline = true;
-          rawEquipments = getLocalEquipments();
-          rawClients = getLocalClients();
-          rawLocations = getLocalLocations();
+          showToast('Erro ao carregar dados do banco de dados.', 'error');
         }
 
         if (!active) return;
-
-        setIsDemoMode(isOffline);
         setClients(rawClients);
         setLocations(rawLocations);
 
@@ -144,7 +143,7 @@ export default function EquipamentosPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code.trim() || !name.trim() || !selectedLocationId) {
+    if (!name.trim() || !selectedLocationId) {
       showToast('Preencha os campos obrigatórios.', 'error');
       return;
     }
@@ -153,7 +152,7 @@ export default function EquipamentosPage() {
       setSubmitting(true);
 
       const equipmentData = {
-        code,
+        code: code.trim() || null,
         name,
         location_id: selectedLocationId,
         serial_number: serialNumber || null,
@@ -164,17 +163,12 @@ export default function EquipamentosPage() {
         status,
       };
 
-      if (isDemoMode) {
-        saveLocalEquipment(equipmentData);
-        showToast('Equipamento cadastrado localmente com sucesso!');
+      const res = await createEquipmentAction(equipmentData);
+      if (res.success) {
+        showToast('Equipamento cadastrado com sucesso!');
       } else {
-        const res = await createEquipmentAction(equipmentData);
-        if (res.success) {
-          showToast('Equipamento cadastrado com sucesso!');
-        } else {
-          // If code is not unique, database will throw unique key violation error
-          throw new Error(res.error);
-        }
+        // If code is not unique, database will throw unique key violation error
+        throw new Error(res.error);
       }
 
       // Reset Form fields
@@ -202,7 +196,7 @@ export default function EquipamentosPage() {
   const filteredEquipments = equipments.filter((eq) => {
     return (
       eq.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      eq.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (eq.code?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
       eq.locationPath.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
@@ -220,16 +214,6 @@ export default function EquipamentosPage() {
               {toast.type === 'error' ? 'error' : 'check_circle'}
             </span>
             <span>{toast.message}</span>
-          </div>
-        )}
-
-        {/* Demo Mode Alert Banner */}
-        {isDemoMode && !loading && (
-          <div className="mb-md bg-secondary-container/15 border border-secondary/20 text-secondary p-sm rounded-xl flex items-center gap-sm">
-            <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: '"FILL" 1' }}>info</span>
-            <div className="font-body-md text-body-md">
-              <strong>Modo de Demonstração Ativo</strong>: Supabase não configurado ou inacessível. Equipamentos serão salvos e carregados do armazenamento local.
-            </div>
           </div>
         )}
 
@@ -377,12 +361,11 @@ export default function EquipamentosPage() {
                     {/* Code */}
                     <div className="flex flex-col gap-1">
                       <label htmlFor="eq-code" className="font-label-caps text-label-caps text-on-surface-variant">
-                        Código do Ativo (Único)*
+                        Código do Ativo (Único)
                       </label>
                       <input
                         id="eq-code"
                         type="text"
-                        required
                         placeholder="Ex: CD001, COMP-402"
                         className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                         value={code}

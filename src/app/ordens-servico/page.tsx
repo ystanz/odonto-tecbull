@@ -29,7 +29,6 @@ export default function WorkOrdersPage() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [activeTab, setActiveTab] = useState<FilterTab>('TODAS');
   const [loading, setLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
     async function fetchWorkOrders() {
@@ -45,13 +44,8 @@ export default function WorkOrdersPage() {
         if (res.success) {
           rawWos = res.data || [];
         } else {
-          isOffline = true;
-          rawWos = getLocalWorkOrders();
-          rawClients = getLocalClients();
-          rawEquips = getLocalEquipments();
+          console.error('Erro ao buscar ordens de serviço do D1');
         }
-
-        setIsDemoMode(isOffline);
 
         const formatted: WorkOrder[] = rawWos.map((wo) => {
           let dateText = wo.service_date || 'N/A';
@@ -69,16 +63,9 @@ export default function WorkOrdersPage() {
           let equipmentName = 'Equipamento';
           let equipmentId = wo.equipment_id;
 
-          if (isOffline) {
-            const client = rawClients.find((c) => c.id === wo.client_id);
-            if (client) clientName = client.name;
-            const equip = rawEquips.find((e) => e.id === wo.equipment_id);
-            if (equip) equipmentName = equip.name;
-          } else {
-            clientName = wo.clients?.name || 'Cliente Geral';
-            equipmentName = wo.equipments?.name || 'Equipamento';
-            equipmentId = wo.equipments?.id || wo.equipment_id;
-          }
+          clientName = wo.clients?.name || 'Cliente Geral';
+          equipmentName = wo.equipments?.name || 'Equipamento';
+          equipmentId = wo.equipments?.id || wo.equipment_id;
 
           return {
             id: wo.id,
@@ -115,16 +102,6 @@ export default function WorkOrdersPage() {
   return (
     <Navigation currentTab="service">
       <main className="flex-1 pb-32 pt-lg px-md w-full max-w-[800px] mx-auto md:px-xl animate-fade-in">
-        
-        {/* Demo Mode Banner */}
-        {isDemoMode && !loading && (
-          <div className="mb-md bg-secondary-container/15 border border-secondary/20 text-secondary p-sm rounded-xl flex items-center gap-sm">
-            <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: '"FILL" 1' }}>info</span>
-            <div className="font-body-md text-body-md">
-              <strong>Modo de Demonstração Ativo</strong>: Exibindo ordens de serviço locais armazenadas no navegador.
-            </div>
-          </div>
-        )}
 
         {/* Header Section */}
         <div className="mb-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-md">

@@ -3,9 +3,16 @@ import Navigation from '@/components/Navigation';
 import { db, schema } from '@/lib/supabase';
 import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
+import EditEquipmentButton from '@/components/EditEquipmentButton';
+import { getClientsAction, getLocationsAction } from '@/app/actions';
+import { DBClient, DBLocation } from '@/lib/types';
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
 interface EquipmentSpecs {
-  code: string;
+  code: string | null;
   name: string;
   locationName: string;
   serialNumber: string;
@@ -21,64 +28,33 @@ interface TimelineItem {
   date: string;
   title: string;
   description: string;
+  partsUsed: string | null;
   technician: string;
   status: string;
   icon: string;
 }
 
-const mockEquipment: EquipmentSpecs = {
-  code: 'CD001',
-  name: 'Cadeira Gnatus G3',
-  locationName: 'Clínica Sorriso > Unidade Centro',
-  serialNumber: 'GN-2023-8942A',
-  installationDate: '2023-04-12',
-  manufacturer: 'Gnatus',
-  warrantyUntil: '2025-04-12',
-  status: 'Ativo',
-  nextServiceDate: '2024-06-15',
-  nextServiceDays: 15
-};
-
-const mockTimeline: TimelineItem[] = [
-  {
-    date: '2024-02-10',
-    title: 'Troca de Óleo do Compressor',
-    description: 'Substituição do óleo sintético, limpeza de filtros e verificação de pressão.',
-    technician: 'Marcos S.',
-    status: 'CONCLUÍDO',
-    icon: 'build'
-  },
-  {
-    date: '2023-11-05',
-    title: 'Reparo no Pedal de Comando',
-    description: 'Substituição da mola de retorno e ajuste de sensibilidade do acionamento pneumático.',
-    technician: 'Ana L.',
-    status: 'CONCLUÍDO',
-    icon: 'healing'
-  },
-  {
-    date: '2023-04-12',
-    title: 'Instalação Inicial',
-    description: 'Montagem e teste de conformidade de pressão e energia na sala 01.',
-    technician: 'Ana L.',
-    status: 'CONCLUÍDO',
-    icon: 'play_arrow'
-  }
-];
-
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
-
 export default async function EquipmentDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  let equipment = { ...mockEquipment };
-  let timeline = [...mockTimeline];
-  let isDemoMode = true;
+  let equipment: EquipmentSpecs | null = null;
+  let timeline: TimelineItem[] = [];
+  let clientsList: DBClient[] = [];
+  let locationsList: DBLocation[] = [];
+  let dbEq: any = null;
 
   try {
     if (typeof process !== 'undefined' && (process.env as Record<string, unknown>).DB) {
+      // Fetch clients and locations
+      const resClients = await getClientsAction();
+      if (resClients.success) {
+        clientsList = resClients.data;
+      }
+      const resLocs = await getLocationsAction();
+      if (resLocs.success) {
+        locationsList = resLocs.data;
+      }
+
       // Fetch equipment with locations and clients using Drizzle join
       const rows = await db
         .select({
@@ -91,6 +67,8 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           warrantyUntil: schema.equipments.warrantyUntil,
           status: schema.equipments.status,
           nextServiceDate: schema.equipments.nextServiceDate,
+          locationId: schema.equipments.locationId,
+          clientId: schema.locations.clientId,
           locationName: schema.locations.name,
           locationRoom: schema.locations.room,
           clientName: schema.clients.name
@@ -101,10 +79,9 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
         .where(eq(schema.equipments.id, id))
         .limit(1);
 
-      const dbEq = rows[0];
+      dbEq = rows[0];
 
       if (dbEq) {
-        isDemoMode = false;
         const locationPath = dbEq.locationName 
           ? `${dbEq.clientName || ''} > ${dbEq.locationName}${dbEq.locationRoom ? ` - ${dbEq.locationRoom}` : ''}`
           : 'Unidade Geral';
@@ -119,7 +96,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
         }
 
         equipment = {
-          code: dbEq.code,
+          code: dbEq.code || null,
           name: dbEq.name,
           locationName: locationPath,
           serialNumber: dbEq.serialNumber || 'N/A',
@@ -143,6 +120,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
             date: wo.serviceDate || wo.createdAt?.split('T')[0] || 'N/A',
             title: wo.status === 'CONCLUÍDA' ? 'Manutenção Corretiva' : 'Solicitação de Reparo',
             description: wo.defectReported,
+            partsUsed: wo.partsUsed || null,
             technician: wo.technicianName || 'Técnico Não Definido',
             status: wo.status,
             icon: wo.status === 'CONCLUÍDA' ? 'check_circle' : 'build'
@@ -151,22 +129,49 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
       }
     }
   } catch (e) {
-    console.error('Erro ao conectar D1 nos equipamentos, usando fallback:', e);
+    console.error('Erro ao conectar D1 nos equipamentos:', e);
   }
+
+  if (!equipment) {
+    return (
+      <Navigation currentTab="equipment">
+        <main className="px-md py-lg max-w-3xl mx-auto space-y-lg text-center flex flex-col items-center justify-center min-h-[50vh]">
+          <span className="material-symbols-outlined text-outline text-6xl">precision_manufacturing</span>
+          <h2 className="font-headline-md text-headline-md text-on-surface font-bold mt-md">
+            Equipamento não encontrado
+          </h2>
+          <p className="font-body-md text-body-md text-on-surface-variant max-w-md mt-xs">
+            O equipamento solicitado não foi encontrado no banco de dados. Ele pode ter sido excluído ou o ID está incorreto.
+          </p>
+          <Link
+            href="/clientes"
+            className="mt-lg h-12 px-6 bg-primary text-on-primary hover:bg-primary/95 font-label-caps text-label-caps rounded-xl transition-colors flex items-center justify-center gap-1 font-semibold shadow-sm cursor-pointer"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+            Voltar para Clientes
+          </Link>
+        </main>
+      </Navigation>
+    );
+  }
+
+  const editEqData = {
+    id: id,
+    code: equipment.code,
+    name: equipment.name,
+    locationId: dbEq ? (dbEq.locationId || '') : '',
+    clientId: dbEq ? (dbEq.clientId || '') : '',
+    serialNumber: equipment.serialNumber === 'N/A' ? '' : equipment.serialNumber,
+    installationDate: equipment.installationDate === 'N/A' ? '' : equipment.installationDate,
+    manufacturer: equipment.manufacturer === 'N/A' ? '' : equipment.manufacturer,
+    warrantyUntil: equipment.warrantyUntil === 'N/A' ? '' : equipment.warrantyUntil,
+    status: equipment.status,
+    nextServiceDate: equipment.nextServiceDate === 'N/A' ? '' : equipment.nextServiceDate,
+  };
 
   return (
     <Navigation currentTab="equipment">
       <main className="px-md py-lg max-w-3xl mx-auto space-y-lg">
-        
-        {/* Banner de Demonstração */}
-        {isDemoMode && (
-          <div className="mb-md bg-secondary-container/15 border border-secondary/20 text-secondary p-sm rounded-xl flex items-center gap-sm">
-            <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: '"FILL" 1' }}>info</span>
-            <div className="font-body-md text-body-md">
-              <strong>Modo de Demonstração Ativo</strong>: Cloudflare D1 não configurado. Exibindo especificações e histórico simulados.
-            </div>
-          </div>
-        )}
 
         {/* Header Navigation link back */}
         <div className="flex items-center space-x-2 text-on-surface-variant font-body-md mb-xs">
@@ -177,24 +182,42 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
         </div>
 
         {/* Status & Image Header */}
-        <div className="flex flex-col sm:flex-row items-start gap-md bg-surface-container-lowest p-md rounded-xl border border-outline/10 shadow-level-1">
-          <div className="flex-shrink-0 w-24 h-24 bg-primary/10 rounded-xl overflow-hidden shadow-sm relative flex items-center justify-center text-primary">
-            <span className="material-symbols-outlined text-4xl">precision_manufacturing</span>
-          </div>
-          <div className="flex flex-col justify-center py-xs">
-            <div className={`inline-flex items-center px-sm py-base rounded-full ${
-              equipment.status === 'Ativo' ? 'bg-tertiary/15 text-tertiary' : 'bg-secondary-container/15 text-secondary'
-            } mb-xs w-max`}>
-              <span className={`w-2 h-2 rounded-full ${equipment.status === 'Ativo' ? 'bg-tertiary' : 'bg-secondary'} mr-2`}></span>
-              <span className="font-label-caps text-label-caps">{equipment.status}</span>
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-md bg-surface-container-lowest p-md rounded-xl border border-outline/10 shadow-level-1">
+          <div className="flex flex-col sm:flex-row items-start gap-md">
+            <div className="flex-shrink-0 w-24 h-24 bg-primary/10 rounded-xl overflow-hidden shadow-sm relative flex items-center justify-center text-primary">
+              <span className="material-symbols-outlined text-4xl">precision_manufacturing</span>
             </div>
-            <h1 className="font-headline-sm text-headline-sm text-on-surface mb-1">
-              {equipment.name}
-            </h1>
-            <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px]">location_on</span>
-              {equipment.locationName}
-            </p>
+            <div className="flex flex-col justify-center py-xs">
+              <div className={`inline-flex items-center px-sm py-base rounded-full ${
+                equipment.status === 'Ativo' ? 'bg-tertiary/15 text-tertiary' : 'bg-secondary-container/15 text-secondary'
+              } mb-xs w-max`}>
+                <span className={`w-2 h-2 rounded-full ${equipment.status === 'Ativo' ? 'bg-tertiary' : 'bg-secondary'} mr-2`}></span>
+                <span className="font-label-caps text-label-caps">{equipment.status}</span>
+              </div>
+              <h1 className="font-headline-sm text-headline-sm text-on-surface mb-1">
+                {equipment.name}
+              </h1>
+              <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">location_on</span>
+                {equipment.locationName}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 self-stretch sm:self-auto justify-end mt-xs sm:mt-0">
+            <Link 
+              href={`/os/nova?eqId=${id}`}
+              className="h-10 px-4 bg-primary text-on-primary hover:bg-primary/95 font-label-caps text-label-caps rounded-xl transition-colors flex items-center justify-center gap-1 cursor-pointer font-semibold shadow-sm text-sm"
+            >
+              <span className="material-symbols-outlined text-[18px]">add</span>
+              <span>Registrar Atendimento</span>
+            </Link>
+
+            <EditEquipmentButton 
+              equipment={editEqData}
+              clients={clientsList}
+              locations={locationsList}
+            />
           </div>
         </div>
 
@@ -256,6 +279,12 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
                   </div>
                   <h3 className="font-body-md text-body-md font-medium text-on-surface mb-1">{item.title}</h3>
                   <p className="font-body-md text-body-md text-on-surface-variant mb-sm">{item.description}</p>
+                  {item.partsUsed && (
+                    <div className="mb-sm flex items-center gap-xs text-[12px] text-on-surface-variant bg-surface p-xs rounded border border-outline/5">
+                      <span className="material-symbols-outlined text-[16px] text-primary">build_circle</span>
+                      <span><strong>Peças Utilizadas:</strong> {item.partsUsed}</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-xs">
                     <div className="w-6 h-6 rounded-full bg-surface-variant overflow-hidden flex items-center justify-center">
                       <span className="material-symbols-outlined text-[16px] text-on-surface-variant">person</span>
@@ -272,7 +301,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
       {/* FAB Mobile Only */}
       <div className="fixed bottom-[88px] right-md z-40 md:hidden">
         <Link 
-          href="/os/nova"
+          href={`/os/nova?eqId=${id}`}
           className="bg-primary text-on-primary rounded-xl h-[56px] px-lg flex items-center gap-sm shadow-[0_8px_24px_rgba(30,42,45,0.12)] hover:bg-primary/90 active:scale-95 transition-all"
         >
           <span className="material-symbols-outlined">add</span>

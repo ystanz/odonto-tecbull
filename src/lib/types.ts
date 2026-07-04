@@ -15,7 +15,7 @@ export interface DBLocation {
 
 export interface DBEquipment {
   id: string;
-  code: string;
+  code: string | null;
   name: string;
   location_id: string;
   serial_number: string | null;

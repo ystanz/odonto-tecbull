@@ -4,47 +4,23 @@ import { db, schema } from '@/lib/supabase';
 import { eq } from 'drizzle-orm';
 import Link from 'next/link';
 
-// Mock data as fallback
-const mockStats = {
-  todayServices: 12,
-  pendingServices: 4,
-  inMaintenance: 3,
-  revenue: 'R$ 4.2k'
-};
-
-const mockAlerts = [
-  {
-    id: 'COMP-402',
-    name: 'Compressor Lubrification',
-    location: 'Clinic Alpha - Main Operatory',
-    status: 'DUE SOON'
-  },
-  {
-    id: 'STER-105',
-    name: 'Autoclave Filter Replacement',
-    location: 'Clinic Beta - Sterilization Room',
-    status: 'DUE SOON'
-  },
-  {
-    id: 'CH-2021-442',
-    name: 'Dental Chair Hydraulics Check',
-    location: 'Clinic Gamma - Room 3',
-    status: 'PENDING'
-  }
-];
+// Supabase uninstalled - database migrated to Cloudflare D1 with Drizzle ORM
 
 export const revalidate = 0; // Disable caching to get fresh data from D1
 
 export default async function DashboardPage() {
-  const stats = { ...mockStats };
-  let alerts = [...mockAlerts];
-  let isDemoMode = true;
+  const stats = {
+    todayServices: 0,
+    pendingServices: 0,
+    inMaintenance: 0,
+    revenue: 'R$ 0.0k'
+  };
+  let alerts: { id: string; name: string; location: string; status: string }[] = [];
 
   try {
     if (typeof process !== 'undefined' && (process.env as Record<string, unknown>).DB) {
       // Fetch total work orders
       const workOrders = await db.select().from(schema.workOrders);
-      isDemoMode = false;
       
       const open = workOrders.filter(wo => wo.status === 'ABERTA').length;
       const inProgress = workOrders.filter(wo => wo.status === 'EM ANDAMENTO').length;
@@ -71,7 +47,7 @@ export default async function DashboardPage() {
 
       if (dbEquipments && dbEquipments.length > 0) {
         alerts = dbEquipments.map((eqData) => ({
-          id: eqData.code,
+          id: eqData.code || 'N/A',
           name: eqData.name,
           location: eqData.locationName ? `${eqData.locationName} - ${eqData.locationRoom || ''}` : 'Unidade Geral',
           status: 'PENDING'
@@ -79,7 +55,7 @@ export default async function DashboardPage() {
       }
     }
   } catch (e) {
-    console.error('Erro ao conectar com o D1, utilizando dados simulados:', e);
+    console.error('Erro ao conectar com o D1:', e);
   }
 
   const currentDate = new Date().toLocaleDateString('pt-BR', {
@@ -91,16 +67,6 @@ export default async function DashboardPage() {
   return (
     <Navigation currentTab="dashboard">
       <main className="flex-grow pb-32 pt-lg px-md w-full max-w-[800px] mx-auto md:px-xl animate-fade-in">
-        
-        {/* Banner de Demonstração */}
-        {isDemoMode && (
-          <div className="mb-md bg-secondary-container/15 border border-secondary/20 text-secondary p-sm rounded-xl flex items-center gap-sm">
-            <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: '"FILL" 1' }}>info</span>
-            <div className="font-body-md text-body-md">
-              <strong>Painel de Demonstração Ativo</strong>: Cloudflare D1 não configurado. Exibindo estatísticas e alertas simulados.
-            </div>
-          </div>
-        )}
 
         {/* Tech and Date Header */}
         <header className="mb-xl flex items-center justify-between border-b border-outline-variant/30 pb-md">
