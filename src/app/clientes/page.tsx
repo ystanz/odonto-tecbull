@@ -1,15 +1,12 @@
 'use client';
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import {
   getClientsAction,
   createClientAction,
-  updateClientAction,
   getLocationsAction,
-  createLocationAction,
   getEquipmentsAction,
 } from '@/app/actions';
 import { DBLocation, DBEquipment, DBClient } from '@/lib/types';
@@ -189,7 +186,16 @@ export default function ClientesPage() {
 
     try {
       setSubmittingLocation(true);
-      const res = await createLocationAction(newLocationClientId, newLocationName, newLocationRoom || undefined);
+      const resRaw = await fetch('/api/locations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: newLocationClientId,
+          name: newLocationName,
+          room: newLocationRoom || null
+        })
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Unidade cadastrada com sucesso!');
       } else {
