@@ -1,4 +1,6 @@
 'use client';
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -72,7 +74,7 @@ export default function NovaOSPage() {
         setEquipments(rawEquipments);
         setClients(rawClients);
       } catch (err) {
-        console.error('Erro ao buscar listas do Supabase:', err);
+        console.error('Erro ao buscar listas do D1:', err);
         if (active) {
           showToast('Erro ao carregar locais. Usando dados locais.', 'error');
         }

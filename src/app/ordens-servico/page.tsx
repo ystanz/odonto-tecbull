@@ -82,7 +82,7 @@ export default function WorkOrdersPage() {
 
         setWorkOrders(formatted);
       } catch (err) {
-        console.error('Erro ao buscar ordens de serviço do Supabase:', err);
+        console.error('Erro ao buscar ordens de serviço do D1:', err);
       } finally {
         setLoading(false);
       }
@@ -113,7 +113,7 @@ export default function WorkOrdersPage() {
               Gerencie e acompanhe as tarefas de manutenção ativas dos equipamentos.
             </p>
           </div>
-          
+
           <Link
             href="/os/nova"
             className="h-touch-target px-md bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm"
@@ -130,11 +130,10 @@ export default function WorkOrdersPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-sm py-sm border-b-2 font-label-caps text-label-caps whitespace-nowrap transition-colors cursor-pointer ${
-                  activeTab === tab
+                className={`px-sm py-sm border-b-2 font-label-caps text-label-caps whitespace-nowrap transition-colors cursor-pointer ${activeTab === tab
                     ? 'border-primary text-primary font-bold'
                     : 'border-transparent text-on-surface-variant hover:text-primary'
-                }`}
+                  }`}
               >
                 {tab.charAt(0) + tab.slice(1).toLowerCase()}
               </button>
@@ -177,9 +176,8 @@ export default function WorkOrdersPage() {
 
               const cardContent = (
                 <article
-                  className={`bg-surface-container-lowest rounded-xl shadow-lg border border-outline/10 p-md flex flex-col gap-sm hover:shadow-xl transition-shadow cursor-pointer relative overflow-hidden group h-full ${
-                    wo.status === 'CONCLUÍDA' ? 'opacity-85' : ''
-                  }`}
+                  className={`bg-surface-container-lowest rounded-xl shadow-lg border border-outline/10 p-md flex flex-col gap-sm hover:shadow-xl transition-shadow cursor-pointer relative overflow-hidden group h-full ${wo.status === 'CONCLUÍDA' ? 'opacity-85' : ''
+                    }`}
                 >
                   <div className={`absolute inset-y-0 left-0 w-1 ${borderClass}`}></div>
                   <div className="flex justify-between items-start pl-xs">
@@ -206,9 +204,8 @@ export default function WorkOrdersPage() {
                   </div>
                   <div className="pl-xs mt-auto pt-sm border-t border-outline-variant/20 flex justify-between items-center">
                     <div
-                      className={`flex items-center gap-xs ${
-                        wo.priority === 'CRÍTICO' && wo.status !== 'CONCLUÍDA' ? 'text-error' : 'text-outline'
-                      }`}
+                      className={`flex items-center gap-xs ${wo.priority === 'CRÍTICO' && wo.status !== 'CONCLUÍDA' ? 'text-error' : 'text-outline'
+                        }`}
                     >
                       <span className="material-symbols-outlined text-[14px]">
                         {wo.status === 'CONCLUÍDA' ? 'check_circle' : 'calendar_today'}
