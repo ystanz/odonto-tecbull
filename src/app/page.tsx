@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 import React from 'react';
 import Navigation from '@/components/Navigation';
-import { db, schema } from '@/lib/supabase';
+import { getDb, schema } from '@/lib/supabase';
 import { eq } from 'drizzle-orm';
 import Link from 'next/link';
 
@@ -19,9 +19,9 @@ export default async function DashboardPage() {
   let alerts: { id: string; name: string; location: string; status: string }[] = [];
 
   try {
-    if (typeof process !== 'undefined' && (process.env as Record<string, unknown>).DB) {
-      // Fetch total work orders
-      const workOrders = await db.select().from(schema.workOrders);
+    const db = getDb();
+    // Fetch total work orders
+    const workOrders = await db.select().from(schema.workOrders);
 
       const open = workOrders.filter(wo => wo.status === 'ABERTA').length;
       const inProgress = workOrders.filter(wo => wo.status === 'EM ANDAMENTO').length;
@@ -54,7 +54,6 @@ export default async function DashboardPage() {
           status: 'PENDING'
         }));
       }
-    }
   } catch (e) {
     console.error('Erro ao conectar com o D1:', e);
   }

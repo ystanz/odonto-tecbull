@@ -1,12 +1,20 @@
 'use server';
 
-import { db, schema } from '@/lib/supabase';
+import { getDb, schema } from '@/lib/supabase';
+import { getRequestContext } from '@cloudflare/next-on-pages';
 import { eq, desc } from 'drizzle-orm';
 import { DBClient, DBLocation, DBEquipment, DBWorkOrder } from '@/lib/types';
 
+// export const runtime = 'edge';
+
 // Helper to check if D1 DB is configured in wrangler/Cloudflare environment
 function isConfigured() {
-  return typeof process !== 'undefined' && !!(process.env as Record<string, unknown>).DB;
+  try {
+    const env = getRequestContext().env as { DB?: any };
+    return !!(env && env.DB);
+  } catch {
+    return false;
+  }
 }
 
 export async function getClientsAction() {
@@ -15,6 +23,7 @@ export async function getClientsAction() {
       return { success: false, error: 'DB_NOT_CONFIGURED', data: [] };
     }
 
+    const db = getDb();
     const data = await db
       .select()
       .from(schema.clients)
@@ -41,6 +50,7 @@ export async function createClientAction(name: string) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .insert(schema.clients)
       .values({ name })
@@ -67,6 +77,7 @@ export async function getLocationsAction() {
       return { success: false, error: 'DB_NOT_CONFIGURED', data: [] };
     }
 
+    const db = getDb();
     const rows = await db
       .select()
       .from(schema.locations)
@@ -100,6 +111,7 @@ export async function createLocationAction(clientId: string, name: string, room?
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .insert(schema.locations)
       .values({ clientId, name, room: room || null })
@@ -128,6 +140,7 @@ export async function getEquipmentsAction() {
       return { success: false, error: 'DB_NOT_CONFIGURED', data: [] };
     }
 
+    const db = getDb();
     const rows = await db
       .select()
       .from(schema.equipments)
@@ -185,6 +198,7 @@ export async function createEquipmentAction(equipmentData: {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .insert(schema.equipments)
       .values({
@@ -229,6 +243,7 @@ export async function getWorkOrdersAction() {
       return { success: false, error: 'DB_NOT_CONFIGURED', data: [] };
     }
 
+    const db = getDb();
     const rows = await db
       .select()
       .from(schema.workOrders)
@@ -296,6 +311,7 @@ export async function createWorkOrderAction(workOrderData: {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .insert(schema.workOrders)
       .values({
@@ -344,6 +360,7 @@ export async function updateClientAction(id: string, name: string) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .update(schema.clients)
       .set({ name })
@@ -375,6 +392,7 @@ export async function deleteClientAction(id: string) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .delete(schema.clients)
       .where(eq(schema.clients.id, id))
@@ -398,6 +416,7 @@ export async function updateLocationAction(id: string, clientId: string, name: s
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .update(schema.locations)
       .set({ clientId, name, room: room || null })
@@ -431,6 +450,7 @@ export async function deleteLocationAction(id: string) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .delete(schema.locations)
       .where(eq(schema.locations.id, id))
@@ -467,6 +487,7 @@ export async function updateEquipmentAction(
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .update(schema.equipments)
       .set({
@@ -516,6 +537,7 @@ export async function deleteEquipmentAction(id: string) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
     }
 
+    const db = getDb();
     const [data] = await db
       .delete(schema.equipments)
       .where(eq(schema.equipments.id, id))

@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 import React from 'react';
 import Navigation from '@/components/Navigation';
-import { db, schema } from '@/lib/supabase';
+import { getDb, schema } from '@/lib/supabase';
 import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import EditEquipmentButton from '@/components/EditEquipmentButton';
@@ -45,10 +45,10 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
   let dbEq: any = null;
 
   try {
-    if (typeof process !== 'undefined' && (process.env as Record<string, unknown>).DB) {
-      // Fetch clients and locations
-      const resClients = await getClientsAction();
-      if (resClients.success) {
+    const db = getDb();
+    // Fetch clients and locations
+    const resClients = await getClientsAction();
+    if (resClients.success) {
         clientsList = resClients.data;
       }
       const resLocs = await getLocationsAction();
@@ -128,7 +128,6 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           }));
         }
       }
-    }
   } catch (e) {
     console.error('Erro ao conectar D1 nos equipamentos:', e);
   }
