@@ -6,6 +6,7 @@ import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import ClientDetailsUI from '@/components/ClientDetailsUI';
 import { getClientDetailsAction } from '@/app/actions';
+import { headers } from 'next/headers';
 
 import { DBClient, DBLocation } from '@/lib/types';
 
@@ -15,6 +16,7 @@ interface PageProps {
 
 export default async function ClientDetailPage({ params }: PageProps) {
   const { id } = await params;
+  await headers(); // Hack to force Next.js and Cloudflare to treat this as a strict dynamic Edge endpoint
 
   let client: DBClient | null = null;
   let locations: DBLocation[] = [];
