@@ -119,51 +119,7 @@ export async function getLocationsAction() {
   }
 }
 
-export async function createLocationAction(
-  clientId: string,
-  name: string,
-  room?: string | null,
-  address?: string | null,
-  contact?: string | null,
-  notes?: string | null
-) {
-  try {
-    if (!isConfigured()) {
-      return { success: false, error: 'DB_NOT_CONFIGURED' };
-    }
-
-    const db = getDb();
-    const [data] = await db
-      .insert(schema.locations)
-      .values({ 
-        clientId, 
-        name, 
-        room: room || null,
-        address: address || null,
-        contact: contact || null,
-        notes: notes || null
-      })
-      .returning();
-
-    return { 
-      success: true, 
-      data: {
-        id: data.id,
-        client_id: data.clientId || '',
-        name: data.name,
-        room: data.room,
-        address: data.address,
-        contact: data.contact,
-        notes: data.notes,
-        created_at: data.createdAt || undefined
-      } as DBLocation 
-    };
-  } catch (err) {
-    console.error('Error creating location:', err);
-    const msg = err instanceof Error ? err.message : 'Unknown error';
-    return { success: false, error: msg };
-  }
-}
+// createLocationAction removed (handled by Route Handlers)
 
 export async function getEquipmentsAction() {
   try {
@@ -375,75 +331,7 @@ export async function createWorkOrderAction(workOrderData: {
   }
 }
 
-export async function updateClientAction(
-  id: string,
-  name: string,
-  responsibleName?: string | null,
-  phone?: string | null,
-  email?: string | null
-) {
-  try {
-    if (!isConfigured()) {
-      return { success: false, error: 'DB_NOT_CONFIGURED' };
-    }
-
-    const db = getDb();
-    const [data] = await db
-      .update(schema.clients)
-      .set({ 
-        name,
-        responsibleName: responsibleName || null,
-        phone: phone || null,
-        email: email || null
-      })
-      .where(eq(schema.clients.id, id))
-      .returning();
-
-    if (!data) {
-      return { success: false, error: 'Client not found' };
-    }
-
-    return {
-      success: true,
-      data: {
-        id: data.id,
-        name: data.name,
-        responsible_name: data.responsibleName,
-        phone: data.phone,
-        email: data.email,
-        created_at: data.createdAt || undefined
-      } as DBClient
-    };
-  } catch (err) {
-    console.error('Error updating client:', err);
-    const msg = err instanceof Error ? err.message : 'Unknown error';
-    return { success: false, error: msg };
-  }
-}
-
-export async function deleteClientAction(id: string) {
-  try {
-    if (!isConfigured()) {
-      return { success: false, error: 'DB_NOT_CONFIGURED' };
-    }
-
-    const db = getDb();
-    const [data] = await db
-      .delete(schema.clients)
-      .where(eq(schema.clients.id, id))
-      .returning();
-
-    if (!data) {
-      return { success: false, error: 'Client not found' };
-    }
-
-    return { success: true, data: { id: data.id } };
-  } catch (err) {
-    console.error('Error deleting client:', err);
-    const msg = err instanceof Error ? err.message : 'Unknown error';
-    return { success: false, error: msg };
-  }
-}
+// updateClientAction and deleteClientAction removed (handled by Route Handlers)
 
 export async function getClientDetailsAction(id: string) {
   try {
@@ -498,81 +386,7 @@ export async function getClientDetailsAction(id: string) {
   }
 }
 
-export async function updateLocationAction(
-  id: string,
-  clientId: string,
-  name: string,
-  room?: string | null,
-  address?: string | null,
-  contact?: string | null,
-  notes?: string | null
-) {
-  try {
-    if (!isConfigured()) {
-      return { success: false, error: 'DB_NOT_CONFIGURED' };
-    }
-
-    const db = getDb();
-    const [data] = await db
-      .update(schema.locations)
-      .set({ 
-        clientId, 
-        name, 
-        room: room || null,
-        address: address || null,
-        contact: contact || null,
-        notes: notes || null
-      })
-      .where(eq(schema.locations.id, id))
-      .returning();
-
-    if (!data) {
-      return { success: false, error: 'Location not found' };
-    }
-
-    return {
-      success: true,
-      data: {
-        id: data.id,
-        client_id: data.clientId || '',
-        name: data.name,
-        room: data.room,
-        address: data.address,
-        contact: data.contact,
-        notes: data.notes,
-        created_at: data.createdAt || undefined
-      } as DBLocation
-    };
-  } catch (err) {
-    console.error('Error updating location:', err);
-    const msg = err instanceof Error ? err.message : 'Unknown error';
-    return { success: false, error: msg };
-  }
-}
-
-export async function deleteLocationAction(id: string) {
-  try {
-    if (!isConfigured()) {
-      return { success: false, error: 'DB_NOT_CONFIGURED' };
-    }
-
-    const db = getDb();
-    const [data] = await db
-      .delete(schema.locations)
-      .where(eq(schema.locations.id, id))
-      .returning();
-
-    if (!data) {
-      return { success: false, error: 'Location not found' };
-    }
-
-    return { success: true, data: { id: data.id } };
-  } catch (err) {
-    console.error('Error deleting location:', err);
-    const msg = err instanceof Error ? err.message : 'Unknown error';
-    return { success: false, error: msg };
-  }
-}
+// updateLocationAction and deleteLocationAction removed (handled by Route Handlers)
 
 export async function updateEquipmentAction(
   id: string,
