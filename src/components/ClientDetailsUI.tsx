@@ -4,9 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  getClientDetailsAction,
-} from '@/app/actions';
+// no actions imported
 import { DBClient, DBLocation } from '@/lib/types';
 
 interface ClientDetailsUIProps {
@@ -63,7 +61,8 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
     if (refreshTrigger === 0) return; // Skip initial load since we have props
     try {
       setLoading(true);
-      const res = await getClientDetailsAction(id);
+      const resRaw = await fetch(`/api/clientes/${id}`);
+      const res = await resRaw.json();
       if (res.success && res.data) {
         setClient(res.data.client);
         setLocations(res.data.locations);

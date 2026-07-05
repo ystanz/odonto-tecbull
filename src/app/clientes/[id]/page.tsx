@@ -5,7 +5,8 @@ import React from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import ClientDetailsUI from '@/components/ClientDetailsUI';
-import { getClientDetailsAction } from '@/app/actions';
+import { getDb, schema } from '@/lib/supabase';
+import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 
 import { DBClient, DBLocation } from '@/lib/types';
@@ -23,12 +24,42 @@ export default async function ClientDetailPage({ params }: PageProps) {
   let errorMsg = null;
 
   try {
-    const res = await getClientDetailsAction(id);
-    if (res.success && res.data) {
-      client = res.data.client;
-      locations = res.data.locations;
+    const db = getDb();
+    
+    const [dbClient] = await db
+      .select()
+      .from(schema.clients)
+      .where(eq(schema.clients.id, id))
+      .limit(1);
+
+    if (dbClient) {
+      client = {
+        id: dbClient.id,
+        name: dbClient.name,
+        responsible_name: dbClient.responsibleName,
+        phone: dbClient.phone,
+        email: dbClient.email,
+        created_at: dbClient.createdAt || undefined,
+      };
+
+      const locationsList = await db
+        .select()
+        .from(schema.locations)
+        .where(eq(schema.locations.clientId, id))
+        .orderBy(schema.locations.name);
+
+      locations = locationsList.map((loc) => ({
+        id: loc.id,
+        client_id: loc.clientId || '',
+        name: loc.name,
+        room: loc.room,
+        address: loc.address,
+        contact: loc.contact,
+        notes: loc.notes,
+        created_at: loc.createdAt || undefined,
+      }));
     } else {
-      errorMsg = res.error || 'Cliente não encontrado.';
+      errorMsg = 'Cliente não encontrado.';
     }
   } catch (err) {
     console.error('Erro ao carregar dados do cliente no servidor:', err);

@@ -3,9 +3,68 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 import { getDb, schema } from '@/lib/supabase';
 import { eq } from 'drizzle-orm';
+import { DBClient, DBLocation } from '@/lib/types';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
+}
+
+export async function GET(request: Request, { params }: RouteParams) {
+  try {
+    const { id } = await params;
+    const db = getDb();
+
+    const [client] = await db
+      .select()
+      .from(schema.clients)
+      .where(eq(schema.clients.id, id))
+      .limit(1);
+
+    if (!client) {
+      return NextResponse.json(
+        { success: false, error: 'Clínica não encontrada.' },
+        { status: 404 }
+      );
+    }
+
+    const locationsList = await db
+      .select()
+      .from(schema.locations)
+      .where(eq(schema.locations.clientId, id))
+      .orderBy(schema.locations.name);
+
+    const formattedClient: DBClient = {
+      id: client.id,
+      name: client.name,
+      responsible_name: client.responsibleName,
+      phone: client.phone,
+      email: client.email,
+      created_at: client.createdAt || undefined,
+    };
+
+    const formattedLocations: DBLocation[] = locationsList.map((loc) => ({
+      id: loc.id,
+      client_id: loc.clientId || '',
+      name: loc.name,
+      room: loc.room,
+      address: loc.address,
+      contact: loc.contact,
+      notes: loc.notes,
+      created_at: loc.createdAt || undefined,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        client: formattedClient,
+        locations: formattedLocations,
+      },
+    });
+  } catch (err) {
+    console.error('Error in API GET /api/clientes/[id]:', err);
+    const msg = err instanceof Error ? err.message : 'Erro interno';
+    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+  }
 }
 
 export async function PUT(request: Request, { params }: RouteParams) {
