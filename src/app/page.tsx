@@ -18,7 +18,7 @@ export default async function DashboardPage() {
 
   try {
     const db = getDb();
-    
+
     // Buscar total de clínicas (clients)
     const clinicsResult = await db.select().from(schema.clients);
     totalClinics = clinicsResult.length;
@@ -72,10 +72,10 @@ export default async function DashboardPage() {
         <header className="mb-xl flex items-center justify-between border-b border-outline-variant/30 pb-md">
           <div>
             <span className="font-label-caps text-label-caps text-on-surface-variant tracking-wider">
-              TÉCNICO PARCEIRO
+              Olá,
             </span>
             <h2 className="font-headline-lg text-headline-lg text-on-background mt-xs font-semibold">
-              Marcelo T.
+              Marcelo
             </h2>
           </div>
           <div className="text-right">
@@ -92,11 +92,11 @@ export default async function DashboardPage() {
         <section className="mb-xl flex flex-col md:flex-row gap-md items-center justify-between bg-surface-container-low rounded-2xl p-lg border border-outline/10 shadow-level-1">
           <div className="flex-grow text-center md:text-left mb-sm md:mb-0">
             <h3 className="font-headline-md text-headline-md text-on-surface font-bold">
-              Bem-vindo ao OdontoService
+              Acesse e gerencie chamados, clientes e equipamentos
             </h3>
-            <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
+            {/* <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
               Acesse e gerencie chamados, clientes e equipamentos clínicos em campo.
-            </p>
+            </p> */}
           </div>
           {/* Mobile FAB Alternative */}
           <Link
