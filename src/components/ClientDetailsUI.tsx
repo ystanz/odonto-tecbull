@@ -15,12 +15,12 @@ import {
 import { DBClient, DBLocation } from '@/lib/types';
 
 interface ClientDetailsUIProps {
-  id: string;
-  initialClient: DBClient;
-  initialLocations: DBLocation[];
+  client: DBClient;
+  locations: DBLocation[];
 }
 
-export default function ClientDetailsUI({ id, initialClient, initialLocations }: ClientDetailsUIProps) {
+export default function ClientDetailsUI({ client: initialClient, locations: initialLocations }: ClientDetailsUIProps) {
+  const id = initialClient.id;
   const router = useRouter();
 
   // Data States

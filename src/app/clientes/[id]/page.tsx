@@ -61,9 +61,8 @@ export default async function ClientDetailPage({ params }: PageProps) {
 
   return (
     <ClientDetailsUI
-      id={id}
-      initialClient={client}
-      initialLocations={locations}
+      client={client}
+      locations={locations}
     />
   );
 }
