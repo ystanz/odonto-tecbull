@@ -101,6 +101,7 @@ export default async function DashboardPage() {
           </div>
           {/* Mobile FAB Alternative */}
           <Link
+            prefetch={false}
             href="/os/nova"
             className="md:hidden w-full h-touch-target bg-primary text-on-primary font-headline-sm text-headline-sm rounded-lg shadow-sm active:scale-95 transition-transform flex items-center justify-center space-x-2"
           >

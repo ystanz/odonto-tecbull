@@ -1,4 +1,6 @@
 'use client';
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
@@ -115,6 +117,7 @@ export default function WorkOrdersPage() {
           </div>
 
           <Link
+            prefetch={false}
             href="/os/nova"
             className="h-touch-target px-md bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm"
           >
@@ -222,7 +225,7 @@ export default function WorkOrdersPage() {
               return (
                 <div key={wo.id}>
                   {wo.equipmentId ? (
-                    <Link href={`/equipamentos/${wo.equipmentId}`}>{cardContent}</Link>
+                    <Link prefetch={false} href={`/equipamentos/${wo.equipmentId}`}>{cardContent}</Link>
                   ) : (
                     cardContent
                   )}
@@ -240,6 +243,7 @@ export default function WorkOrdersPage() {
 
         {/* Floating Action Button */}
         <Link
+          prefetch={false}
           href="/os/nova"
           className="fixed bottom-[96px] md:bottom-lg right-md md:right-lg h-[56px] px-lg rounded-xl bg-primary text-on-primary shadow-lg flex items-center gap-sm hover:bg-primary-container transition-colors active:scale-95 z-40 cursor-pointer"
         >

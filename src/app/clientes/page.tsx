@@ -365,7 +365,7 @@ export default function ClientesPage() {
                                 {loc.statusText}
                               </p>
                             </div>
-                            <Link href={`/equipamentos?q=${encodeURIComponent(loc.name)}`}>
+                            <Link prefetch={false} href={`/equipamentos?q=${encodeURIComponent(loc.name)}`}>
                               <span className="material-symbols-outlined text-primary hover:scale-115 transition-transform p-sm">
                                 chevron_right
                               </span>
@@ -389,6 +389,7 @@ export default function ClientesPage() {
 
         {/* Floating Action Button */}
         <Link
+          prefetch={false}
           href="/os/nova"
           className="fixed bottom-[96px] right-md w-touch-target h-touch-target bg-primary text-on-primary rounded-xl shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40 hover:bg-primary-container"
         >

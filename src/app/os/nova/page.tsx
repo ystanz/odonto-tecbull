@@ -233,7 +233,7 @@ export default function NovaOSPage() {
         {/* Header */}
         <div className="mb-lg">
           <div className="flex items-center space-x-2 text-on-surface-variant font-body-md mb-xs">
-            <Link href="/ordens-servico" className="hover:text-primary flex items-center">
+            <Link prefetch={false} href="/ordens-servico" className="hover:text-primary flex items-center">
               <span className="material-symbols-outlined text-md mr-1">arrow_back</span>
               Voltar para Ordens de Serviço
             </Link>

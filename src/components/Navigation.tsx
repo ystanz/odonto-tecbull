@@ -64,6 +64,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
 
         <div className="space-y-sm flex-1">
           <Link 
+            prefetch={false}
             href="/"
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${
               currentTab === 'dashboard' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
@@ -74,6 +75,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
           </Link>
 
           <Link 
+            prefetch={false}
             href="/ordens-servico"
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${
               currentTab === 'service' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
@@ -84,6 +86,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
           </Link>
 
           <Link 
+            prefetch={false}
             href="/equipamentos"
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${
               currentTab === 'equipment' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
@@ -94,6 +97,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
           </Link>
 
           <Link 
+            prefetch={false}
             href="/clientes"
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${
               currentTab === 'clients' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
@@ -106,6 +110,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
 
         <div className="mt-auto pt-lg">
           <Link 
+            prefetch={false}
             href="/os/nova"
             className="w-full h-touch-target bg-primary text-on-primary font-headline-sm text-headline-sm rounded-lg shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center space-x-2"
           >
@@ -129,6 +134,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
       {/* BottomNavBar (Mobile) */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full h-touch-target flex justify-around items-center px-sm pb-safe bg-surface dark:bg-surface-container-lowest shadow-[0_-2px_8px_rgba(30,42,45,0.05)] rounded-t-xl z-50">
         <Link 
+          prefetch={false}
           href="/"
           className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
             currentTab === 'dashboard' 
@@ -141,6 +147,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         </Link>
 
         <Link 
+          prefetch={false}
           href="/ordens-servico"
           className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
             currentTab === 'service' 
@@ -153,6 +160,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         </Link>
 
         <Link 
+          prefetch={false}
           href="/equipamentos"
           className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
             currentTab === 'equipment' 
@@ -165,6 +173,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         </Link>
 
         <Link 
+          prefetch={false}
           href="/clientes"
           className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
             currentTab === 'clients' 

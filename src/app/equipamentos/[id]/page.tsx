@@ -145,6 +145,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
             O equipamento solicitado não foi encontrado no banco de dados. Ele pode ter sido excluído ou o ID está incorreto.
           </p>
           <Link
+            prefetch={false}
             href="/clientes"
             className="mt-lg h-12 px-6 bg-primary text-on-primary hover:bg-primary/95 font-label-caps text-label-caps rounded-xl transition-colors flex items-center justify-center gap-1 font-semibold shadow-sm cursor-pointer"
           >
@@ -176,7 +177,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
 
         {/* Header Navigation link back */}
         <div className="flex items-center space-x-2 text-on-surface-variant font-body-md mb-xs">
-          <Link href="/clientes" className="hover:text-primary flex items-center">
+          <Link prefetch={false} href="/clientes" className="hover:text-primary flex items-center">
             <span className="material-symbols-outlined text-md mr-1">arrow_back</span>
             Voltar para Clientes
           </Link>
@@ -206,6 +207,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
 
           <div className="flex flex-wrap gap-2 self-stretch sm:self-auto justify-end mt-xs sm:mt-0">
             <Link
+              prefetch={false}
               href={`/os/nova?eqId=${id}`}
               className="h-10 px-4 bg-primary text-on-primary hover:bg-primary/95 font-label-caps text-label-caps rounded-xl transition-colors flex items-center justify-center gap-1 cursor-pointer font-semibold shadow-sm text-sm"
             >
@@ -301,6 +303,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
       {/* FAB Mobile Only */}
       <div className="fixed bottom-[88px] right-md z-40 md:hidden">
         <Link
+          prefetch={false}
           href={`/os/nova?eqId=${id}`}
           className="bg-primary text-on-primary rounded-xl h-[56px] px-lg flex items-center gap-sm shadow-[0_8px_24px_rgba(30,42,45,0.12)] hover:bg-primary/90 active:scale-95 transition-all"
         >
