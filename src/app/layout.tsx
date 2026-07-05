@@ -20,6 +20,12 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "DentalService - OdontoTec Bull",
   description: "Painel de controle e ordens de serviço para manutenção de equipamentos odontológicos.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "TecBull OS",
+  },
 };
 
 export default function RootLayout({
@@ -37,6 +43,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
         />
+        <meta name="theme-color" content="#1e2a2d" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className="min-h-full flex flex-col bg-[#FAF8F4] text-on-background">
         {children}

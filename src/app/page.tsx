@@ -11,50 +11,50 @@ import Link from 'next/link';
 export const revalidate = 0; // Disable caching to get fresh data from D1
 
 export default async function DashboardPage() {
-  const stats = {
-    todayServices: 0,
-    pendingServices: 0,
-    inMaintenance: 0,
-    revenue: 'R$ 0.0k'
-  };
+  let totalClinics = 0;
+  let totalEquipments = 0;
+  let totalOpenOS = 0;
   let alerts: { id: string; name: string; location: string; status: string }[] = [];
 
   try {
     const db = getDb();
-    // Fetch total work orders
+    
+    // Buscar total de clínicas (clients)
+    const clinicsResult = await db.select().from(schema.clients);
+    totalClinics = clinicsResult.length;
+
+    // Buscar total de equipamentos (equipments)
+    const equipmentsResult = await db.select().from(schema.equipments);
+    totalEquipments = equipmentsResult.length;
+
+    // Buscar total de OS abertas (workOrders com status ABERTA ou EM ANDAMENTO)
     const workOrders = await db.select().from(schema.workOrders);
+    totalOpenOS = workOrders.filter(
+      (wo) => wo.status === 'ABERTA' || wo.status === 'EM ANDAMENTO'
+    ).length;
 
-      const open = workOrders.filter(wo => wo.status === 'ABERTA').length;
-      const inProgress = workOrders.filter(wo => wo.status === 'EM ANDAMENTO').length;
-      const completed = workOrders.filter(wo => wo.status === 'CONCLUÍDA').length;
+    // Fetch equipment alerts (status = 'Pendente')
+    const dbEquipments = await db
+      .select({
+        id: schema.equipments.id,
+        code: schema.equipments.code,
+        name: schema.equipments.name,
+        status: schema.equipments.status,
+        locationName: schema.locations.name,
+        locationRoom: schema.locations.room
+      })
+      .from(schema.equipments)
+      .leftJoin(schema.locations, eq(schema.equipments.locationId, schema.locations.id))
+      .where(eq(schema.equipments.status, 'Pendente'));
 
-      stats.todayServices = workOrders.length; // Total registered
-      stats.pendingServices = open;
-      stats.inMaintenance = inProgress;
-      stats.revenue = `R$ ${(completed * 1.4).toFixed(1)}k`; // Estimated based on completed
-
-      // Fetch equipment alerts (status = 'Pendente')
-      const dbEquipments = await db
-        .select({
-          id: schema.equipments.id,
-          code: schema.equipments.code,
-          name: schema.equipments.name,
-          status: schema.equipments.status,
-          locationName: schema.locations.name,
-          locationRoom: schema.locations.room
-        })
-        .from(schema.equipments)
-        .leftJoin(schema.locations, eq(schema.equipments.locationId, schema.locations.id))
-        .where(eq(schema.equipments.status, 'Pendente'));
-
-      if (dbEquipments && dbEquipments.length > 0) {
-        alerts = dbEquipments.map((eqData) => ({
-          id: eqData.code || 'N/A',
-          name: eqData.name,
-          location: eqData.locationName ? `${eqData.locationName} - ${eqData.locationRoom || ''}` : 'Unidade Geral',
-          status: 'PENDING'
-        }));
-      }
+    if (dbEquipments && dbEquipments.length > 0) {
+      alerts = dbEquipments.map((eqData) => ({
+        id: eqData.code || 'N/A',
+        name: eqData.name,
+        location: eqData.locationName ? `${eqData.locationName} - ${eqData.locationRoom || ''}` : 'Unidade Geral',
+        status: 'PENDENTE'
+      }));
+    }
   } catch (e) {
     console.error('Erro ao conectar com o D1:', e);
   }
@@ -110,53 +110,41 @@ export default async function DashboardPage() {
           </Link>
         </section>
 
-        {/* Quick Stats Bento Grid */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-sm md:gap-md">
-          {/* Stat 1 */}
+        {/* Metric Cards */}
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-sm md:gap-md">
+          {/* Card 1: Clínicas */}
           <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-center space-x-2 text-primary-container">
-              <span className="material-symbols-outlined text-xl">calendar_today</span>
-              <span className="font-label-caps text-label-caps">Serviços HOJE</span>
+            <div className="flex items-center space-x-2 text-primary">
+              <span className="material-symbols-outlined text-xl">location_city</span>
+              <span className="font-label-caps text-label-caps">Total de Clínicas</span>
             </div>
             <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-primary">
-                {String(stats.todayServices).padStart(2, '0')}
+              <span className="font-headline-lg text-headline-lg text-on-surface font-bold">
+                {String(totalClinics).padStart(2, '0')}
               </span>
             </div>
           </div>
-          {/* Stat 2 */}
+          {/* Card 2: Equipamentos */}
           <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-center space-x-2 text-secondary-container">
+            <div className="flex items-center space-x-2 text-tertiary">
+              <span className="material-symbols-outlined text-xl">precision_manufacturing</span>
+              <span className="font-label-caps text-label-caps">Total de Equipamentos</span>
+            </div>
+            <div className="mt-4">
+              <span className="font-headline-lg text-headline-lg text-on-surface font-bold">
+                {String(totalEquipments).padStart(2, '0')}
+              </span>
+            </div>
+          </div>
+          {/* Card 3: OS Abertas */}
+          <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
+            <div className="flex items-center space-x-2 text-secondary">
               <span className="material-symbols-outlined text-xl">pending_actions</span>
-              <span className="font-label-caps text-label-caps">PENDENTES</span>
+              <span className="font-label-caps text-label-caps">OS Abertas</span>
             </div>
             <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-on-surface">
-                {String(stats.pendingServices).padStart(2, '0')}
-              </span>
-            </div>
-          </div>
-          {/* Stat 3 */}
-          <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-center space-x-2 text-tertiary-container">
-              <span className="material-symbols-outlined text-xl">engineering</span>
-              <span className="font-label-caps text-label-caps">EM MANUTENÇÃO</span>
-            </div>
-            <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-tertiary">
-                {String(stats.inMaintenance).padStart(2, '0')}
-              </span>
-            </div>
-          </div>
-          {/* Stat 4 */}
-          <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-center space-x-2 text-on-surface-variant">
-              <span className="material-symbols-outlined text-xl">payments</span>
-              <span className="font-label-caps text-label-caps">Faturamento</span>
-            </div>
-            <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-on-surface font-semibold">
-                {stats.revenue}
+              <span className="font-headline-lg text-headline-lg text-on-surface font-bold">
+                {String(totalOpenOS).padStart(2, '0')}
               </span>
             </div>
           </div>
