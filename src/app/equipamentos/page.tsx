@@ -1,6 +1,4 @@
 'use client';
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
 import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
