@@ -6,11 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   getClientDetailsAction,
-  updateClientAction,
-  deleteClientAction,
-  createLocationAction,
-  updateLocationAction,
-  deleteLocationAction,
 } from '@/app/actions';
 import { DBClient, DBLocation } from '@/lib/types';
 
@@ -100,16 +95,21 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
     try {
       setSubmittingClient(true);
-      const res = await updateClientAction(
-        id,
-        clientName,
-        clientResponsibleName || null,
-        clientPhone || null,
-        clientEmail || null
-      );
+      const resRaw = await fetch(`/api/clientes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: clientName,
+          responsibleName: clientResponsibleName || null,
+          phone: clientPhone || null,
+          email: clientEmail || null
+        })
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Dados do cliente atualizados com sucesso!');
         setIsEditClientModalOpen(false);
+        router.refresh();
         setRefreshTrigger(prev => prev + 1);
       } else {
         throw new Error(res.error);
@@ -129,7 +129,10 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
     try {
       setDeletingClient(true);
-      const res = await deleteClientAction(id);
+      const resRaw = await fetch(`/api/clientes/${id}`, {
+        method: 'DELETE'
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Clínica excluída com sucesso!');
         router.push('/clientes');
@@ -149,14 +152,19 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
     try {
       setSubmittingLocation(true);
-      const res = await createLocationAction(
-        id,
-        locName,
-        locRoom || null,
-        locAddress || null,
-        locContact || null,
-        locNotes || null
-      );
+      const resRaw = await fetch('/api/locations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: id,
+          name: locName,
+          room: locRoom || null,
+          address: locAddress || null,
+          contact: locContact || null,
+          notes: locNotes || null
+        })
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Unidade cadastrada com sucesso!');
         setIsAddLocationModalOpen(false);
@@ -166,6 +174,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
         setLocAddress('');
         setLocContact('');
         setLocNotes('');
+        router.refresh();
         setRefreshTrigger(prev => prev + 1);
       } else {
         throw new Error(res.error);
@@ -184,19 +193,24 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
     try {
       setSubmittingLocation(true);
-      const res = await updateLocationAction(
-        editingLocation.id,
-        id,
-        locName,
-        locRoom || null,
-        locAddress || null,
-        locContact || null,
-        locNotes || null
-      );
+      const resRaw = await fetch(`/api/locations/${editingLocation.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: id,
+          name: locName,
+          room: locRoom || null,
+          address: locAddress || null,
+          contact: locContact || null,
+          notes: locNotes || null
+        })
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Unidade atualizada com sucesso!');
         setIsEditLocationModalOpen(false);
         setEditingLocation(null);
+        router.refresh();
         setRefreshTrigger(prev => prev + 1);
       } else {
         throw new Error(res.error);
@@ -215,9 +229,13 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
     }
 
     try {
-      const res = await deleteLocationAction(locId);
+      const resRaw = await fetch(`/api/locations/${locId}`, {
+        method: 'DELETE'
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Unidade excluída com sucesso!');
+        router.refresh();
         setRefreshTrigger(prev => prev + 1);
       } else {
         throw new Error(res.error);
