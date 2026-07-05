@@ -54,3 +54,11 @@ export const settings = sqliteTable('settings', {
   value: text('value'),
   createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
 });
+
+export const workNotes = sqliteTable('work_notes', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  osId: text('os_id').notNull().references(() => workOrders.id, { onDelete: 'cascade' }),
+  note: text('note').notNull(),
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
+});
+

@@ -49,3 +49,10 @@ export interface DBWorkOrder {
   clients?: DBClient;
   equipments?: DBEquipment;
 }
+
+export interface DBWorkNote {
+  id: string;
+  os_id: string;
+  note: string;
+  created_at?: string;
+}
