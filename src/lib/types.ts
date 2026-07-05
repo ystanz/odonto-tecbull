@@ -1,6 +1,9 @@
 export interface DBClient {
   id: string;
   name: string;
+  responsible_name?: string | null;
+  phone?: string | null;
+  email?: string | null;
   created_at?: string;
 }
 
@@ -9,6 +12,9 @@ export interface DBLocation {
   client_id: string;
   name: string;
   room: string | null;
+  address?: string | null;
+  contact?: string | null;
+  notes?: string | null;
   created_at?: string;
   clients?: DBClient; // Para joins do Supabase
 }

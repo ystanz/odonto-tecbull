@@ -6,17 +6,17 @@ const EQUIPMENTS_KEY = 'techbull_equipments';
 const WORK_ORDERS_KEY = 'techbull_work_orders';
 
 const initialClients: DBClient[] = [
-  { id: 'b1928424-dc50-4ff6-9818-d9bc7bf8bf21', name: 'Clínica Sorriso' },
-  { id: 'd5a2c4e2-6b9e-4a6c-9c69-80ffee14a3c7', name: 'OdontoMaster' },
-  { id: 'e3d1e307-00c6-4519-a64b-a18209c46ee2', name: 'Clinica OdontoVida' }
+  { id: 'b1928424-dc50-4ff6-9818-d9bc7bf8bf21', name: 'Clínica Sorriso', responsible_name: 'Dr. Roberto Santos', phone: '11988888888', email: 'roberto@sorriso.com' },
+  { id: 'd5a2c4e2-6b9e-4a6c-9c69-80ffee14a3c7', name: 'OdontoMaster', responsible_name: 'Dra. Carla Souza', phone: '11977777777', email: 'carla@odontomaster.com' },
+  { id: 'e3d1e307-00c6-4519-a64b-a18209c46ee2', name: 'Clinica OdontoVida', responsible_name: 'Dr. Paulo Abreu', phone: '11966666666', email: 'paulo@odontovida.com' }
 ];
 
 const initialLocations: DBLocation[] = [
-  { id: 'c01a600b-34f1-e111-92b7-082fd26699b6', client_id: 'b1928424-dc50-4ff6-9818-d9bc7bf8bf21', name: 'Centro Unit', room: 'Operatory 1' },
-  { id: 'd2718a78-31b0-41c6-a319-3fbe86dbac15', client_id: 'b1928424-dc50-4ff6-9818-d9bc7bf8bf21', name: 'Centro Unit', room: 'Operatory 2' },
-  { id: 'fd983088-bad1-001f-2a26-3235ffb77a6c', client_id: 'b1928424-dc50-4ff6-9818-d9bc7bf8bf21', name: 'Barra Unit', room: 'Main Operatory' },
-  { id: '234f3b23-4f3b-4114-b5f8-8bad1001f2a2', client_id: 'd5a2c4e2-6b9e-4a6c-9c69-80ffee14a3c7', name: 'Main Clinic', room: 'Room 3' },
-  { id: 'e9f6fa1e-5030-0021-0d1e-50309ed3aa9e', client_id: 'e3d1e307-00c6-4519-a64b-a18209c46ee2', name: 'Centro Sorriso Infantil', room: 'Main Operatory' }
+  { id: 'c01a600b-34f1-e111-92b7-082fd26699b6', client_id: 'b1928424-dc50-4ff6-9818-d9bc7bf8bf21', name: 'Centro Unit', room: 'Operatory 1', address: 'Av. Paulista, 1000', contact: 'Recepção', notes: 'Próximo ao metrô' },
+  { id: 'd2718a78-31b0-41c6-a319-3fbe86dbac15', client_id: 'b1928424-dc50-4ff6-9818-d9bc7bf8bf21', name: 'Centro Unit', room: 'Operatory 2', address: 'Av. Paulista, 1000', contact: 'Recepção', notes: 'Próximo ao metrô' },
+  { id: 'fd983088-bad1-001f-2a26-3235ffb77a6c', client_id: 'b1928424-dc50-4ff6-9818-d9bc7bf8bf21', name: 'Barra Unit', room: 'Main Operatory', address: 'Av. das Américas, 500', contact: 'Portaria', notes: 'Bloco B' },
+  { id: '234f3b23-4f3b-4114-b5f8-8bad1001f2a2', client_id: 'd5a2c4e2-6b9e-4a6c-9c69-80ffee14a3c7', name: 'Main Clinic', room: 'Room 3', address: 'Rua das Flores, 15', contact: 'Dr. Carla', notes: 'Fundos' },
+  { id: 'e9f6fa1e-5030-0021-0d1e-50309ed3aa9e', client_id: 'e3d1e307-00c6-4519-a64b-a18209c46ee2', name: 'Centro Sorriso Infantil', room: 'Main Operatory', address: 'Rua Augusta, 450', contact: 'Ana Luiza', notes: 'Sala decorada' }
 ];
 
 const initialEquipments: DBEquipment[] = [
@@ -111,11 +111,14 @@ export function getLocalClients(): DBClient[] {
   return JSON.parse(raw);
 }
 
-export function saveLocalClient(name: string): DBClient {
+export function saveLocalClient(name: string, responsibleName?: string | null, phone?: string | null, email?: string | null): DBClient {
   const clients = getLocalClients();
   const newClient: DBClient = {
     id: crypto.randomUUID(),
     name,
+    responsible_name: responsibleName || null,
+    phone: phone || null,
+    email: email || null,
     created_at: new Date().toISOString()
   };
   clients.push(newClient);
@@ -133,13 +136,23 @@ export function getLocalLocations(): DBLocation[] {
   return JSON.parse(raw);
 }
 
-export function saveLocalLocation(clientId: string, name: string, room: string | null): DBLocation {
+export function saveLocalLocation(
+  clientId: string,
+  name: string,
+  room: string | null,
+  address?: string | null,
+  contact?: string | null,
+  notes?: string | null
+): DBLocation {
   const locations = getLocalLocations();
   const newLocation: DBLocation = {
     id: crypto.randomUUID(),
     client_id: clientId,
     name,
     room,
+    address: address || null,
+    contact: contact || null,
+    notes: notes || null,
     created_at: new Date().toISOString()
   };
   locations.push(newLocation);

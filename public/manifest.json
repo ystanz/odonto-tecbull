@@ -1,7 +1,7 @@
 {
   "name": "TecBull OS",
   "short_name": "TecBull",
-  "description": "Gestão de Ordens de Serviço OdontoTech Bull",
+  "description": "Gestão de Ordens de Serviço TecBull",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FAF8F4",

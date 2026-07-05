@@ -32,6 +32,9 @@ export async function getClientsAction() {
     const formatted: DBClient[] = data.map(item => ({
       id: item.id,
       name: item.name,
+      responsible_name: item.responsibleName,
+      phone: item.phone,
+      email: item.email,
       created_at: item.createdAt || undefined
     }));
 
@@ -43,7 +46,7 @@ export async function getClientsAction() {
   }
 }
 
-export async function createClientAction(name: string) {
+export async function createClientAction(name: string, responsibleName?: string | null, phone?: string | null, email?: string | null) {
   try {
     if (!isConfigured()) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
@@ -52,7 +55,12 @@ export async function createClientAction(name: string) {
     const db = getDb();
     const [data] = await db
       .insert(schema.clients)
-      .values({ name })
+      .values({ 
+        name,
+        responsibleName: responsibleName || null,
+        phone: phone || null,
+        email: email || null
+      })
       .returning();
 
     return { 
@@ -60,6 +68,9 @@ export async function createClientAction(name: string) {
       data: {
         id: data.id,
         name: data.name,
+        responsible_name: data.responsibleName,
+        phone: data.phone,
+        email: data.email,
         created_at: data.createdAt || undefined
       } as DBClient 
     };
@@ -88,10 +99,16 @@ export async function getLocationsAction() {
       client_id: row.locations.clientId || '',
       name: row.locations.name,
       room: row.locations.room,
+      address: row.locations.address,
+      contact: row.locations.contact,
+      notes: row.locations.notes,
       created_at: row.locations.createdAt || undefined,
       clients: row.clients ? {
         id: row.clients.id,
         name: row.clients.name,
+        responsible_name: row.clients.responsibleName,
+        phone: row.clients.phone,
+        email: row.clients.email,
         created_at: row.clients.createdAt || undefined
       } : undefined
     }));
@@ -104,7 +121,14 @@ export async function getLocationsAction() {
   }
 }
 
-export async function createLocationAction(clientId: string, name: string, room?: string) {
+export async function createLocationAction(
+  clientId: string,
+  name: string,
+  room?: string | null,
+  address?: string | null,
+  contact?: string | null,
+  notes?: string | null
+) {
   try {
     if (!isConfigured()) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
@@ -113,7 +137,14 @@ export async function createLocationAction(clientId: string, name: string, room?
     const db = getDb();
     const [data] = await db
       .insert(schema.locations)
-      .values({ clientId, name, room: room || null })
+      .values({ 
+        clientId, 
+        name, 
+        room: room || null,
+        address: address || null,
+        contact: contact || null,
+        notes: notes || null
+      })
       .returning();
 
     return { 
@@ -123,6 +154,9 @@ export async function createLocationAction(clientId: string, name: string, room?
         client_id: data.clientId || '',
         name: data.name,
         room: data.room,
+        address: data.address,
+        contact: data.contact,
+        notes: data.notes,
         created_at: data.createdAt || undefined
       } as DBLocation 
     };
@@ -343,7 +377,13 @@ export async function createWorkOrderAction(workOrderData: {
   }
 }
 
-export async function updateClientAction(id: string, name: string) {
+export async function updateClientAction(
+  id: string,
+  name: string,
+  responsibleName?: string | null,
+  phone?: string | null,
+  email?: string | null
+) {
   try {
     if (!isConfigured()) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
@@ -352,7 +392,12 @@ export async function updateClientAction(id: string, name: string) {
     const db = getDb();
     const [data] = await db
       .update(schema.clients)
-      .set({ name })
+      .set({ 
+        name,
+        responsibleName: responsibleName || null,
+        phone: phone || null,
+        email: email || null
+      })
       .where(eq(schema.clients.id, id))
       .returning();
 
@@ -365,6 +410,9 @@ export async function updateClientAction(id: string, name: string) {
       data: {
         id: data.id,
         name: data.name,
+        responsible_name: data.responsibleName,
+        phone: data.phone,
+        email: data.email,
         created_at: data.createdAt || undefined
       } as DBClient
     };
@@ -399,7 +447,68 @@ export async function deleteClientAction(id: string) {
   }
 }
 
-export async function updateLocationAction(id: string, clientId: string, name: string, room?: string) {
+export async function getClientDetailsAction(id: string) {
+  try {
+    if (!isConfigured()) {
+      return { success: false, error: 'DB_NOT_CONFIGURED' };
+    }
+
+    const db = getDb();
+    const [client] = await db
+      .select()
+      .from(schema.clients)
+      .where(eq(schema.clients.id, id))
+      .limit(1);
+
+    if (!client) {
+      return { success: false, error: 'Client not found' };
+    }
+
+    const locationsList = await db
+      .select()
+      .from(schema.locations)
+      .where(eq(schema.locations.clientId, id))
+      .orderBy(schema.locations.name);
+
+    return {
+      success: true,
+      data: {
+        client: {
+          id: client.id,
+          name: client.name,
+          responsible_name: client.responsibleName,
+          phone: client.phone,
+          email: client.email,
+          created_at: client.createdAt || undefined
+        } as DBClient,
+        locations: locationsList.map(loc => ({
+          id: loc.id,
+          client_id: loc.clientId || '',
+          name: loc.name,
+          room: loc.room,
+          address: loc.address,
+          contact: loc.contact,
+          notes: loc.notes,
+          created_at: loc.createdAt || undefined
+        } as DBLocation))
+      }
+    };
+  } catch (err) {
+    console.error('Error fetching client details:', err);
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    return { success: false, error: msg };
+  }
+}
+
+export async function updateLocationAction(
+  id: string,
+  clientId: string,
+  name: string,
+  room?: string | null,
+  address?: string | null,
+  contact?: string | null,
+  notes?: string | null
+) {
   try {
     if (!isConfigured()) {
       return { success: false, error: 'DB_NOT_CONFIGURED' };
@@ -408,7 +517,14 @@ export async function updateLocationAction(id: string, clientId: string, name: s
     const db = getDb();
     const [data] = await db
       .update(schema.locations)
-      .set({ clientId, name, room: room || null })
+      .set({ 
+        clientId, 
+        name, 
+        room: room || null,
+        address: address || null,
+        contact: contact || null,
+        notes: notes || null
+      })
       .where(eq(schema.locations.id, id))
       .returning();
 
@@ -423,6 +539,9 @@ export async function updateLocationAction(id: string, clientId: string, name: s
         client_id: data.clientId || '',
         name: data.name,
         room: data.room,
+        address: data.address,
+        contact: data.contact,
+        notes: data.notes,
         created_at: data.createdAt || undefined
       } as DBLocation
     };

@@ -3,14 +3,20 @@ import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 export const clients = sqliteTable('clients', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
+  responsibleName: text('responsible_name'),
+  phone: text('phone'),
+  email: text('email'),
   createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
 });
 
 export const locations = sqliteTable('locations', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  clientId: text('client_id').references(() => clients.id, { onDelete: 'cascade' }),
+  clientId: text('client_id').notNull().references(() => clients.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   room: text('room'),
+  address: text('address'),
+  contact: text('contact'),
+  notes: text('notes'),
   createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
 });
 
