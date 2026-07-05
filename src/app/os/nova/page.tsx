@@ -1,6 +1,4 @@
 'use client';
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -9,7 +7,6 @@ import Link from 'next/link';
 import {
   getLocationsAction,
   getEquipmentsAction,
-  getClientsAction,
   createWorkOrderAction,
 } from '@/app/actions';
 import { DBLocation, DBEquipment, DBClient } from '@/lib/types';
@@ -63,7 +60,8 @@ export default function NovaOSPage() {
           rawLocations = resLocs.data || [];
           const resEquips = await getEquipmentsAction();
           rawEquipments = resEquips.success ? resEquips.data || [] : [];
-          const resClients = await getClientsAction();
+          const resRaw = await fetch('/api/clientes');
+          const resClients = await resRaw.json();
           rawClients = resClients.success ? resClients.data || [] : [];
         } else {
           showToast('Erro ao carregar dados do banco de dados.', 'error');
@@ -73,6 +71,19 @@ export default function NovaOSPage() {
         setLocations(rawLocations);
         setEquipments(rawEquipments);
         setClients(rawClients);
+
+        // Read eqId query parameter to pre-fill location and equipment selection
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search);
+          const eqId = params.get('eqId');
+          if (eqId) {
+            const foundEquip = rawEquipments.find((e) => e.id === eqId);
+            if (foundEquip) {
+              setSelectedLocationId(foundEquip.location_id || '');
+              setSelectedEquipmentId(eqId);
+            }
+          }
+        }
       } catch (err) {
         console.error('Erro ao buscar listas do D1:', err);
         if (active) {
@@ -90,23 +101,6 @@ export default function NovaOSPage() {
       active = false;
     };
   }, [showToast]);
-
-  // Read eqId query parameter on mount to pre-fill location and equipment selection
-  useEffect(() => {
-    if (loading || equipments.length === 0) return;
-
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const eqId = params.get('eqId');
-      if (eqId) {
-        const foundEquip = equipments.find((e) => e.id === eqId);
-        if (foundEquip) {
-          setSelectedLocationId(foundEquip.location_id || '');
-          setSelectedEquipmentId(eqId);
-        }
-      }
-    }
-  }, [loading, equipments]);
 
   // Dynamic Equipments list filtered by location
   const filteredEquipments = equipments.filter((eq) => (eq.location_id || '') === selectedLocationId);

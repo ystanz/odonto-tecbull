@@ -27,7 +27,7 @@ interface ClientData {
 export default function ClientesPage() {
   const [clients, setClients] = useState<ClientData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -141,12 +141,7 @@ export default function ClientesPage() {
     };
   }, [refreshTrigger, showToast]);
 
-  const toggleSection = (id: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
+
 
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();

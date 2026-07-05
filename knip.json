@@ -1,0 +1,15 @@
+{
+    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "next": {
+        "entry": [
+            "src/app/**/page.tsx",
+            "src/app/**/layout.tsx",
+            "src/app/**/route.ts",
+            "src/app/actions.ts"
+        ]
+    },
+    "ignoreDependencies": [
+        "npm-check-updates",
+        "wrangler"
+    ]
+}

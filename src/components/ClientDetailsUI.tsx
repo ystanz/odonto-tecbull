@@ -85,6 +85,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
   }, [id, refreshTrigger, showToast]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadClientDetails();
   }, [loadClientDetails]);
 

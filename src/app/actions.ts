@@ -7,6 +7,7 @@ import { DBClient, DBLocation, DBEquipment, DBWorkOrder } from '@/lib/types';
 // Helper to check if D1 DB is configured in wrangler/Cloudflare environment
 function isConfigured() {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dbBinding = (globalThis as any).DB || process.env.DB;
     return !!dbBinding;
   } catch {

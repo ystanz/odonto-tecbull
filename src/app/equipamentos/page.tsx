@@ -1,13 +1,11 @@
 'use client';
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import {
   getEquipmentsAction,
   createEquipmentAction,
-  getClientsAction,
   getLocationsAction,
 } from '@/app/actions';
 import { DBEquipment, DBClient, DBLocation } from '@/lib/types';
@@ -27,23 +25,19 @@ export default function EquipamentosPage() {
   const [equipments, setEquipments] = useState<FormattedEquipment[]>([]);
   const [clients, setClients] = useState<DBClient[]>([]);
   const [locations, setLocations] = useState<DBLocation[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('q') || '';
+    }
+    return '';
+  });
+
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Read search query parameter from URL on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const q = params.get('q');
-      if (q) {
-        setSearchQuery(q);
-      }
-    }
-  }, []);
 
   // Form Fields State
   const [name, setName] = useState('');
@@ -74,13 +68,14 @@ export default function EquipamentosPage() {
         let rawEquipments: DBEquipment[] = [];
         let rawClients: DBClient[] = [];
         let rawLocations: DBLocation[] = [];
-        let isOffline = false;
+
 
         // Fetch from actions
         const resEquips = await getEquipmentsAction();
         if (resEquips.success) {
           rawEquipments = resEquips.data || [];
-          const resClients = await getClientsAction();
+          const resRaw = await fetch('/api/clientes');
+          const resClients = await resRaw.json();
           rawClients = resClients.success ? resClients.data || [] : [];
           const resLocs = await getLocationsAction();
           rawLocations = resLocs.success ? resLocs.data || [] : [];

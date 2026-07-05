@@ -2,10 +2,11 @@ import { drizzle } from 'drizzle-orm/d1';
 import * as schema from '@/db/schema';
 
 export function getDb() {
-  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dbBinding = (globalThis as any).DB || process.env.DB;
   if (!dbBinding) throw new Error("D1 DB binding not found.");
-  return drizzle(dbBinding, { schema });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return drizzle(dbBinding as any, { schema });
 }
 
 export { schema };

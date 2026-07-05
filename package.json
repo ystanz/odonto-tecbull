@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "oxlint": "oxlint .",
+    "knip": "knip",
+    "audit": "npm audit",
+    "verify": "npm run lint && npm run typecheck && npm run build",
+    "verify:full": "npm run oxlint && npm run lint && npm run typecheck && npm run knip && npm run build"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
@@ -23,6 +30,9 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "knip": "^6.24.0",
+    "npm-check-updates": "^22.2.9",
+    "oxlint": "^1.72.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4.106.0"

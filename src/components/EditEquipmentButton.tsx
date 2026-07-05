@@ -55,6 +55,7 @@ export default function EditEquipmentButton({
 
   // Sync state if equipment prop changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(equipment.name);
     setSelectedClientId(equipment.clientId || '');
     setSelectedLocationId(equipment.locationId || '');

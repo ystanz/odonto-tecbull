@@ -6,7 +6,6 @@ import { getDb, schema } from '@/lib/supabase';
 import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import EditEquipmentButton from '@/components/EditEquipmentButton';
-import { getClientsAction, getLocationsAction } from '@/app/actions';
 import { DBClient, DBLocation } from '@/lib/types';
 
 interface PageProps {
@@ -41,19 +40,49 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
   let timeline: TimelineItem[] = [];
   let clientsList: DBClient[] = [];
   let locationsList: DBLocation[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let dbEq: any = null;
 
   try {
     const db = getDb();
-    // Fetch clients and locations
-    const resClients = await getClientsAction();
-    if (resClients.success) {
-        clientsList = resClients.data;
-      }
-      const resLocs = await getLocationsAction();
-      if (resLocs.success) {
-        locationsList = resLocs.data;
-      }
+    // Fetch clients directly from D1 using Drizzle
+    const rawClients = await db
+      .select()
+      .from(schema.clients)
+      .orderBy(schema.clients.name);
+    clientsList = rawClients.map(item => ({
+      id: item.id,
+      name: item.name,
+      responsible_name: item.responsibleName,
+      phone: item.phone,
+      email: item.email,
+      created_at: item.createdAt || undefined,
+    }));
+
+    // Fetch locations directly from D1 using Drizzle
+    const rowsLocations = await db
+      .select()
+      .from(schema.locations)
+      .leftJoin(schema.clients, eq(schema.locations.clientId, schema.clients.id))
+      .orderBy(schema.locations.name);
+    locationsList = rowsLocations.map(row => ({
+      id: row.locations.id,
+      client_id: row.locations.clientId || '',
+      name: row.locations.name,
+      room: row.locations.room,
+      address: row.locations.address,
+      contact: row.locations.contact,
+      notes: row.locations.notes,
+      created_at: row.locations.createdAt || undefined,
+      clients: row.clients ? {
+        id: row.clients.id,
+        name: row.clients.name,
+        responsible_name: row.clients.responsibleName,
+        phone: row.clients.phone,
+        email: row.clients.email,
+        created_at: row.clients.createdAt || undefined
+      } : undefined
+    }));
 
       // Fetch equipment with locations and clients using Drizzle join
       const rows = await db

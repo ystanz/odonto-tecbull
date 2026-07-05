@@ -1,16 +1,9 @@
 'use client';
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import { getWorkOrdersAction } from '@/app/actions';
-import {
-  getLocalWorkOrders,
-  getLocalClients,
-  getLocalEquipments,
-} from '@/lib/localDb';
-import { DBWorkOrder, DBClient, DBEquipment } from '@/lib/types';
+import { DBWorkOrder } from '@/lib/types';
 import Link from 'next/link';
 
 interface WorkOrder {
@@ -37,11 +30,8 @@ export default function WorkOrdersPage() {
       try {
         setLoading(true);
         let rawWos: DBWorkOrder[] = [];
-        let isOffline = false;
 
         const res = await getWorkOrdersAction();
-        let rawClients: DBClient[] = [];
-        let rawEquips: DBEquipment[] = [];
 
         if (res.success) {
           rawWos = res.data || [];
