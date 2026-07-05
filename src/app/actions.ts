@@ -1,7 +1,6 @@
 'use server';
 
 import { getDb, schema } from '@/lib/supabase';
-import { getRequestContext } from '@cloudflare/next-on-pages';
 import { eq, desc } from 'drizzle-orm';
 import { DBClient, DBLocation, DBEquipment, DBWorkOrder } from '@/lib/types';
 
@@ -10,8 +9,8 @@ import { DBClient, DBLocation, DBEquipment, DBWorkOrder } from '@/lib/types';
 // Helper to check if D1 DB is configured in wrangler/Cloudflare environment
 function isConfigured() {
   try {
-    const env = getRequestContext().env as { DB?: any };
-    return !!(env && env.DB);
+    const dbBinding = (globalThis as any).DB || process.env.DB;
+    return !!dbBinding;
   } catch {
     return false;
   }
