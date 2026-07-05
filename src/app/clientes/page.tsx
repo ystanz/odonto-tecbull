@@ -3,10 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
-import {
-  getLocationsAction,
-  getEquipmentsAction,
-} from '@/app/actions';
+// no actions imported
 import { DBLocation, DBEquipment, DBClient } from '@/lib/types';
 
 interface Location {
@@ -71,9 +68,12 @@ export default function ClientesPage() {
         const resClients = await resRaw.json();
         if (resClients.success) {
           rawClients = resClients.data || [];
-          const resLocs = await getLocationsAction();
+          const resLocsRaw = await fetch('/api/locations');
+          const resLocs = await resLocsRaw.json();
           rawLocations = resLocs.success ? resLocs.data || [] : [];
-          const resEquips = await getEquipmentsAction();
+
+          const resEquipsRaw = await fetch('/api/equipamentos');
+          const resEquips = await resEquipsRaw.json();
           rawEquipments = resEquips.success ? resEquips.data || [] : [];
         } else {
           showToast('Erro ao carregar dados do banco de dados.', 'error');

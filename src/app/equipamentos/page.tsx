@@ -3,11 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
-import {
-  getEquipmentsAction,
-  createEquipmentAction,
-  getLocationsAction,
-} from '@/app/actions';
+// no actions imported
 import { DBEquipment, DBClient, DBLocation } from '@/lib/types';
 
 interface FormattedEquipment {
@@ -70,14 +66,16 @@ export default function EquipamentosPage() {
         let rawLocations: DBLocation[] = [];
 
 
-        // Fetch from actions
-        const resEquips = await getEquipmentsAction();
+        // Fetch from REST APIs
+        const resEquipsRaw = await fetch('/api/equipamentos');
+        const resEquips = await resEquipsRaw.json();
         if (resEquips.success) {
           rawEquipments = resEquips.data || [];
           const resRaw = await fetch('/api/clientes');
           const resClients = await resRaw.json();
           rawClients = resClients.success ? resClients.data || [] : [];
-          const resLocs = await getLocationsAction();
+          const resLocsRaw = await fetch('/api/locations');
+          const resLocs = await resLocsRaw.json();
           rawLocations = resLocs.success ? resLocs.data || [] : [];
         } else {
           showToast('Erro ao carregar dados do banco de dados.', 'error');
@@ -143,17 +141,21 @@ export default function EquipamentosPage() {
     try {
       setSubmitting(true);
 
-      const equipmentData = {
-        name,
-        location_id: selectedLocationId || null,
-        serial_number: serialNumber || null,
-        manufacturer: manufacturer || null,
-        installation_date: installationDate || null,
-        next_service_date: nextServiceDate || null,
-        status,
-      };
 
-      const res = await createEquipmentAction(equipmentData);
+      const resRaw = await fetch('/api/equipamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          locationId: selectedLocationId || null,
+          serialNumber: serialNumber || null,
+          manufacturer: manufacturer || null,
+          installationDate: installationDate || null,
+          nextServiceDate: nextServiceDate || null,
+          status,
+        })
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Equipamento cadastrado com sucesso!');
       } else {

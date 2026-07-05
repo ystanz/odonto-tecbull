@@ -4,11 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
-import {
-  getLocationsAction,
-  getEquipmentsAction,
-  createWorkOrderAction,
-} from '@/app/actions';
+// no actions imported
 import { DBLocation, DBEquipment, DBClient } from '@/lib/types';
 // Supabase uninstalled - database migrated to Cloudflare D1 with Drizzle ORM
 
@@ -54,11 +50,13 @@ export default function NovaOSPage() {
         let rawEquipments: DBEquipment[] = [];
         let rawClients: DBClient[] = [];
         setLoading(true);
-        // Fetch from Drizzle actions
-        const resLocs = await getLocationsAction();
+        // Fetch from REST APIs
+        const resLocsRaw = await fetch('/api/locations');
+        const resLocs = await resLocsRaw.json();
         if (resLocs.success) {
           rawLocations = resLocs.data || [];
-          const resEquips = await getEquipmentsAction();
+          const resEquipsRaw = await fetch('/api/equipamentos');
+          const resEquips = await resEquipsRaw.json();
           rawEquipments = resEquips.success ? resEquips.data || [] : [];
           const resRaw = await fetch('/api/clientes');
           const resClients = await resRaw.json();
@@ -168,23 +166,26 @@ export default function NovaOSPage() {
       // 3. Generate OS Code
       const code = `#OS-${Math.floor(1000 + Math.random() * 9000)}`;
 
-      // 4. Construct DB Record
-      const workOrderRecord = {
-        code,
-        client_id: clientId,
-        equipment_id: selectedEquipmentId,
-        status: 'ABERTA' as const,
-        priority,
-        defect_reported: defectReported,
-        parts_used: partsUsed.trim() ? partsUsed.trim() : null,
-        work_notes: workNotes.trim() ? workNotes.trim() : null,
-        image_url: uploadedUrl,
-        service_date: new Date().toISOString().split('T')[0],
-        technician_name: 'Marcelo T.', // Default technician
-      };
 
-      // 5. Insert Record
-      const res = await createWorkOrderAction(workOrderRecord);
+      // 5. Insert Record via REST API
+      const resRaw = await fetch('/api/ordens-servico', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code,
+          clientId,
+          equipmentId: selectedEquipmentId,
+          status: 'ABERTA',
+          priority,
+          defectReported,
+          partsUsed: partsUsed.trim() ? partsUsed.trim() : null,
+          workNotes: workNotes.trim() ? workNotes.trim() : null,
+          imageUrl: uploadedUrl,
+          serviceDate: new Date().toISOString().split('T')[0],
+          technicianName: 'Marcelo T.',
+        })
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Ordem de Serviço aberta com sucesso!');
       } else {

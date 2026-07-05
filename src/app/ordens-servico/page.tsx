@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
-import { getWorkOrdersAction } from '@/app/actions';
+// no actions imported
 import { DBWorkOrder } from '@/lib/types';
 import Link from 'next/link';
 
@@ -31,12 +31,13 @@ export default function WorkOrdersPage() {
         setLoading(true);
         let rawWos: DBWorkOrder[] = [];
 
-        const res = await getWorkOrdersAction();
+        const resRaw = await fetch('/api/ordens-servico');
+        const res = await resRaw.json();
 
         if (res.success) {
           rawWos = res.data || [];
         } else {
-          console.error('Erro ao buscar ordens de serviço do D1');
+          console.error('Erro ao buscar ordens de serviço da API');
         }
 
         const formatted: WorkOrder[] = rawWos.map((wo) => {

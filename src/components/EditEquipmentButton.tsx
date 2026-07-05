@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { updateEquipmentAction } from '@/app/actions';
+// no actions imported
 import { DBClient, DBLocation } from '@/lib/types';
 
 interface EditEquipmentButtonProps {
@@ -76,16 +76,21 @@ export default function EditEquipmentButton({
     try {
       setSubmitting(true);
 
-      const equipmentData = {
-        name,
-        location_id: selectedLocationId || null,
-        serial_number: serialNumber || null,
-        installation_date: installationDate || null,
-        status,
-        next_service_date: nextServiceDate || null,
-      };
 
-      const res = await updateEquipmentAction(equipment.id, equipmentData);
+      const resRaw = await fetch(`/api/equipamentos/${equipment.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          locationId: selectedLocationId || null,
+          serialNumber: serialNumber || null,
+          manufacturer: manufacturer || null,
+          installationDate: installationDate || null,
+          nextServiceDate: nextServiceDate || null,
+          status,
+        })
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Equipamento atualizado com sucesso!');
       } else {
