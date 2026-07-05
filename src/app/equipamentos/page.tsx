@@ -14,7 +14,6 @@ import { DBEquipment, DBClient, DBLocation } from '@/lib/types';
 
 interface FormattedEquipment {
   id: string;
-  code: string | null;
   name: string;
   locationPath: string;
   serialNumber: string;
@@ -47,14 +46,12 @@ export default function EquipamentosPage() {
   }, []);
 
   // Form Fields State
-  const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [serialNumber, setSerialNumber] = useState('');
   const [manufacturer, setManufacturer] = useState('');
   const [installationDate, setInstallationDate] = useState('');
-  const [warrantyUntil, setWarrantyUntil] = useState('');
   const [nextServiceDate, setNextServiceDate] = useState('');
   const [status, setStatus] = useState('Ativo');
 
@@ -108,7 +105,6 @@ export default function EquipamentosPage() {
 
           return {
             id: eq.id,
-            code: eq.code,
             name: eq.name,
             locationPath,
             serialNumber: eq.serial_number || 'N/A',
@@ -144,7 +140,7 @@ export default function EquipamentosPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !selectedLocationId) {
+    if (!name.trim()) {
       showToast('Preencha os campos obrigatórios.', 'error');
       return;
     }
@@ -153,13 +149,11 @@ export default function EquipamentosPage() {
       setSubmitting(true);
 
       const equipmentData = {
-        code: code.trim() || null,
         name,
-        location_id: selectedLocationId,
+        location_id: selectedLocationId || null,
         serial_number: serialNumber || null,
         manufacturer: manufacturer || null,
         installation_date: installationDate || null,
-        warranty_until: warrantyUntil || null,
         next_service_date: nextServiceDate || null,
         status,
       };
@@ -168,19 +162,16 @@ export default function EquipamentosPage() {
       if (res.success) {
         showToast('Equipamento cadastrado com sucesso!');
       } else {
-        // If code is not unique, database will throw unique key violation error
         throw new Error(res.error);
       }
 
       // Reset Form fields
-      setCode('');
       setName('');
       setSelectedClientId('');
       setSelectedLocationId('');
       setSerialNumber('');
       setManufacturer('');
       setInstallationDate('');
-      setWarrantyUntil('');
       setNextServiceDate('');
       setStatus('Ativo');
 
@@ -197,7 +188,6 @@ export default function EquipamentosPage() {
   const filteredEquipments = equipments.filter((eq) => {
     return (
       eq.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (eq.code?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
       eq.locationPath.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
@@ -284,11 +274,8 @@ export default function EquipamentosPage() {
                   <article className="bg-surface-container-lowest rounded-xl shadow-sm border border-outline/10 p-md flex flex-col justify-between h-full hover:shadow-md hover:border-primary/20 transition-all cursor-pointer relative overflow-hidden group active:scale-[0.99]">
                     <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors"></div>
 
-                    {/* Top row code & status */}
-                    <div className="flex justify-between items-center pl-xs mb-sm">
-                      <span className="font-technical-code text-technical-code text-outline font-bold">
-                        {eq.code}
-                      </span>
+                    {/* Top row status */}
+                    <div className="flex justify-end items-center pl-xs mb-sm">
                       <span className={`inline-flex items-center px-sm py-base rounded-full font-label-caps text-label-caps ${badgeClass}`}>
                         <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${dotClass}`}></span>
                         {eq.status}
@@ -358,22 +345,7 @@ export default function EquipamentosPage() {
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Code */}
-                    <div className="flex flex-col gap-1">
-                      <label htmlFor="eq-code" className="font-label-caps text-label-caps text-on-surface-variant">
-                        Código do Ativo (Único)
-                      </label>
-                      <input
-                        id="eq-code"
-                        type="text"
-                        placeholder="Ex: CD001, COMP-402"
-                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                      />
-                    </div>
-
+                  <div className="grid grid-cols-1 gap-4">
                     {/* Name */}
                     <div className="flex flex-col gap-1">
                       <label htmlFor="eq-name" className="font-label-caps text-label-caps text-on-surface-variant">
@@ -424,12 +396,11 @@ export default function EquipamentosPage() {
                     {/* Location Dropdown */}
                     <div className="flex flex-col gap-1">
                       <label htmlFor="eq-location" className="font-label-caps text-label-caps text-on-surface-variant">
-                        Unidade / Local*
+                        Unidade / Local
                       </label>
                       <div className="relative w-full">
                         <select
                           id="eq-location"
-                          required
                           disabled={!selectedClientId}
                           className="w-full h-12 px-4 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           value={selectedLocationId}
@@ -481,7 +452,7 @@ export default function EquipamentosPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Installation Date */}
                     <div className="flex flex-col gap-1">
                       <label htmlFor="eq-install" className="font-label-caps text-label-caps text-on-surface-variant">
@@ -493,20 +464,6 @@ export default function EquipamentosPage() {
                         className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                         value={installationDate}
                         onChange={(e) => setInstallationDate(e.target.value)}
-                      />
-                    </div>
-
-                    {/* Warranty Date */}
-                    <div className="flex flex-col gap-1">
-                      <label htmlFor="eq-warranty" className="font-label-caps text-label-caps text-on-surface-variant">
-                        Garantia Até
-                      </label>
-                      <input
-                        id="eq-warranty"
-                        type="date"
-                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                        value={warrantyUntil}
-                        onChange={(e) => setWarrantyUntil(e.target.value)}
                       />
                     </div>
 

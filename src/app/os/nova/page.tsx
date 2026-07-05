@@ -101,7 +101,7 @@ export default function NovaOSPage() {
       if (eqId) {
         const foundEquip = equipments.find((e) => e.id === eqId);
         if (foundEquip) {
-          setSelectedLocationId(foundEquip.location_id);
+          setSelectedLocationId(foundEquip.location_id || '');
           setSelectedEquipmentId(eqId);
         }
       }
@@ -109,7 +109,7 @@ export default function NovaOSPage() {
   }, [loading, equipments]);
 
   // Dynamic Equipments list filtered by location
-  const filteredEquipments = equipments.filter((eq) => eq.location_id === selectedLocationId);
+  const filteredEquipments = equipments.filter((eq) => (eq.location_id || '') === selectedLocationId);
 
   // Selected location details helper
   const getLocationLabel = (loc: DBLocation) => {
@@ -303,7 +303,7 @@ export default function NovaOSPage() {
                   </option>
                   {filteredEquipments.map((eq) => (
                     <option key={eq.id} value={eq.id}>
-                      {eq.name} ({eq.code})
+                      {eq.name}
                     </option>
                   ))}
                   {selectedLocationId && filteredEquipments.length === 0 && (

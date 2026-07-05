@@ -37,7 +37,6 @@ export default async function DashboardPage() {
     const dbEquipments = await db
       .select({
         id: schema.equipments.id,
-        code: schema.equipments.code,
         name: schema.equipments.name,
         status: schema.equipments.status,
         locationName: schema.locations.name,
@@ -49,7 +48,7 @@ export default async function DashboardPage() {
 
     if (dbEquipments && dbEquipments.length > 0) {
       alerts = dbEquipments.map((eqData) => ({
-        id: eqData.code || 'N/A',
+        id: eqData.id,
         name: eqData.name,
         location: eqData.locationName ? `${eqData.locationName} - ${eqData.locationRoom || ''}` : 'Unidade Geral',
         status: 'PENDENTE'
@@ -172,9 +171,6 @@ export default async function DashboardPage() {
                   <p className="font-body-md text-body-md text-on-surface-variant mt-[2px]">
                     {alert.location}
                   </p>
-                  <span className="font-technical-code text-technical-code text-outline mt-1 inline-block">
-                    Código: {alert.id}
-                  </span>
                 </div>
                 <div>
                   <span className="px-sm py-1 rounded bg-error/15 text-error font-label-caps text-label-caps whitespace-nowrap">

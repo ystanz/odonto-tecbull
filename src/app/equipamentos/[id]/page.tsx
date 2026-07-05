@@ -14,13 +14,11 @@ interface PageProps {
 }
 
 interface EquipmentSpecs {
-  code: string | null;
   name: string;
   locationName: string;
   serialNumber: string;
   installationDate: string;
   manufacturer: string;
-  warrantyUntil: string;
   status: string;
   nextServiceDate: string;
   nextServiceDays: number;
@@ -61,12 +59,10 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
       const rows = await db
         .select({
           id: schema.equipments.id,
-          code: schema.equipments.code,
           name: schema.equipments.name,
           serialNumber: schema.equipments.serialNumber,
           installationDate: schema.equipments.installationDate,
           manufacturer: schema.equipments.manufacturer,
-          warrantyUntil: schema.equipments.warrantyUntil,
           status: schema.equipments.status,
           nextServiceDate: schema.equipments.nextServiceDate,
           locationId: schema.equipments.locationId,
@@ -98,13 +94,11 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
         }
 
         equipment = {
-          code: dbEq.code || null,
           name: dbEq.name,
           locationName: locationPath,
           serialNumber: dbEq.serialNumber || 'N/A',
           installationDate: dbEq.installationDate || 'N/A',
           manufacturer: dbEq.manufacturer || 'N/A',
-          warrantyUntil: dbEq.warrantyUntil || 'N/A',
           status: dbEq.status,
           nextServiceDate: dbEq.nextServiceDate || 'N/A',
           nextServiceDays: days
@@ -159,14 +153,12 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
 
   const editEqData = {
     id: id,
-    code: equipment.code,
     name: equipment.name,
     locationId: dbEq ? (dbEq.locationId || '') : '',
     clientId: dbEq ? (dbEq.clientId || '') : '',
     serialNumber: equipment.serialNumber === 'N/A' ? '' : equipment.serialNumber,
     installationDate: equipment.installationDate === 'N/A' ? '' : equipment.installationDate,
     manufacturer: equipment.manufacturer === 'N/A' ? '' : equipment.manufacturer,
-    warrantyUntil: equipment.warrantyUntil === 'N/A' ? '' : equipment.warrantyUntil,
     status: equipment.status,
     nextServiceDate: equipment.nextServiceDate === 'N/A' ? '' : equipment.nextServiceDate,
   };
@@ -226,7 +218,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
         {/* Technical Specs Card */}
         <div className="bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(30,42,45,0.05)] p-md border border-outline/10">
           <h2 className="font-label-caps text-label-caps text-on-surface-variant mb-sm">Especificações Técnicas</h2>
-          <div className="grid grid-cols-2 gap-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm">
             <div>
               <span className="block font-label-caps text-label-caps text-outline mb-1">Serial Number</span>
               <span className="block font-technical-code text-technical-code text-on-surface">{equipment.serialNumber}</span>
@@ -238,10 +230,6 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
             <div>
               <span className="block font-label-caps text-label-caps text-outline mb-1">Fabricante</span>
               <span className="block font-body-md text-body-md text-on-surface">{equipment.manufacturer}</span>
-            </div>
-            <div>
-              <span className="block font-label-caps text-label-caps text-outline mb-1">Garantia</span>
-              <span className="block font-technical-code text-technical-code text-on-surface">{equipment.warrantyUntil}</span>
             </div>
           </div>
         </div>

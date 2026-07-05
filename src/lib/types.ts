@@ -15,13 +15,11 @@ export interface DBLocation {
 
 export interface DBEquipment {
   id: string;
-  code: string | null;
   name: string;
-  location_id: string;
+  location_id?: string | null;
   serial_number: string | null;
   installation_date: string | null;
   manufacturer: string | null;
-  warranty_until: string | null;
   status: string; // 'Ativo' | 'Pendente' | 'Inativo' etc
   next_service_date: string | null;
   created_at?: string;

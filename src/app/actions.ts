@@ -149,13 +149,11 @@ export async function getEquipmentsAction() {
 
     const formatted: DBEquipment[] = rows.map((row) => ({
       id: row.equipments.id,
-      code: row.equipments.code,
       name: row.equipments.name,
       location_id: row.equipments.locationId || '',
       serial_number: row.equipments.serialNumber,
       installation_date: row.equipments.installationDate,
       manufacturer: row.equipments.manufacturer,
-      warranty_until: row.equipments.warrantyUntil,
       status: row.equipments.status,
       next_service_date: row.equipments.nextServiceDate,
       created_at: row.equipments.createdAt || undefined,
@@ -182,13 +180,11 @@ export async function getEquipmentsAction() {
 }
 
 export async function createEquipmentAction(equipmentData: {
-  code?: string | null;
   name: string;
-  location_id: string;
+  location_id?: string | null;
   serial_number?: string | null;
   installation_date?: string | null;
   manufacturer?: string | null;
-  warranty_until?: string | null;
   status?: string;
   next_service_date?: string | null;
 }) {
@@ -201,13 +197,11 @@ export async function createEquipmentAction(equipmentData: {
     const [data] = await db
       .insert(schema.equipments)
       .values({
-        code: equipmentData.code || null,
         name: equipmentData.name,
-        locationId: equipmentData.location_id,
+        locationId: equipmentData.location_id || null,
         serialNumber: equipmentData.serial_number || null,
         installationDate: equipmentData.installation_date || null,
         manufacturer: equipmentData.manufacturer || null,
-        warrantyUntil: equipmentData.warranty_until || null,
         status: equipmentData.status || 'Ativo',
         nextServiceDate: equipmentData.next_service_date || null,
       })
@@ -217,13 +211,11 @@ export async function createEquipmentAction(equipmentData: {
       success: true, 
       data: {
         id: data.id,
-        code: data.code,
         name: data.name,
         location_id: data.locationId || '',
         serial_number: data.serialNumber,
         installation_date: data.installationDate,
         manufacturer: data.manufacturer,
-        warranty_until: data.warrantyUntil,
         status: data.status,
         next_service_date: data.nextServiceDate,
         created_at: data.createdAt || undefined
@@ -271,13 +263,11 @@ export async function getWorkOrdersAction() {
       } : undefined,
       equipments: row.equipments ? {
         id: row.equipments.id,
-        code: row.equipments.code,
         name: row.equipments.name,
         location_id: row.equipments.locationId || '',
         serial_number: row.equipments.serialNumber,
         installation_date: row.equipments.installationDate,
         manufacturer: row.equipments.manufacturer,
-        warranty_until: row.equipments.warrantyUntil,
         status: row.equipments.status,
         next_service_date: row.equipments.nextServiceDate,
         created_at: row.equipments.createdAt || undefined
@@ -470,13 +460,11 @@ export async function deleteLocationAction(id: string) {
 export async function updateEquipmentAction(
   id: string,
   equipmentData: {
-    code?: string | null;
     name: string;
-    location_id: string;
+    location_id?: string | null;
     serial_number?: string | null;
     installation_date?: string | null;
     manufacturer?: string | null;
-    warranty_until?: string | null;
     status?: string;
     next_service_date?: string | null;
   }
@@ -490,13 +478,11 @@ export async function updateEquipmentAction(
     const [data] = await db
       .update(schema.equipments)
       .set({
-        code: equipmentData.code || null,
         name: equipmentData.name,
-        locationId: equipmentData.location_id,
+        locationId: equipmentData.location_id || null,
         serialNumber: equipmentData.serial_number || null,
         installationDate: equipmentData.installation_date || null,
         manufacturer: equipmentData.manufacturer || null,
-        warrantyUntil: equipmentData.warranty_until || null,
         status: equipmentData.status || 'Ativo',
         nextServiceDate: equipmentData.next_service_date || null,
       })
@@ -511,13 +497,11 @@ export async function updateEquipmentAction(
       success: true,
       data: {
         id: data.id,
-        code: data.code,
         name: data.name,
         location_id: data.locationId || '',
         serial_number: data.serialNumber,
         installation_date: data.installationDate,
         manufacturer: data.manufacturer,
-        warranty_until: data.warrantyUntil,
         status: data.status,
         next_service_date: data.nextServiceDate,
         created_at: data.createdAt || undefined

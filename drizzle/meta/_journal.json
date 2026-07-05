@@ -15,6 +15,13 @@
       "when": 1783189808732,
       "tag": "0001_kind_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783271440614,
+      "tag": "0002_clever_wildside",
+      "breakpoints": true
     }
   ]
 }

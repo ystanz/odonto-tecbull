@@ -8,14 +8,12 @@ import { DBClient, DBLocation } from '@/lib/types';
 interface EditEquipmentButtonProps {
   equipment: {
     id: string;
-    code: string | null;
     name: string;
     locationId: string;
     clientId: string;
     serialNumber: string | null;
     installationDate: string | null;
     manufacturer: string | null;
-    warrantyUntil: string | null;
     status: string;
     nextServiceDate: string | null;
   };
@@ -32,14 +30,12 @@ export default function EditEquipmentButton({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Form Fields State
-  const [code, setCode] = useState(equipment.code || '');
   const [name, setName] = useState(equipment.name);
   const [selectedClientId, setSelectedClientId] = useState(equipment.clientId || '');
   const [selectedLocationId, setSelectedLocationId] = useState(equipment.locationId || '');
   const [serialNumber, setSerialNumber] = useState(equipment.serialNumber || '');
   const [manufacturer, setManufacturer] = useState(equipment.manufacturer || '');
   const [installationDate, setInstallationDate] = useState(equipment.installationDate || '');
-  const [warrantyUntil, setWarrantyUntil] = useState(equipment.warrantyUntil || '');
   const [nextServiceDate, setNextServiceDate] = useState(equipment.nextServiceDate || '');
   const [status, setStatus] = useState(equipment.status || 'Ativo');
 
@@ -59,21 +55,19 @@ export default function EditEquipmentButton({
 
   // Sync state if equipment prop changes
   useEffect(() => {
-    setCode(equipment.code || '');
     setName(equipment.name);
     setSelectedClientId(equipment.clientId || '');
     setSelectedLocationId(equipment.locationId || '');
     setSerialNumber(equipment.serialNumber || '');
     setManufacturer(equipment.manufacturer || '');
     setInstallationDate(equipment.installationDate || '');
-    setWarrantyUntil(equipment.warrantyUntil || '');
     setNextServiceDate(equipment.nextServiceDate || '');
     setStatus(equipment.status || 'Ativo');
   }, [equipment]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !selectedLocationId) {
+    if (!name.trim()) {
       showToast('Preencha os campos obrigatórios.', 'error');
       return;
     }
@@ -82,13 +76,10 @@ export default function EditEquipmentButton({
       setSubmitting(true);
 
       const equipmentData = {
-        code: code.trim() || null,
         name,
-        location_id: selectedLocationId,
+        location_id: selectedLocationId || null,
         serial_number: serialNumber || null,
         installation_date: installationDate || null,
-        manufacturer: manufacturer || null,
-        warranty_until: warrantyUntil || null,
         status,
         next_service_date: nextServiceDate || null,
       };
@@ -157,22 +148,7 @@ export default function EditEquipmentButton({
               </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Code */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-code" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Código do Ativo (Único)
-                    </label>
-                    <input
-                      id="edit-eq-code"
-                      type="text"
-                      placeholder="Ex: CD001, COMP-402"
-                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                    />
-                  </div>
-
+                <div className="grid grid-cols-1 gap-4">
                   {/* Name */}
                   <div className="flex flex-col gap-1">
                     <label htmlFor="edit-eq-name" className="font-label-caps text-label-caps text-on-surface-variant">
@@ -223,12 +199,11 @@ export default function EditEquipmentButton({
                   {/* Location Dropdown */}
                   <div className="flex flex-col gap-1">
                     <label htmlFor="edit-eq-location" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Unidade / Local*
+                      Unidade / Local
                     </label>
                     <div className="relative w-full">
                       <select
                         id="edit-eq-location"
-                        required
                         disabled={!selectedClientId}
                         className="w-full h-12 px-4 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         value={selectedLocationId}
@@ -280,7 +255,7 @@ export default function EditEquipmentButton({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Installation Date */}
                   <div className="flex flex-col gap-1">
                     <label htmlFor="edit-eq-install" className="font-label-caps text-label-caps text-on-surface-variant">
@@ -292,20 +267,6 @@ export default function EditEquipmentButton({
                       className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                       value={installationDate}
                       onChange={(e) => setInstallationDate(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Warranty Date */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-warranty" className="font-label-caps text-label-caps text-on-surface-variant">
-                      Garantia Até
-                    </label>
-                    <input
-                      id="edit-eq-warranty"
-                      type="date"
-                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                      value={warrantyUntil}
-                      onChange={(e) => setWarrantyUntil(e.target.value)}
                     />
                   </div>
 

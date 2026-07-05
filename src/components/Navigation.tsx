@@ -31,9 +31,9 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
 
       {/* NavigationDrawer (Desktop & Mobile drawer overlay) */}
       <aside 
-        className={`${
-          isMobileMenuOpen ? 'flex' : 'hidden'
-        } md:flex h-full w-80 rounded-r-xl bg-surface dark:bg-surface-dim shadow-2xl fixed inset-y-0 left-0 z-[60] flex-col p-md transition-all duration-300`}
+        className={`fixed inset-y-0 left-0 z-[60] h-full w-80 rounded-r-xl bg-surface dark:bg-surface-dim shadow-2xl flex flex-col p-md transition-transform duration-300 ease-in-out md:translate-x-0 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
         <div className="flex items-center justify-between mb-lg p-sm">
           <div className="flex items-center space-x-4">
@@ -136,7 +136,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         <Link 
           prefetch={false}
           href="/"
-          className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
+          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 hover:text-primary ${
             currentTab === 'dashboard' 
               ? 'bg-secondary-container text-on-secondary-container rounded-full' 
               : 'text-on-surface-variant'
@@ -149,7 +149,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         <Link 
           prefetch={false}
           href="/ordens-servico"
-          className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
+          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 hover:text-primary ${
             currentTab === 'service' 
               ? 'bg-secondary-container text-on-secondary-container rounded-full' 
               : 'text-on-surface-variant'
@@ -162,7 +162,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         <Link 
           prefetch={false}
           href="/equipamentos"
-          className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
+          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 hover:text-primary ${
             currentTab === 'equipment' 
               ? 'bg-secondary-container text-on-secondary-container rounded-full' 
               : 'text-on-surface-variant'
@@ -175,7 +175,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         <Link 
           prefetch={false}
           href="/clientes"
-          className={`flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 active:scale-90 ${
+          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 hover:text-primary ${
             currentTab === 'clients' 
               ? 'bg-secondary-container text-on-secondary-container rounded-full' 
               : 'text-on-surface-variant'

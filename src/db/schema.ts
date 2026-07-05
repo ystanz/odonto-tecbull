@@ -16,13 +16,11 @@ export const locations = sqliteTable('locations', {
 
 export const equipments = sqliteTable('equipments', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  code: text('code').unique(),
   name: text('name').notNull(),
   locationId: text('location_id').references(() => locations.id, { onDelete: 'set null' }),
   serialNumber: text('serial_number'),
   installationDate: text('installation_date'),
   manufacturer: text('manufacturer'),
-  warrantyUntil: text('warranty_until'),
   status: text('status').notNull().default('Ativo'),
   nextServiceDate: text('next_service_date'),
   createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),

@@ -22,37 +22,31 @@ const initialLocations: DBLocation[] = [
 const initialEquipments: DBEquipment[] = [
   {
     id: '114b5f88-bad1-001f-2a13-4d619bcee6ff',
-    code: 'CD001',
     name: 'Cadeira Gnatus G3',
     location_id: 'c01a600b-34f1-e111-92b7-082fd26699b6',
     serial_number: 'GN-2023-8942A',
     installation_date: '2023-04-12',
     manufacturer: 'Gnatus',
-    warranty_until: '2025-04-12',
     status: 'Ativo',
     next_service_date: '2024-06-15'
   },
   {
     id: 'e8871e88-bad1-001f-2a1e-50309ed3aa9e',
-    code: 'COMP-402',
     name: 'Compressor Lubrification',
     location_id: 'fd983088-bad1-001f-2a26-3235ffb77a6c',
     serial_number: 'CP-8842-X',
     installation_date: '2024-01-10',
     manufacturer: 'Schulz',
-    warranty_until: '2026-01-10',
     status: 'Pendente',
     next_service_date: '2026-07-10'
   },
   {
     id: '6b9e7888-bad1-001f-2a1e-50309ed3aa9e',
-    code: 'STER-105',
     name: 'Autoclave Filter Replacement',
     location_id: 'e9f6fa1e-5030-0021-0d1e-50309ed3aa9e',
     serial_number: 'ST-9912-B',
     installation_date: '2023-08-20',
     manufacturer: 'Cristófoli',
-    warranty_until: '2025-08-20',
     status: 'Pendente',
     next_service_date: '2026-08-20'
   }
