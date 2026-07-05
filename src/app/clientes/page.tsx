@@ -4,8 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import {
-  getClientsAction,
-  createClientAction,
   getLocationsAction,
   getEquipmentsAction,
 } from '@/app/actions';
@@ -69,7 +67,8 @@ export default function ClientesPage() {
         let rawLocations: DBLocation[] = [];
         let rawEquipments: DBEquipment[] = [];
 
-        const resClients = await getClientsAction();
+        const resRaw = await fetch('/api/clientes');
+        const resClients = await resRaw.json();
         if (resClients.success) {
           rawClients = resClients.data || [];
           const resLocs = await getLocationsAction();
@@ -155,12 +154,17 @@ export default function ClientesPage() {
 
     try {
       setSubmittingClient(true);
-      const res = await createClientAction(
-        newClientName,
-        newClientResponsibleName || null,
-        newClientPhone || null,
-        newClientEmail || null
-      );
+      const resRaw = await fetch('/api/clientes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newClientName,
+          responsibleName: newClientResponsibleName || null,
+          phone: newClientPhone || null,
+          email: newClientEmail || null
+        })
+      });
+      const res = await resRaw.json();
       if (res.success) {
         showToast('Clínica cadastrada com sucesso!');
       } else {

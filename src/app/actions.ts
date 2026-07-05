@@ -14,70 +14,7 @@ function isConfigured() {
   }
 }
 
-export async function getClientsAction() {
-  try {
-    if (!isConfigured()) {
-      return { success: false, error: 'DB_NOT_CONFIGURED', data: [] };
-    }
-
-    const db = getDb();
-    const data = await db
-      .select()
-      .from(schema.clients)
-      .orderBy(schema.clients.name);
-
-    // Mapeando schema.clients para DBClient
-    const formatted: DBClient[] = data.map(item => ({
-      id: item.id,
-      name: item.name,
-      responsible_name: item.responsibleName,
-      phone: item.phone,
-      email: item.email,
-      created_at: item.createdAt || undefined
-    }));
-
-    return { success: true, data: formatted };
-  } catch (err) {
-    console.error('Error fetching clients:', err);
-    const msg = err instanceof Error ? err.message : 'Unknown error';
-    return { success: false, error: msg, data: [] };
-  }
-}
-
-export async function createClientAction(name: string, responsibleName?: string | null, phone?: string | null, email?: string | null) {
-  try {
-    if (!isConfigured()) {
-      return { success: false, error: 'DB_NOT_CONFIGURED' };
-    }
-
-    const db = getDb();
-    const [data] = await db
-      .insert(schema.clients)
-      .values({ 
-        name,
-        responsibleName: responsibleName || null,
-        phone: phone || null,
-        email: email || null
-      })
-      .returning();
-
-    return { 
-      success: true, 
-      data: {
-        id: data.id,
-        name: data.name,
-        responsible_name: data.responsibleName,
-        phone: data.phone,
-        email: data.email,
-        created_at: data.createdAt || undefined
-      } as DBClient 
-    };
-  } catch (err) {
-    console.error('Error creating client:', err);
-    const msg = err instanceof Error ? err.message : 'Unknown error';
-    return { success: false, error: msg };
-  }
-}
+// getClientsAction and createClientAction removed (handled by Route Handlers)
 
 export async function getLocationsAction() {
   try {
