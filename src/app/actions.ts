@@ -4,7 +4,7 @@ import { getDb, schema } from '@/lib/supabase';
 import { eq, desc } from 'drizzle-orm';
 import { DBClient, DBLocation, DBEquipment, DBWorkOrder } from '@/lib/types';
 
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 // Helper to check if D1 DB is configured in wrangler/Cloudflare environment
 function isConfigured() {

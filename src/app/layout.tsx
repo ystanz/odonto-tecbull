@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DentalService - OdontoTec Bull",
+  title: "TecBull",
   description: "Painel de controle e ordens de serviço para manutenção de equipamentos odontológicos.",
   manifest: "/manifest.json",
   appleWebApp: {
