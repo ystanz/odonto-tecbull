@@ -13,12 +13,12 @@ interface WorkOrder {
   equipmentName: string;
   equipmentId?: string;
   defectReported: string;
-  status: 'ABERTA' | 'EM ANDAMENTO' | 'CONCLUÍDA';
+  status: 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA';
   priority: 'NORMAL' | 'CRÍTICO';
   serviceDate: string;
 }
 
-type FilterTab = 'TODAS' | 'ABERTAS' | 'EM ANDAMENTO' | 'CONCLUÍDAS';
+type FilterTab = 'TODAS' | 'ABERTAS' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDAS';
 
 export default function WorkOrdersPage() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
@@ -88,6 +88,7 @@ export default function WorkOrdersPage() {
     if (activeTab === 'TODAS') return true;
     if (activeTab === 'ABERTAS') return wo.status === 'ABERTA';
     if (activeTab === 'EM ANDAMENTO') return wo.status === 'EM ANDAMENTO';
+    if (activeTab === 'AGUARDANDO PEÇA') return wo.status === 'AGUARDANDO PEÇA';
     if (activeTab === 'CONCLUÍDAS') return wo.status === 'CONCLUÍDA';
     return true;
   });
@@ -120,7 +121,7 @@ export default function WorkOrdersPage() {
         {/* Tabs */}
         <div className="w-full overflow-x-auto no-scrollbar mb-xl border-b border-outline-variant/30">
           <div className="flex gap-lg min-w-max px-xs">
-            {(['TODAS', 'ABERTAS', 'EM ANDAMENTO', 'CONCLUÍDAS'] as FilterTab[]).map((tab) => (
+            {(['TODAS', 'ABERTAS', 'EM ANDAMENTO', 'AGUARDANDO PEÇA', 'CONCLUÍDAS'] as FilterTab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -166,6 +167,10 @@ export default function WorkOrdersPage() {
                 borderClass = 'bg-tertiary-container';
                 statusBadgeClass = 'bg-tertiary-container/15 text-tertiary-container';
                 statusLabel = 'CONCLUÍDA';
+              } else if (wo.status === 'AGUARDANDO PEÇA') {
+                borderClass = 'bg-amber-600';
+                statusBadgeClass = 'bg-amber-500/15 text-amber-700';
+                statusLabel = 'AGUARDANDO PEÇA';
               }
 
               const cardContent = (

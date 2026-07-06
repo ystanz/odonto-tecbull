@@ -38,7 +38,7 @@ export interface DBWorkOrder {
   code: string;
   client_id: string;
   equipment_id: string;
-  status: 'ABERTA' | 'EM ANDAMENTO' | 'CONCLUÍDA';
+  status: 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA';
   priority: 'NORMAL' | 'CRÍTICO';
   defect_reported: string;
   parts_used?: string | null;

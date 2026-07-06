@@ -25,9 +25,9 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
   const pageTitle = getPageTitle(pathname);
 
   return (
-    <div className="min-h-screen text-black bg-[#FAF8F4] antialiased pb-24 md:pb-0 md:pl-80">
+    <div className="min-h-screen text-black bg-[#FAF8F4] antialiased pb-24 md:pb-0 md:pl-80 print:pl-0 print:pb-0 print:bg-white">
       {/* TopAppBar (Mobile) */}
-      <header className="w-full sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md flex items-center justify-between px-md py-sm md:hidden">
+      <header className="w-full sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md flex items-center justify-between px-md py-sm md:hidden print:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="text-black dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center"
@@ -44,7 +44,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
 
       {/* NavigationDrawer (Desktop & Mobile drawer overlay) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-[60] h-full w-80 rounded-r-xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col p-md transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-[60] h-full w-80 rounded-r-xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col p-md transition-transform duration-300 ease-in-out md:translate-x-0 print:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex items-center justify-between mb-lg p-sm">
@@ -136,7 +136,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
       {isMobileMenuOpen && (
         <div
           onClick={() => setIsMobileMenuOpen(false)}
-          className="fixed inset-0 bg-black/40 z-50 md:hidden"
+          className="fixed inset-0 bg-black/40 z-50 md:hidden print:hidden"
         />
       )}
 
@@ -144,7 +144,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
       {children}
 
       {/* BottomNavBar (Mobile) */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full h-touch-target flex justify-around items-center px-sm pb-safe bg-surface dark:bg-surface-container-lowest shadow-[0_-2px_8px_rgba(30,42,45,0.05)] rounded-t-xl z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 w-full h-touch-target flex justify-around items-center px-sm pb-safe bg-surface dark:bg-surface-container-lowest shadow-[0_-2px_8px_rgba(30,42,45,0.05)] rounded-t-xl z-50 print:hidden">
         <Link
           prefetch={false}
           href="/"

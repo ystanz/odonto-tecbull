@@ -70,6 +70,33 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
     }
   }, [initialWorkOrder.id, showToast]);
 
+  const handleStatusChange = async (newStatus: 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA') => {
+    const previousStatus = workOrder.status;
+    
+    setWorkOrder((prev) => ({ ...prev, status: newStatus }));
+    setStatus(newStatus);
+
+    try {
+      const resRaw = await fetch(`/api/os/${workOrder.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const res = await resRaw.json();
+      if (!res.success) {
+        throw new Error(res.error || 'Erro ao atualizar status');
+      }
+      showToast('Status atualizado com sucesso!');
+      router.refresh();
+      reloadData();
+    } catch (err) {
+      setWorkOrder((prev) => ({ ...prev, status: previousStatus }));
+      setStatus(previousStatus);
+      const msg = err instanceof Error ? err.message : 'Erro interno';
+      showToast(`Erro ao atualizar status: ${msg}`, 'error');
+    }
+  };
+
   // Handle Work Order Edit Submit
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,7 +232,7 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
         )}
 
         {/* Back Link & Title */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-sm print:hidden">
           <div className="flex items-center space-x-2 text-on-surface-variant font-body-md">
             <Link prefetch={false} href="/ordens-servico" className="hover:text-primary flex items-center">
               <span className="material-symbols-outlined text-md mr-1">arrow_back</span>
@@ -213,6 +240,13 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
             </Link>
           </div>
           <div className="flex gap-sm">
+            <button
+              onClick={() => window.print()}
+              className="h-10 px-4 bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
+            >
+              <span className="material-symbols-outlined text-[16px]">print</span>
+              Gerar PDF
+            </button>
             <button
               onClick={() => setIsEditModalOpen(true)}
               className="h-10 px-4 bg-surface-container-high border border-outline/10 text-on-surface font-label-caps text-label-caps rounded-xl hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
@@ -231,24 +265,55 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
           </div>
         </div>
 
+        {/* Cabeçalho de Impressão (Exclusivo para PDF) */}
+        <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-md mb-lg">
+          <div className="flex items-center space-x-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon-512x512.png" alt="Logo TecBull" className="w-16 h-16 object-cover" />
+            <div>
+              <h2 className="text-xl font-bold text-black tracking-wide font-headline-lg">TecBull</h2>
+              <p className="text-xs text-gray-600">Serviços e Manutenção de Equipamentos Odontológicos</p>
+              <p className="text-[10px] text-gray-500 mt-1">Contato: suporte@tecbull.com | (11) 99999-9999</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block font-label-caps">ORDEM DE SERVIÇO</span>
+            <span className="text-xl font-extrabold text-black block mt-1">{workOrder.code}</span>
+            <span className="text-xs text-gray-600 block mt-1">Status: {workOrder.status}</span>
+          </div>
+        </div>
+
         {/* Header Ticket Info Card */}
-        <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm relative overflow-hidden group">
-          <div className={`absolute inset-y-0 left-0 w-1.5 ${workOrder.priority === 'CRÍTICO' ? 'bg-error' : 'bg-primary'}`}></div>
-          <div className="pl-md space-y-sm">
-            <div className="flex flex-wrap items-center justify-between gap-sm">
+        <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm relative overflow-hidden group print:bg-white print:border-0 print:shadow-none print:p-0">
+          <div className={`absolute inset-y-0 left-0 w-1.5 ${workOrder.priority === 'CRÍTICO' ? 'bg-error' : 'bg-primary'} print:hidden`}></div>
+          <div className="pl-md space-y-sm print:pl-0">
+            <div className="flex flex-wrap items-center justify-between gap-sm print:hidden">
               <div className="flex items-center gap-sm">
-                <span className="material-symbols-outlined text-primary text-3xl">confirmation_number</span>
                 <h1 className="font-headline-md text-headline-md text-on-surface font-bold">
                   Ordem de Serviço {workOrder.code}
                 </h1>
               </div>
-              <div className="flex gap-xs">
-                <span className={`px-sm py-base text-label-caps font-label-caps rounded-full text-xs font-semibold ${
-                  workOrder.status === 'CONCLUÍDA' ? 'bg-tertiary/15 text-tertiary' :
-                  workOrder.status === 'EM ANDAMENTO' ? 'bg-secondary/15 text-secondary' : 'bg-primary/15 text-primary'
-                }`}>
-                  {workOrder.status}
-                </span>
+              <div className="flex gap-xs items-center">
+                <div className="relative">
+                  <select
+                    value={workOrder.status}
+                    onChange={(e) => handleStatusChange(e.target.value as 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA')}
+                    className={`pl-3 pr-8 py-1 rounded-full text-xs font-semibold appearance-none cursor-pointer focus:outline-none transition-colors border border-outline/10 font-label-caps ${
+                      workOrder.status === 'CONCLUÍDA' ? 'bg-tertiary/15 text-tertiary' :
+                      workOrder.status === 'EM ANDAMENTO' ? 'bg-secondary/15 text-secondary' :
+                      workOrder.status === 'AGUARDANDO PEÇA' ? 'bg-orange-500/15 text-orange-700' :
+                      'bg-primary/15 text-primary'
+                    }`}
+                  >
+                    <option value="ABERTA">ABERTA</option>
+                    <option value="EM ANDAMENTO">EM ANDAMENTO</option>
+                    <option value="AGUARDANDO PEÇA">AGUARDANDO PEÇA</option>
+                    <option value="CONCLUÍDA">CONCLUÍDA</option>
+                  </select>
+                  <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-sm font-bold">
+                    arrow_drop_down
+                  </span>
+                </div>
                 <span className={`px-sm py-base text-label-caps font-label-caps rounded-full text-xs font-semibold ${
                   workOrder.priority === 'CRÍTICO' ? 'bg-error/15 text-error' : 'bg-outline/15 text-outline'
                 }`}>
@@ -258,67 +323,58 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
             </div>
 
             {/* Structured ServiceNow Style Attributes Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md pt-md border-t border-outline/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md pt-md border-t border-outline/5 print:border-black print:text-black">
               <div className="space-y-base">
-                <p className="text-body-md text-on-surface-variant flex items-center gap-xs">
-                  <span className="material-symbols-outlined text-outline text-[18px]">calendar_today</span>
+                <p className="text-body-md text-on-surface-variant">
                   <span><strong>Data de Abertura:</strong> {formatDate(workOrder.created_at)}</span>
                 </p>
-                <p className="text-body-md text-on-surface-variant flex items-center gap-xs">
-                  <span className="material-symbols-outlined text-outline text-[18px]">domain</span>
+                <p className="text-body-md text-on-surface-variant">
                   <span><strong>Cliente:</strong> {clientName}</span>
                 </p>
               </div>
 
               <div className="space-y-base">
-                <p className="text-body-md text-on-surface-variant flex items-center gap-xs">
-                  <span className="material-symbols-outlined text-outline text-[18px]">build</span>
+                <p className="text-body-md text-on-surface-variant">
                   <span><strong>Equipamento:</strong> {equipmentName}</span>
                 </p>
-                <p className="text-body-md text-on-surface-variant flex items-center gap-xs">
-                  <span className="material-symbols-outlined text-outline text-[18px]">qr_code</span>
+                <p className="text-body-md text-on-surface-variant">
                   <span><strong>Nº de Série:</strong> {serialNumber}</span>
                 </p>
-                <p className="text-body-md text-on-surface-variant flex items-center gap-xs">
-                  <span className="material-symbols-outlined text-outline text-[18px]">factory</span>
+                <p className="text-body-md text-on-surface-variant">
                   <span><strong>Fabricante:</strong> {manufacturer}</span>
                 </p>
               </div>
 
               <div className="space-y-base md:col-span-2 lg:col-span-1">
-                <p className="text-body-md text-on-surface-variant flex items-center gap-xs">
-                  <span className="material-symbols-outlined text-outline text-[18px]">event_available</span>
+                <p className="text-body-md text-on-surface-variant">
                   <span><strong>Data do Serviço:</strong> {workOrder.service_date || 'Agendado'}</span>
                 </p>
-                <p className="text-body-md text-on-surface-variant flex items-start gap-xs">
-                  <span className="material-symbols-outlined text-outline text-[18px] mt-[3px]">settings_input_component</span>
+                <p className="text-body-md text-on-surface-variant">
                   <span><strong>Peças Utilizadas:</strong> {workOrder.parts_used || 'Nenhuma peça cadastrada'}</span>
                 </p>
               </div>
             </div>
 
             {/* Ticket Defect & Solution Details */}
-            <div className="pt-md border-t border-outline/5 space-y-sm">
-              <div className="bg-surface-container-low p-md rounded-lg border border-outline/5">
-                <h3 className="font-headline-sm text-on-surface font-semibold flex items-center gap-xs text-[14px]">
-                  <span className="material-symbols-outlined text-error text-[18px]">report_problem</span>
+            <div className="pt-md border-t border-outline/5 space-y-sm print:text-black">
+              <div className="bg-surface-container-low p-md rounded-lg border border-outline/5 print:bg-white print:border-0 print:p-0">
+                <h3 className="font-headline-sm text-on-surface font-semibold text-[14px] print:text-black">
                   Defeito Relatado / Sintoma:
                 </h3>
-                <p className="mt-xs text-body-lg text-on-surface-variant">{workOrder.defect_reported}</p>
+                <p className="mt-xs text-body-lg text-on-surface-variant print:text-black">{workOrder.defect_reported}</p>
               </div>
 
               {workOrder.work_notes && (
-                <div className="bg-tertiary/5 p-md rounded-lg border border-tertiary/10">
-                  <h3 className="font-headline-sm text-tertiary font-semibold flex items-center gap-xs text-[14px]">
-                    <span className="material-symbols-outlined text-tertiary text-[18px]">playlist_add_check</span>
+                <div className="bg-tertiary/5 p-md rounded-lg border border-tertiary/10 print:bg-white print:border-0 print:p-0 print:mt-md">
+                  <h3 className="font-headline-sm text-tertiary font-semibold text-[14px] print:text-black">
                     Solução Aplicada / Observações:
                   </h3>
-                  <p className="mt-xs text-body-lg text-on-surface-variant whitespace-pre-line">{workOrder.work_notes}</p>
+                  <p className="mt-xs text-body-lg text-on-surface-variant whitespace-pre-line print:text-black">{workOrder.work_notes}</p>
                 </div>
               )}
 
               {workOrder.image_url && (
-                <div className="pt-sm">
+                <div className="pt-sm print:hidden">
                   <span className="text-xs font-semibold text-outline block mb-1">Anexo / Imagem do chamado:</span>
                   <a href={workOrder.image_url} target="_blank" rel="noopener noreferrer" className="inline-block overflow-hidden rounded-lg border border-outline/10 hover:border-primary transition-colors">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -331,7 +387,7 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
         </div>
 
         {/* WORKNOTES: ServiceNow Style Activity Stream */}
-        <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm space-y-md">
+        <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm space-y-md print:hidden">
           <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs">
             <span className="material-symbols-outlined text-primary">forum</span>
             Histórico e Notas Internas (Activity Stream)
@@ -436,10 +492,11 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
                         required
                         className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                         value={status}
-                        onChange={(e) => setStatus(e.target.value as 'ABERTA' | 'EM ANDAMENTO' | 'CONCLUÍDA')}
+                        onChange={(e) => setStatus(e.target.value as 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA')}
                       >
                         <option value="ABERTA">ABERTA</option>
                         <option value="EM ANDAMENTO">EM ANDAMENTO</option>
+                        <option value="AGUARDANDO PEÇA">AGUARDANDO PEÇA</option>
                         <option value="CONCLUÍDA">CONCLUÍDA</option>
                       </select>
                     </div>

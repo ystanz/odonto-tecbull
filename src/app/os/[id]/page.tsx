@@ -40,7 +40,7 @@ export default async function OSDetailPage({ params }: PageProps) {
         code: row.work_orders.code,
         client_id: row.work_orders.clientId || '',
         equipment_id: row.work_orders.equipmentId || '',
-        status: row.work_orders.status as 'ABERTA' | 'EM ANDAMENTO' | 'CONCLUÍDA',
+        status: row.work_orders.status as 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA',
         priority: row.work_orders.priority as 'NORMAL' | 'CRÍTICO',
         defect_reported: row.work_orders.defectReported,
         parts_used: row.work_orders.partsUsed,
