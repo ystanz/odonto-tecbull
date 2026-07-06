@@ -6,7 +6,7 @@ import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import OSDetailsUI from '@/components/OSDetailsUI';
 import { getDb, schema } from '@/lib/supabase';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { DBWorkOrder, DBWorkNote } from '@/lib/types';
 
@@ -72,7 +72,7 @@ export default async function OSDetailPage({ params }: PageProps) {
         .select()
         .from(schema.workNotes)
         .where(eq(schema.workNotes.osId, id))
-        .orderBy(schema.workNotes.createdAt);
+        .orderBy(desc(schema.workNotes.createdAt));
 
       notes = list.map((n) => ({
         id: n.id,

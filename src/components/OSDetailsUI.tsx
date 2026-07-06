@@ -26,7 +26,6 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
   const [defectReported, setDefectReported] = useState(initialWorkOrder.defect_reported);
   const [partsUsed, setPartsUsed] = useState(initialWorkOrder.parts_used || '');
   const [workNotesText, setWorkNotesText] = useState(initialWorkOrder.work_notes || '');
-  const [technicianName, setTechnicianName] = useState(initialWorkOrder.technician_name || '');
   const [serviceDate, setServiceDate] = useState(initialWorkOrder.service_date || '');
 
   // New WorkNote Input State
@@ -57,7 +56,6 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
         setDefectReported(res.data.defect_reported);
         setPartsUsed(res.data.parts_used || '');
         setWorkNotesText(res.data.work_notes || '');
-        setTechnicianName(res.data.technician_name || '');
         setServiceDate(res.data.service_date || '');
       }
 
@@ -91,7 +89,6 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
           defectReported,
           partsUsed: partsUsed.trim() || null,
           workNotes: workNotesText.trim() || null,
-          technicianName: technicianName.trim() || null,
           serviceDate: serviceDate || null
         })
       });
@@ -271,10 +268,6 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
                   <span className="material-symbols-outlined text-outline text-[18px]">domain</span>
                   <span><strong>Cliente:</strong> {clientName}</span>
                 </p>
-                <p className="text-body-md text-on-surface-variant flex items-center gap-xs">
-                  <span className="material-symbols-outlined text-outline text-[18px]">badge</span>
-                  <span><strong>Técnico:</strong> {workOrder.technician_name || 'Não atribuído'}</span>
-                </p>
               </div>
 
               <div className="space-y-base">
@@ -386,7 +379,9 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
               </div>
             ) : (
               <div className="relative pl-6 space-y-6 before:absolute before:inset-y-0 before:left-2.5 before:w-0.5 before:bg-outline/10">
-                {workNotes.map((note) => (
+                {[...workNotes]
+                  .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+                  .map((note) => (
                   <div key={note.id} className="relative flex flex-col gap-base group">
                     {/* Circle Indicator on timeline */}
                     <div className="absolute -left-6 top-1.5 w-5.5 h-5.5 rounded-full bg-surface-container-lowest border-2 border-primary flex items-center justify-center shadow-sm">
@@ -466,33 +461,17 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1">
-                      <label htmlFor="edit-os-tech" className="font-label-caps text-label-caps text-on-surface-variant">
-                        Técnico Responsável
-                      </label>
-                      <input
-                        id="edit-os-tech"
-                        type="text"
-                        placeholder="Ex: Marcelo T."
-                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                        value={technicianName}
-                        onChange={(e) => setTechnicianName(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                      <label htmlFor="edit-os-date" className="font-label-caps text-label-caps text-on-surface-variant">
-                        Data do Atendimento
-                      </label>
-                      <input
-                        id="edit-os-date"
-                        type="date"
-                        className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-                        value={serviceDate}
-                        onChange={(e) => setServiceDate(e.target.value)}
-                      />
-                    </div>
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="edit-os-date" className="font-label-caps text-label-caps text-on-surface-variant">
+                      Data do Atendimento
+                    </label>
+                    <input
+                      id="edit-os-date"
+                      type="date"
+                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      value={serviceDate}
+                      onChange={(e) => setServiceDate(e.target.value)}
+                    />
                   </div>
 
                   <div className="flex flex-col gap-1">
