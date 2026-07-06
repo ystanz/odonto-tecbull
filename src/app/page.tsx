@@ -1,62 +1,53 @@
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
-import { getDb, schema } from '@/lib/supabase';
-import { eq } from 'drizzle-orm';
 import Link from 'next/link';
 
-// Supabase uninstalled - database migrated to Cloudflare D1 with Drizzle ORM
+interface RecentWorkOrder {
+  id: string;
+  code: string;
+  status: 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA';
+  priority: 'NORMAL' | 'CRÍTICO';
+  defectReported: string;
+  createdAt: string;
+  clientName: string;
+  equipmentName: string;
+}
 
-export const revalidate = 0; // Disable caching to get fresh data from D1
+interface DashboardData {
+  totalClients: number;
+  totalEquipments: number;
+  activeWorkOrders: number;
+  recentWorkOrders: RecentWorkOrder[];
+}
 
-export default async function DashboardPage() {
-  let totalClinics = 0;
-  let totalEquipments = 0;
-  let totalOpenOS = 0;
-  let alerts: { id: string; name: string; location: string; status: string }[] = [];
+export default function DashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  try {
-    const db = getDb();
-
-    // Buscar total de clínicas (clients)
-    const clinicsResult = await db.select().from(schema.clients);
-    totalClinics = clinicsResult.length;
-
-    // Buscar total de equipamentos (equipments)
-    const equipmentsResult = await db.select().from(schema.equipments);
-    totalEquipments = equipmentsResult.length;
-
-    // Buscar total de OS abertas (workOrders com status ABERTA ou EM ANDAMENTO)
-    const workOrders = await db.select().from(schema.workOrders);
-    totalOpenOS = workOrders.filter(
-      (wo) => wo.status === 'ABERTA' || wo.status === 'EM ANDAMENTO'
-    ).length;
-
-    // Fetch equipment alerts (status = 'Pendente')
-    const dbEquipments = await db
-      .select({
-        id: schema.equipments.id,
-        name: schema.equipments.name,
-        status: schema.equipments.status,
-        locationName: schema.locations.name,
-        locationRoom: schema.locations.room
-      })
-      .from(schema.equipments)
-      .leftJoin(schema.locations, eq(schema.equipments.locationId, schema.locations.id))
-      .where(eq(schema.equipments.status, 'Pendente'));
-
-    if (dbEquipments && dbEquipments.length > 0) {
-      alerts = dbEquipments.map((eqData) => ({
-        id: eqData.id,
-        name: eqData.name,
-        location: eqData.locationName ? `${eqData.locationName} - ${eqData.locationRoom || ''}` : 'Unidade Geral',
-        status: 'PENDENTE'
-      }));
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        setLoading(true);
+        const resRaw = await fetch('/api/dashboard');
+        const res = await resRaw.json();
+        if (res.success && res.data) {
+          setData(res.data);
+        } else {
+          setError(res.error || 'Erro ao carregar os dados do dashboard.');
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Erro de conexão com o servidor.');
+      } finally {
+        setLoading(false);
+      }
     }
-  } catch (e) {
-    console.error('Erro ao conectar com o D1:', e);
-  }
+
+    fetchDashboardData();
+  }, []);
 
   const currentDate = new Date().toLocaleDateString('pt-BR', {
     day: 'numeric',
@@ -64,10 +55,23 @@ export default async function DashboardPage() {
     year: 'numeric'
   });
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return 'N/A';
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
     <Navigation currentTab="dashboard">
       <main className="flex-grow pb-32 pt-lg px-md w-full max-w-[800px] mx-auto md:px-xl animate-fade-in">
-
         {/* Tech and Date Header */}
         <header className="mb-xl flex items-center justify-between border-b border-outline-variant/30 pb-md">
           <div>
@@ -88,96 +92,162 @@ export default async function DashboardPage() {
           </div>
         </header>
 
-        {/* Hero Section / Mobile Quick Actions */}
-        <section className="mb-xl flex flex-col md:flex-row gap-md items-center justify-between bg-surface-container-low rounded-2xl p-lg border border-outline/10 shadow-level-1">
-          <div className="flex-grow text-center md:text-left mb-sm md:mb-0">
-            <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
-              Acesse e gerencie chamados, clientes e equipamentos clínicos em campo.
-            </p>
+        {/* Loading Indicator */}
+        {loading && (
+          <div className="text-center py-16 text-on-surface-variant font-body-md flex flex-col items-center justify-center gap-sm bg-white rounded-2xl border border-outline/10 shadow-sm">
+            <span className="material-symbols-outlined animate-spin text-primary text-3xl">sync</span>
+            <span>Carregando dados operacionais em tempo real...</span>
           </div>
-          {/* Mobile FAB Alternative */}
-          <Link
-            prefetch={false}
-            href="/os/nova"
-            className="md:hidden w-full h-touch-target bg-primary text-on-primary font-headline-sm text-headline-sm rounded-lg shadow-sm active:scale-95 transition-transform flex items-center justify-center space-x-2"
-          >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>add</span>
-            <span>Novo Serviço</span>
-          </Link>
-        </section>
+        )}
 
-        {/* Metric Cards */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-sm md:gap-md">
-          {/* Card 1: Clínicas */}
-          <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-center space-x-2 text-primary">
-              <span className="material-symbols-outlined text-xl">location_city</span>
-              <span className="font-label-caps text-label-caps">Total de Clínicas</span>
-            </div>
-            <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-on-surface font-bold">
-                {String(totalClinics).padStart(2, '0')}
-              </span>
-            </div>
+        {/* Error Indicator */}
+        {!loading && error && (
+          <div className="text-center py-12 text-error font-body-md bg-error/10 border border-error/20 rounded-2xl p-lg flex flex-col items-center gap-sm">
+            <span className="material-symbols-outlined text-4xl">report_off</span>
+            <span className="font-semibold">{error}</span>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-xs px-4 py-2 bg-error text-white font-label-caps text-label-caps rounded-xl shadow hover:bg-error/95 transition-all text-xs"
+            >
+              Tentar Novamente
+            </button>
           </div>
-          {/* Card 2: Equipamentos */}
-          <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-center space-x-2 text-tertiary">
-              <span className="material-symbols-outlined text-xl">precision_manufacturing</span>
-              <span className="font-label-caps text-label-caps">Total de Equipamentos</span>
-            </div>
-            <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-on-surface font-bold">
-                {String(totalEquipments).padStart(2, '0')}
-              </span>
-            </div>
-          </div>
-          {/* Card 3: OS Abertas */}
-          <div className="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-center space-x-2 text-secondary">
-              <span className="material-symbols-outlined text-xl">pending_actions</span>
-              <span className="font-label-caps text-label-caps">OS Abertas</span>
-            </div>
-            <div className="mt-4">
-              <span className="font-headline-lg text-headline-lg text-on-surface font-bold">
-                {String(totalOpenOS).padStart(2, '0')}
-              </span>
-            </div>
-          </div>
-        </section>
+        )}
 
-        {/* Dynamic Alerts Section */}
-        <section className="mt-xl">
-          <div className="mb-md flex items-center space-x-2">
-            <span className="material-symbols-outlined text-error">notification_important</span>
-            <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-              Manutenções e Alertas Urgentes
-            </h3>
-          </div>
-
-          <div className="space-y-sm">
-            {alerts.map((alert) => (
-              <div
-                key={alert.id}
-                className="bg-surface-container-lowest border-l-4 border-error rounded-xl p-md shadow-level-1 border-y border-r border-outline/10 flex items-center justify-between"
-              >
-                <div className="pr-xs">
-                  <h4 className="font-headline-xs text-headline-xs text-on-surface font-semibold">
-                    {alert.name}
-                  </h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant mt-[2px]">
-                    {alert.location}
-                  </p>
+        {/* Dashboard Content */}
+        {!loading && !error && data && (
+          <div className="space-y-xl">
+            {/* Metric Cards Grid */}
+            <section className="grid grid-cols-1 sm:grid-cols-3 gap-sm md:gap-md">
+              {/* Card 1: Clínicas */}
+              <div className="bg-white rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
+                <div className="flex items-center space-x-2 text-primary">
+                  <span className="material-symbols-outlined text-xl">location_city</span>
+                  <span className="font-label-caps text-label-caps font-semibold">Total de Clínicas</span>
                 </div>
-                <div>
-                  <span className="px-sm py-1 rounded bg-error/15 text-error font-label-caps text-label-caps whitespace-nowrap">
-                    {alert.status}
+                <div className="mt-4">
+                  <span className="font-headline-lg text-3xl text-on-surface font-extrabold">
+                    {String(data.totalClients).padStart(2, '0')}
                   </span>
                 </div>
               </div>
-            ))}
+
+              {/* Card 2: Equipamentos */}
+              <div className="bg-white rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
+                <div className="flex items-center space-x-2 text-tertiary">
+                  <span className="material-symbols-outlined text-xl">precision_manufacturing</span>
+                  <span className="font-label-caps text-label-caps font-semibold">Equipamentos</span>
+                </div>
+                <div className="mt-4">
+                  <span className="font-headline-lg text-3xl text-on-surface font-extrabold">
+                    {String(data.totalEquipments).padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Card 3: OS Ativas */}
+              <div className="bg-white rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
+                <div className="flex items-center space-x-2 text-secondary">
+                  <span className="material-symbols-outlined text-xl">pending_actions</span>
+                  <span className="font-label-caps text-label-caps font-semibold">OS Ativas</span>
+                </div>
+                <div className="mt-4">
+                  <span className="font-headline-lg text-3xl text-on-surface font-extrabold">
+                    {String(data.activeWorkOrders).padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            {/* Recent OS Table Section */}
+            <section className="bg-white rounded-2xl border border-outline/10 shadow-sm p-lg">
+              <div className="mb-md flex items-center justify-between">
+                <div className="flex items-center space-x-2 text-on-surface">
+                  <span className="material-symbols-outlined text-primary">history</span>
+                  <h3 className="font-headline-sm text-lg font-bold">
+                    Últimos Chamados / Ordens de Serviço
+                  </h3>
+                </div>
+                <Link
+                  prefetch={false}
+                  href="/ordens-servico"
+                  className="text-xs text-primary font-bold hover:underline font-label-caps text-label-caps flex items-center gap-base"
+                >
+                  Ver Todos
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </Link>
+              </div>
+
+              {data.recentWorkOrders.length === 0 ? (
+                <div className="text-center py-8 text-on-surface-variant font-body-md italic flex flex-col items-center justify-center gap-sm">
+                  <span className="material-symbols-outlined text-outline text-4xl">chat_bubble_outline</span>
+                  <span>Nenhum chamado aberto recentemente no sistema.</span>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-outline/10 text-on-surface-variant font-label-caps text-label-caps text-xs">
+                        <th className="py-sm pb-md font-semibold">OS/ID</th>
+                        <th className="py-sm pb-md font-semibold">Cliente</th>
+                        <th className="py-sm pb-md font-semibold">Equipamento</th>
+                        <th className="py-sm pb-md font-semibold">Data</th>
+                        <th className="py-sm pb-md font-semibold text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-outline/5">
+                      {data.recentWorkOrders.map((wo) => {
+                        let statusBadgeClass = 'bg-primary/15 text-primary';
+                        if (wo.status === 'EM ANDAMENTO') {
+                          statusBadgeClass = 'bg-secondary/15 text-secondary';
+                        } else if (wo.status === 'AGUARDANDO PEÇA') {
+                          statusBadgeClass = 'bg-orange-500/15 text-orange-700';
+                        } else if (wo.status === 'CONCLUÍDA') {
+                          statusBadgeClass = 'bg-tertiary/15 text-tertiary';
+                        }
+
+                        return (
+                          <tr
+                            key={wo.id}
+                            className="hover:bg-surface-container-lowest/50 transition-colors cursor-pointer group"
+                          >
+                            <td className="py-md font-technical-code text-sm">
+                              <Link href={`/os/${wo.id}`} className="block text-primary hover:underline font-semibold">
+                                {wo.code}
+                              </Link>
+                            </td>
+                            <td className="py-md font-body-md text-sm text-on-surface-variant">
+                              <Link href={`/os/${wo.id}`} className="block text-inherit group-hover:text-on-surface transition-colors">
+                                {wo.clientName || 'Cliente Geral'}
+                              </Link>
+                            </td>
+                            <td className="py-md font-body-md text-sm text-on-surface-variant">
+                              <Link href={`/os/${wo.id}`} className="block text-inherit group-hover:text-on-surface transition-colors">
+                                {wo.equipmentName || 'Equipamento'}
+                              </Link>
+                            </td>
+                            <td className="py-md font-technical-code text-sm text-on-surface-variant">
+                              <Link href={`/os/${wo.id}`} className="block text-inherit group-hover:text-on-surface transition-colors">
+                                {formatDate(wo.createdAt)}
+                              </Link>
+                            </td>
+                            <td className="py-md text-right">
+                              <Link href={`/os/${wo.id}`} className="inline-block">
+                                <span className={`inline-flex items-center px-sm py-base rounded-full text-[10px] font-semibold font-label-caps ${statusBadgeClass}`}>
+                                  {wo.status}
+                                </span>
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
           </div>
-        </section>
+        )}
       </main>
     </Navigation>
   );
