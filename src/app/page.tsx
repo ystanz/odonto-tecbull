@@ -91,12 +91,9 @@ export default async function DashboardPage() {
         {/* Hero Section / Mobile Quick Actions */}
         <section className="mb-xl flex flex-col md:flex-row gap-md items-center justify-between bg-surface-container-low rounded-2xl p-lg border border-outline/10 shadow-level-1">
           <div className="flex-grow text-center md:text-left mb-sm md:mb-0">
-            <h3 className="font-headline-md text-headline-md text-on-surface font-bold">
-              Acesse e gerencie chamados, clientes e equipamentos
-            </h3>
-            {/* <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
+            <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
               Acesse e gerencie chamados, clientes e equipamentos clínicos em campo.
-            </p> */}
+            </p>
           </div>
           {/* Mobile FAB Alternative */}
           <Link

@@ -25,7 +25,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
         <h1 className="font-headline-md text-headline-md font-bold text-black dark:text-primary-fixed">
           TecBull
         </h1>
-        <button className="text-black dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center">
+        <button className="text-on-background dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center">
           <span className="material-symbols-outlined">search</span>
         </button>
       </header>
