@@ -1,5 +1,9 @@
+name = "odonto-tecbull"
+compatibility_date = "2024-03-20"
+compatibility_flags = ["nodejs_compat"]
+
 [[d1_databases]]
-binding = "tecbull_db_prod"
-database_name = "tecbull-db-prod"
+binding = "DB"
+database_name = "tecbull_db_prod"
 database_id = "f62dd20f-5111-405c-9503-3b81f3632d67"
 migrations_dir = "drizzle"

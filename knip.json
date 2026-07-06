@@ -8,8 +8,12 @@
             "src/app/actions.ts"
         ]
     },
+    "ignore": [
+        "open-next.config.ts"
+    ],
     "ignoreDependencies": [
         "npm-check-updates",
-        "wrangler"
+        "wrangler",
+        "@opennextjs/cloudflare"
     ]
 }
