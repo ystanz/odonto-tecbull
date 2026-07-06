@@ -139,6 +139,32 @@ export default function EditEquipmentButton({
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Tem certeza de que deseja excluir este equipamento? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const resRaw = await fetch(`/api/equipamentos/${equipment.id}`, {
+        method: 'DELETE',
+      });
+      const res = await resRaw.json();
+      if (res.success) {
+        setIsModalOpen(false);
+        router.push('/equipamentos');
+        router.refresh();
+      } else {
+        throw new Error(res.error || 'Erro ao excluir o equipamento');
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erro desconhecido';
+      showToast(`Erro ao deletar equipamento: ${msg}`, 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       {/* Toast Alert */}
@@ -390,21 +416,33 @@ export default function EditEquipmentButton({
                   )}
                 </div>
 
-                <div className="flex justify-end gap-3 mt-4">
+                <div className="flex justify-between items-center mt-4">
                   <button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
                     disabled={submitting}
-                    className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    onClick={handleDelete}
+                    className="h-12 px-4 rounded-lg bg-error/10 hover:bg-error/20 text-error font-label-caps text-label-caps transition-colors cursor-pointer flex items-center gap-1 font-semibold"
                   >
-                    {submitting ? 'Salvando...' : 'Salvar'}
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                    Deletar Equipamento
                   </button>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      {submitting ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>

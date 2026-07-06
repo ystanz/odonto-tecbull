@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 interface NavigationProps {
   currentTab: 'dashboard' | 'service' | 'equipment' | 'clients';
@@ -11,11 +12,22 @@ interface NavigationProps {
 
 export default function Navigation({ currentTab, children }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const getPageTitle = (path: string) => {
+    if (path === '/' || !path) return 'Dashboard';
+    if (path.startsWith('/clientes')) return 'Clientes';
+    if (path.startsWith('/equipamentos')) return 'Equipamentos';
+    if (path.startsWith('/ordens-servico') || path.startsWith('/os')) return 'Ordens de Serviço';
+    return 'TecBull';
+  };
+
+  const pageTitle = getPageTitle(pathname);
 
   return (
     <div className="min-h-screen text-black bg-[#FAF8F4] antialiased pb-24 md:pb-0 md:pl-80">
       {/* TopAppBar (Mobile) */}
-      <header className="w-full sticky top-0 z-50 bg-surface dark:bg-surface-dim shadow-sm flex items-center justify-between px-md py-sm md:hidden">
+      <header className="w-full sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md flex items-center justify-between px-md py-sm md:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="text-black dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center"
@@ -23,7 +35,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
           <span className="material-symbols-outlined">menu</span>
         </button>
         <h1 className="font-headline-md text-headline-md font-bold text-black dark:text-primary-fixed">
-          TecBull
+          {pageTitle}
         </h1>
         <button className="text-on-background dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center">
           <span className="material-symbols-outlined">search</span>
@@ -32,7 +44,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
 
       {/* NavigationDrawer (Desktop & Mobile drawer overlay) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-[60] h-full w-80 rounded-r-xl bg-surface dark:bg-surface-dim shadow-2xl flex flex-col p-md transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-[60] h-full w-80 rounded-r-xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col p-md transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex items-center justify-between mb-lg p-sm">

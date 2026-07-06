@@ -25,6 +25,7 @@ interface EquipmentSpecs {
 }
 
 interface TimelineItem {
+  id: string;
   date: string;
   title: string;
   description: string;
@@ -145,6 +146,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
 
         if (dbWos && dbWos.length > 0) {
           timeline = dbWos.map((wo) => ({
+            id: wo.id,
             date: wo.serviceDate || wo.createdAt?.split('T')[0] || 'N/A',
             title: wo.status === 'CONCLUÍDA' ? 'Manutenção Corretiva' : 'Solicitação de Reparo',
             description: wo.defectReported,
@@ -172,11 +174,11 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           </p>
           <Link
             prefetch={false}
-            href="/clientes"
+            href="/equipamentos"
             className="mt-lg h-12 px-6 bg-primary text-on-primary hover:bg-primary/95 font-label-caps text-label-caps rounded-xl transition-colors flex items-center justify-center gap-1 font-semibold shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined">arrow_back</span>
-            Voltar para Clientes
+            Voltar
           </Link>
         </main>
       </Navigation>
@@ -202,9 +204,9 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
 
         {/* Header Navigation link back */}
         <div className="flex items-center space-x-2 text-on-surface-variant font-body-md mb-xs">
-          <Link prefetch={false} href="/clientes" className="hover:text-primary flex items-center">
+          <Link prefetch={false} href="/equipamentos" className="hover:text-primary flex items-center">
             <span className="material-symbols-outlined text-md mr-1">arrow_back</span>
-            Voltar para Clientes
+            Voltar
           </Link>
         </div>
 
@@ -298,28 +300,24 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
                 <div className="relative z-10 w-6 h-6 rounded-full bg-surface-container-lowest border-2 border-primary flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
                   <span className="material-symbols-outlined text-[14px] text-primary">{item.icon}</span>
                 </div>
-                <div className="flex-1 bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(30,42,45,0.05)] p-sm border border-outline/10">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-technical-code text-technical-code text-on-surface-variant">{item.date}</span>
-                    <div className="inline-flex items-center px-2 py-0.5 rounded-sm bg-tertiary/15">
-                      <span className="font-technical-code text-[10px] text-tertiary">{item.status}</span>
+                <Link href={`/os/${item.id}`} className="flex-1 block hover:no-underline">
+                  <div className="bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(30,42,45,0.05)] p-sm border border-outline/10 hover:border-primary/50 transition-colors">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="font-technical-code text-technical-code text-on-surface-variant">{item.date}</span>
+                      <div className="inline-flex items-center px-2 py-0.5 rounded-sm bg-tertiary/15">
+                        <span className="font-technical-code text-[10px] text-tertiary">{item.status}</span>
+                      </div>
                     </div>
+                    <h3 className="font-body-md text-body-md font-medium text-on-surface mb-1">{item.title}</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant mb-sm">{item.description}</p>
+                    {item.partsUsed && (
+                      <div className="mb-sm flex items-center gap-xs text-[12px] text-on-surface-variant bg-surface p-xs rounded border border-outline/5">
+                        <span className="material-symbols-outlined text-[16px] text-primary">build_circle</span>
+                        <span><strong>Peças Utilizadas:</strong> {item.partsUsed}</span>
+                      </div>
+                    )}
                   </div>
-                  <h3 className="font-body-md text-body-md font-medium text-on-surface mb-1">{item.title}</h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant mb-sm">{item.description}</p>
-                  {item.partsUsed && (
-                    <div className="mb-sm flex items-center gap-xs text-[12px] text-on-surface-variant bg-surface p-xs rounded border border-outline/5">
-                      <span className="material-symbols-outlined text-[16px] text-primary">build_circle</span>
-                      <span><strong>Peças Utilizadas:</strong> {item.partsUsed}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-xs">
-                    <div className="w-6 h-6 rounded-full bg-surface-variant overflow-hidden flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[16px] text-on-surface-variant">person</span>
-                    </div>
-                    <span className="font-label-caps text-label-caps text-on-surface-variant">Tech: {item.technician}</span>
-                  </div>
-                </div>
+                </Link>
               </div>
             ))}
           </div>
