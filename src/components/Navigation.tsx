@@ -3,44 +3,20 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import Header from './Header';
 
 interface NavigationProps {
-  currentTab: 'dashboard' | 'service' | 'equipment' | 'clients';
   children: React.ReactNode;
+  currentTab?: string;
 }
 
-export default function Navigation({ currentTab, children }: NavigationProps) {
+export default function Navigation({ children, currentTab }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
-
-  const getPageTitle = (path: string) => {
-    if (path === '/' || !path) return 'Dashboard';
-    if (path.startsWith('/clientes')) return 'Clientes';
-    if (path.startsWith('/equipamentos')) return 'Equipamentos';
-    if (path.startsWith('/ordens-servico') || path.startsWith('/os')) return 'Ordens de Serviço';
-    return 'TecBull';
-  };
-
-  const pageTitle = getPageTitle(pathname);
 
   return (
     <div className="min-h-screen text-black bg-[#FAF8F4] antialiased pb-24 md:pb-0 md:pl-80 print:pl-0 print:pb-0 print:bg-white">
-      {/* TopAppBar (Mobile) */}
-      <header className="w-full sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md flex items-center justify-between px-md py-sm md:hidden print:hidden">
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="text-black dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center"
-        >
-          <span className="material-symbols-outlined">menu</span>
-        </button>
-        <h1 className="font-headline-md text-headline-md font-bold text-black dark:text-primary-fixed">
-          {pageTitle}
-        </h1>
-        <button className="text-on-background dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center">
-          <span className="material-symbols-outlined">search</span>
-        </button>
-      </header>
+      {/* Header unificado de pesquisa e topo */}
+      <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
 
       {/* NavigationDrawer (Desktop & Mobile drawer overlay) */}
       <aside
@@ -49,8 +25,6 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
       >
         <div className="flex items-center justify-between mb-lg p-sm">
           <div className="flex items-center space-x-4">
-
-            {/* 2. Div da Logo atualizada */}
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shadow-sm overflow-hidden relative">
               <Image
                 src="/icon-512x512.png"
@@ -60,7 +34,6 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
                 sizes="48px"
               />
             </div>
-
             <div>
               <h2 className="font-headline-sm text-headline-sm text-black dark:text-primary-fixed">
                 Marcelo Bull
@@ -71,7 +44,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
           {isMobileMenuOpen && (
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="md:hidden text-black p-1 rounded-full hover:bg-surface-container-high"
+              className="md:hidden text-black p-1 rounded-full hover:bg-surface-container-high cursor-pointer"
             >
               <span className="material-symbols-outlined">close</span>
             </button>
