@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface RecentWorkOrder {
   id: string;
@@ -23,11 +23,20 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     async function fetchDashboardData() {
       try {
         setLoading(true);
@@ -47,7 +56,7 @@ export default function DashboardPage() {
     }
 
     fetchDashboardData();
-  }, []);
+  }, [isMounted]);
 
   const currentDate = new Date().toLocaleDateString('pt-BR', {
     day: 'numeric',
@@ -68,6 +77,39 @@ export default function DashboardPage() {
       return dateStr;
     }
   };
+
+  // Renderiza um skeleton estático no servidor e na hidratação inicial do cliente
+  if (!isMounted) {
+    return (
+      <Navigation currentTab="dashboard">
+        <main className="flex-grow pb-32 pt-lg px-md w-full max-w-[800px] mx-auto md:px-xl">
+          <header className="mb-xl flex items-center justify-between border-b border-outline-variant/30 pb-md">
+            <div>
+              <span className="font-label-caps text-label-caps text-on-surface-variant tracking-wider">
+                Olá,
+              </span>
+              <h2 className="font-headline-lg text-headline-lg text-on-background mt-xs font-semibold">
+                Marcelo
+              </h2>
+            </div>
+            <div className="text-right">
+              <span className="font-label-caps text-label-caps text-on-surface-variant block tracking-wider">
+                DATA DE HOJE
+              </span>
+              <span className="font-headline-sm text-headline-sm text-primary font-bold mt-xs block">
+                ...
+              </span>
+            </div>
+          </header>
+
+          <div className="text-center py-16 text-on-surface-variant font-body-md flex flex-col items-center justify-center gap-sm bg-white rounded-2xl border border-outline/10 shadow-sm">
+            <span className="material-symbols-outlined animate-spin text-primary text-3xl">sync</span>
+            <span>Carregando dados operacionais...</span>
+          </div>
+        </main>
+      </Navigation>
+    );
+  }
 
   return (
     <Navigation currentTab="dashboard">
@@ -118,7 +160,7 @@ export default function DashboardPage() {
         {!loading && !error && data && (
           <div className="space-y-xl">
             {/* Metric Cards Grid */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-sm md:gap-md">
+            <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {/* Card 1: Clínicas */}
               <div className="bg-white rounded-xl p-md shadow-level-1 border border-outline/10 flex flex-col justify-between min-h-[120px]">
                 <div className="flex items-center space-x-2 text-primary">
@@ -168,14 +210,13 @@ export default function DashboardPage() {
                     Últimos Chamados / Ordens de Serviço
                   </h3>
                 </div>
-                <Link
-                  prefetch={false}
-                  href="/ordens-servico"
+                <button
+                  onClick={() => router.push('/ordens-servico')}
                   className="text-xs text-primary font-bold hover:underline font-label-caps text-label-caps flex items-center gap-base"
                 >
                   Ver Todos
                   <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                </Link>
+                </button>
               </div>
 
               {data.recentWorkOrders.length === 0 ? (
@@ -184,8 +225,8 @@ export default function DashboardPage() {
                   <span>Nenhum chamado aberto recentemente no sistema.</span>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full text-left border-collapse min-w-[600px]">
                     <thead>
                       <tr className="border-b border-outline/10 text-on-surface-variant font-label-caps text-label-caps text-xs">
                         <th className="py-sm pb-md font-semibold">OS/ID</th>
@@ -209,34 +250,27 @@ export default function DashboardPage() {
                         return (
                           <tr
                             key={wo.id}
+                            onClick={() => router.push(`/os/${wo.id}`)}
                             className="hover:bg-surface-container-lowest/50 transition-colors cursor-pointer group"
                           >
                             <td className="py-md font-technical-code text-sm">
-                              <Link href={`/os/${wo.id}`} className="block text-primary hover:underline font-semibold">
+                              <span className="block text-primary hover:underline font-semibold">
                                 {wo.code}
-                              </Link>
+                              </span>
                             </td>
-                            <td className="py-md font-body-md text-sm text-on-surface-variant">
-                              <Link href={`/os/${wo.id}`} className="block text-inherit group-hover:text-on-surface transition-colors">
-                                {wo.clientName || 'Cliente Geral'}
-                              </Link>
+                            <td className="py-md font-body-md text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
+                              {wo.clientName || 'Cliente Geral'}
                             </td>
-                            <td className="py-md font-body-md text-sm text-on-surface-variant">
-                              <Link href={`/os/${wo.id}`} className="block text-inherit group-hover:text-on-surface transition-colors">
-                                {wo.equipmentName || 'Equipamento'}
-                              </Link>
+                            <td className="py-md font-body-md text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
+                              {wo.equipmentName || 'Equipamento'}
                             </td>
-                            <td className="py-md font-technical-code text-sm text-on-surface-variant">
-                              <Link href={`/os/${wo.id}`} className="block text-inherit group-hover:text-on-surface transition-colors">
-                                {formatDate(wo.createdAt)}
-                              </Link>
+                            <td className="py-md font-technical-code text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
+                              {formatDate(wo.createdAt)}
                             </td>
                             <td className="py-md text-right">
-                              <Link href={`/os/${wo.id}`} className="inline-block">
-                                <span className={`inline-flex items-center px-sm py-base rounded-full text-[10px] font-semibold font-label-caps ${statusBadgeClass}`}>
-                                  {wo.status}
-                                </span>
-                              </Link>
+                              <span className={`inline-flex items-center px-sm py-base rounded-full text-[10px] font-semibold font-label-caps ${statusBadgeClass}`}>
+                                {wo.status}
+                              </span>
                             </td>
                           </tr>
                         );
