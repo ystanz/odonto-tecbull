@@ -36,6 +36,13 @@
       "when": 1783292176597,
       "tag": "0004_far_zzzax",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1783300000000,
+      "tag": "0005_add_image_data",
+      "breakpoints": true
     }
   ]
 }

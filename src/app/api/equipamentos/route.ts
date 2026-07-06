@@ -24,6 +24,7 @@ export async function GET() {
       manufacturer: row.equipments.manufacturer,
       status: row.equipments.status,
       next_service_date: row.equipments.nextServiceDate,
+      image_data: row.equipments.imageData,
       created_at: row.equipments.createdAt || undefined,
       locations: row.locations ? {
         id: row.locations.id,
@@ -50,7 +51,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, locationId, serialNumber, installationDate, manufacturer, status, nextServiceDate } = body;
+    const { name, locationId, serialNumber, installationDate, manufacturer, status, nextServiceDate, imageData } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -71,6 +72,7 @@ export async function POST(request: Request) {
         manufacturer: manufacturer || null,
         status: status || 'Ativo',
         nextServiceDate: nextServiceDate || null,
+        imageData: imageData || null,
       })
       .returning();
 
@@ -83,6 +85,7 @@ export async function POST(request: Request) {
       manufacturer: newEquipment.manufacturer,
       status: newEquipment.status,
       next_service_date: newEquipment.nextServiceDate,
+      image_data: newEquipment.imageData,
       created_at: newEquipment.createdAt || undefined,
     };
 

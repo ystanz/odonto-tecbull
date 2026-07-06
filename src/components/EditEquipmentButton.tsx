@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 // no actions imported
 import { DBClient, DBLocation } from '@/lib/types';
+import { compressImage } from '@/lib/imageCompression';
 
 interface EditEquipmentButtonProps {
   equipment: {
@@ -16,6 +17,7 @@ interface EditEquipmentButtonProps {
     manufacturer: string | null;
     status: string;
     nextServiceDate: string | null;
+    imageData?: string | null;
   };
   clients: DBClient[];
   locations: DBLocation[];
@@ -38,6 +40,31 @@ export default function EditEquipmentButton({
   const [installationDate, setInstallationDate] = useState(equipment.installationDate || '');
   const [nextServiceDate, setNextServiceDate] = useState(equipment.nextServiceDate || '');
   const [status, setStatus] = useState(equipment.status || 'Ativo');
+  const [imagePreview, setImagePreview] = useState<string | null>(equipment.imageData || null);
+  const [imageData, setImageData] = useState<string | null>(equipment.imageData || null);
+  const [compressing, setCompressing] = useState(false);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        setCompressing(true);
+        const base64Compressed = await compressImage(file);
+        setImageData(base64Compressed);
+        setImagePreview(base64Compressed);
+      } catch (err) {
+        console.error(err);
+        showToast('Erro ao processar imagem.', 'error');
+      } finally {
+        setCompressing(false);
+      }
+    }
+  };
+
+  const removeImage = () => {
+    setImageData(null);
+    setImagePreview(null);
+  };
 
   // Form Loading & Feedback
   const [submitting, setSubmitting] = useState(false);
@@ -64,6 +91,8 @@ export default function EditEquipmentButton({
     setInstallationDate(equipment.installationDate || '');
     setNextServiceDate(equipment.nextServiceDate || '');
     setStatus(equipment.status || 'Ativo');
+    setImageData(equipment.imageData || null);
+    setImagePreview(equipment.imageData || null);
   }, [equipment]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,6 +117,7 @@ export default function EditEquipmentButton({
           installationDate: installationDate || null,
           nextServiceDate: nextServiceDate || null,
           status,
+          imageData: imageData || null,
         })
       });
       const res = await resRaw.json();
@@ -316,6 +346,48 @@ export default function EditEquipmentButton({
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Image Upload Field */}
+                <div className="flex flex-col gap-1">
+                  <span className="font-label-caps text-label-caps text-on-surface-variant">
+                    Foto do Equipamento (Opcional)
+                  </span>
+                  {!imagePreview ? (
+                    <label className="border-2 border-dashed border-outline-variant/30 hover:border-primary/50 transition-colors rounded-xl p-md flex flex-col items-center justify-center gap-sm cursor-pointer bg-surface-container-lowest">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        className="hidden"
+                        onChange={handleImageChange}
+                        disabled={compressing}
+                      />
+                      <span className="material-symbols-outlined text-3xl text-outline-variant">
+                        add_a_photo
+                      </span>
+                      <span className="font-body-md text-body-md font-semibold text-primary">
+                        {compressing ? 'Compactando...' : 'Adicionar Foto'}
+                      </span>
+                    </label>
+                  ) : (
+                    <div className="relative rounded-xl overflow-hidden border border-outline/20 bg-surface-container-low p-xs flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imagePreview}
+                        alt="Preview do Equipamento"
+                        className="max-h-40 object-contain rounded-lg shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute top-xs right-xs w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center active:scale-95 transition-all shadow-md cursor-pointer"
+                        aria-label="Remover Imagem"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-end gap-3 mt-4">

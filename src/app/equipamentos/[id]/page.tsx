@@ -21,6 +21,7 @@ interface EquipmentSpecs {
   status: string;
   nextServiceDate: string;
   nextServiceDays: number;
+  imageData?: string | null;
 }
 
 interface TimelineItem {
@@ -98,7 +99,8 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           clientId: schema.locations.clientId,
           locationName: schema.locations.name,
           locationRoom: schema.locations.room,
-          clientName: schema.clients.name
+          clientName: schema.clients.name,
+          imageData: schema.equipments.imageData
         })
         .from(schema.equipments)
         .leftJoin(schema.locations, eq(schema.equipments.locationId, schema.locations.id))
@@ -130,7 +132,8 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
           manufacturer: dbEq.manufacturer || 'N/A',
           status: dbEq.status,
           nextServiceDate: dbEq.nextServiceDate || 'N/A',
-          nextServiceDays: days
+          nextServiceDays: days,
+          imageData: dbEq.imageData
         };
 
         // Fetch completed work orders for this equipment as history
@@ -190,6 +193,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
     manufacturer: equipment.manufacturer === 'N/A' ? '' : equipment.manufacturer,
     status: equipment.status,
     nextServiceDate: equipment.nextServiceDate === 'N/A' ? '' : equipment.nextServiceDate,
+    imageData: dbEq ? (dbEq.imageData || null) : null
   };
 
   return (
@@ -207,8 +211,13 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
         {/* Status & Image Header */}
         <div className="flex flex-col sm:flex-row items-start justify-between gap-md bg-surface-container-lowest p-md rounded-xl border border-outline/10 shadow-level-1">
           <div className="flex flex-col sm:flex-row items-start gap-md">
-            <div className="flex-shrink-0 w-24 h-24 bg-primary/10 rounded-xl overflow-hidden shadow-sm relative flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined text-4xl">precision_manufacturing</span>
+            <div className="flex-shrink-0 w-24 h-24 bg-primary/10 rounded-xl overflow-hidden shadow-sm relative flex items-center justify-center text-primary border border-outline/10">
+              {equipment.imageData ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={equipment.imageData} alt={equipment.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="material-symbols-outlined text-4xl">precision_manufacturing</span>
+              )}
             </div>
             <div className="flex flex-col justify-center py-xs">
               <div className={`inline-flex items-center px-sm py-base rounded-full ${equipment.status === 'Ativo' ? 'bg-tertiary/15 text-tertiary' : 'bg-secondary-container/15 text-secondary'

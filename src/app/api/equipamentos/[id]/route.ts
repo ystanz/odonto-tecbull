@@ -12,7 +12,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, locationId, serialNumber, installationDate, manufacturer, status, nextServiceDate } = body;
+    const { name, locationId, serialNumber, installationDate, manufacturer, status, nextServiceDate, imageData } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -32,6 +32,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         manufacturer: manufacturer || null,
         status: status || 'Ativo',
         nextServiceDate: nextServiceDate || null,
+        imageData: imageData !== undefined ? (imageData || null) : undefined,
       })
       .where(eq(schema.equipments.id, id))
       .returning();

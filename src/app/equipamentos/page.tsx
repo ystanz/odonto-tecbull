@@ -5,6 +5,7 @@ import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 // no actions imported
 import { DBEquipment, DBClient, DBLocation } from '@/lib/types';
+import { compressImage } from '@/lib/imageCompression';
 
 interface FormattedEquipment {
   id: string;
@@ -15,6 +16,7 @@ interface FormattedEquipment {
   installationDate: string;
   status: string;
   nextServiceDate: string;
+  imageData?: string | null;
 }
 
 export default function EquipamentosPage() {
@@ -44,6 +46,31 @@ export default function EquipamentosPage() {
   const [installationDate, setInstallationDate] = useState('');
   const [nextServiceDate, setNextServiceDate] = useState('');
   const [status, setStatus] = useState('Ativo');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageData, setImageData] = useState<string | null>(null);
+  const [compressing, setCompressing] = useState(false);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        setCompressing(true);
+        const base64Compressed = await compressImage(file);
+        setImageData(base64Compressed);
+        setImagePreview(base64Compressed);
+      } catch (err) {
+        console.error(err);
+        showToast('Erro ao processar imagem.', 'error');
+      } finally {
+        setCompressing(false);
+      }
+    }
+  };
+
+  const removeImage = () => {
+    setImageData(null);
+    setImagePreview(null);
+  };
 
   // Form Loading & Feedback
   const [submitting, setSubmitting] = useState(false);
@@ -105,6 +132,7 @@ export default function EquipamentosPage() {
             installationDate: eq.installation_date || 'N/A',
             status: eq.status || 'Ativo',
             nextServiceDate: eq.next_service_date || 'N/A',
+            imageData: eq.image_data,
           };
         });
 
@@ -153,6 +181,7 @@ export default function EquipamentosPage() {
           installationDate: installationDate || null,
           nextServiceDate: nextServiceDate || null,
           status,
+          imageData: imageData || null,
         })
       });
       const res = await resRaw.json();
@@ -171,6 +200,8 @@ export default function EquipamentosPage() {
       setInstallationDate('');
       setNextServiceDate('');
       setStatus('Ativo');
+      setImageData(null);
+      setImagePreview(null);
 
       setIsModalOpen(false);
       setRefreshTrigger((prev) => prev + 1);
@@ -280,21 +311,29 @@ export default function EquipamentosPage() {
                     </div>
 
                     {/* Mid row details */}
-                    <div className="pl-xs flex-1 mb-md">
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors font-bold mb-xs">
-                        {eq.name}
-                      </h3>
-                      <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs">
-                        <span className="material-symbols-outlined text-[16px] text-outline">location_on</span>
-                        {eq.locationPath}
-                      </p>
-
-                      {eq.serialNumber && eq.serialNumber !== 'N/A' && (
-                        <p className="font-technical-code text-technical-code text-outline mt-base flex items-center gap-xs">
-                          <span className="material-symbols-outlined text-[14px]">barcode_scanner</span>
-                          S/N: {eq.serialNumber}
-                        </p>
+                    <div className="pl-xs flex-1 mb-md flex gap-md items-start">
+                      {eq.imageData && (
+                        <div className="w-16 h-16 bg-surface-container-high rounded-lg overflow-hidden border border-outline/10 flex-shrink-0 relative">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={eq.imageData} alt={eq.name} className="w-full h-full object-cover" />
+                        </div>
                       )}
+                      <div className="flex-1">
+                        <h3 className="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors font-bold mb-xs">
+                          {eq.name}
+                        </h3>
+                        <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs">
+                          <span className="material-symbols-outlined text-[16px] text-outline">location_on</span>
+                          {eq.locationPath}
+                        </p>
+
+                        {eq.serialNumber && eq.serialNumber !== 'N/A' && (
+                          <p className="font-technical-code text-technical-code text-outline mt-base flex items-center gap-xs">
+                            <span className="material-symbols-outlined text-[14px]">barcode_scanner</span>
+                            S/N: {eq.serialNumber}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Bottom row actions */}
@@ -503,6 +542,48 @@ export default function EquipamentosPage() {
                         </button>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Image Upload Field */}
+                  <div className="flex flex-col gap-1">
+                    <span className="font-label-caps text-label-caps text-on-surface-variant">
+                      Foto do Equipamento (Opcional)
+                    </span>
+                    {!imagePreview ? (
+                      <label className="border-2 border-dashed border-outline-variant/30 hover:border-primary/50 transition-colors rounded-xl p-md flex flex-col items-center justify-center gap-sm cursor-pointer bg-surface-container-lowest">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          className="hidden"
+                          onChange={handleImageChange}
+                          disabled={compressing}
+                        />
+                        <span className="material-symbols-outlined text-3xl text-outline-variant">
+                          add_a_photo
+                        </span>
+                        <span className="font-body-md text-body-md font-semibold text-primary">
+                          {compressing ? 'Compactando...' : 'Adicionar Foto'}
+                        </span>
+                      </label>
+                    ) : (
+                      <div className="relative rounded-xl overflow-hidden border border-outline/20 bg-surface-container-low p-xs flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imagePreview}
+                          alt="Preview do Equipamento"
+                          className="max-h-40 object-contain rounded-lg shadow-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={removeImage}
+                          className="absolute top-xs right-xs w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center active:scale-95 transition-all shadow-md cursor-pointer"
+                          aria-label="Remover Imagem"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex justify-end gap-3 mt-4">

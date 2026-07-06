@@ -29,6 +29,7 @@ export const equipments = sqliteTable('equipments', {
   manufacturer: text('manufacturer'),
   status: text('status').notNull().default('Ativo'),
   nextServiceDate: text('next_service_date'),
+  imageData: text('image_data'),
   createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
 });
 

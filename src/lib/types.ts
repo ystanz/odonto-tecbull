@@ -28,6 +28,7 @@ export interface DBEquipment {
   manufacturer: string | null;
   status: string; // 'Ativo' | 'Pendente' | 'Inativo' etc
   next_service_date: string | null;
+  image_data?: string | null;
   created_at?: string;
   locations?: DBLocation; // Para joins do Supabase
 }
