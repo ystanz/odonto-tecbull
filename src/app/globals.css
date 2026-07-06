@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  --color-black: #111d20;
   --color-on-secondary-fixed-variant: #6c3a00;
   --color-tertiary-container: #1c4e2f;
   --color-surface-container-lowest: #ffffff;
@@ -139,13 +140,16 @@ body {
 /* Tactical Timeline Line */
 .timeline-line {
   position: absolute;
-  left: 28px; /* 16px padding + 12px half icon */
+  left: 28px;
+  /* 16px padding + 12px half icon */
   top: 24px;
   bottom: -24px;
   width: 2px;
-  background-color: rgba(113, 120, 124, 0.15); /* outline 15% */
+  background-color: rgba(113, 120, 124, 0.15);
+  /* outline 15% */
   z-index: 0;
 }
+
 .timeline-item:last-child .timeline-line {
   display: none;
 }

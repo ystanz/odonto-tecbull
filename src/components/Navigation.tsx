@@ -18,16 +18,13 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
       <header className="w-full sticky top-0 z-50 bg-surface dark:bg-surface-dim shadow-sm flex items-center justify-between px-md py-sm md:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="text-primary dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center"
+          className="text-black dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center"
         >
           <span className="material-symbols-outlined">menu</span>
         </button>
-        <h1 className="font-headline-md text-headline-md font-bold text-on-background dark:text-primary-fixed">
+        <h1 className="font-headline-md text-headline-md font-bold text-black dark:text-primary-fixed">
           TecBull
         </h1>
-        <button className="text-on-background dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100 p-2 rounded-full h-touch-target w-touch-target flex items-center justify-center">
-          <span className="material-symbols-outlined">search</span>
-        </button>
       </header>
 
       {/* NavigationDrawer (Desktop & Mobile drawer overlay) */}
@@ -50,7 +47,7 @@ export default function Navigation({ currentTab, children }: NavigationProps) {
             </div>
 
             <div>
-              <h2 className="font-headline-sm text-headline-sm text-on-background dark:text-primary-fixed">
+              <h2 className="font-headline-sm text-headline-sm text-black dark:text-primary-fixed">
                 Marcelo Bull
               </h2>
             </div>
