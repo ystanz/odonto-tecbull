@@ -293,6 +293,15 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
     setIsEditLocationModalOpen(true);
   };
 
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    const clientName = client.name.replace(/\s+/g, '_');
+    document.title = `Relatorio_${clientName}_${dateStr}`;
+    window.print();
+    setTimeout(() => { document.title = originalTitle; }, 100);
+  };
+
   return (
     <Navigation currentTab="clients">
       <main className="flex-1 overflow-y-auto px-md py-lg pb-32 max-w-4xl mx-auto w-full space-y-lg">
@@ -353,24 +362,24 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
         {!loading && client && (
           <>
             {/* Client Profile Header Card */}
-            <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-md relative overflow-hidden group print:shadow-none print:text-black print:border-black print:p-0">
+            <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-md relative overflow-hidden group print:shadow-none print:bg-transparent print:border-none print:rounded-none print:p-0 print:m-0 print:border-b print:border-gray-200 print:pb-4 print:mb-4">
               <div className="absolute inset-y-0 left-0 w-1.5 bg-primary print:hidden"></div>
               
-              <div className="space-y-sm pl-md print:pl-0">
+              <div className="space-y-sm pl-md print:pl-0 print:flex print:flex-col print:gap-1 print:text-black">
                 <div className="flex items-center gap-sm">
-                  <h1 className="font-headline-md text-headline-md text-on-surface font-bold print:text-black">
+                  <h1 className="font-headline-md text-headline-md text-on-surface font-bold print:text-black print:text-lg">
                     {client.name}
                   </h1>
                 </div>
  
                 {/* Client Contact Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-sm pt-xs print:text-black print:grid-cols-2">
-                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-sm pt-xs print:grid print:grid-cols-2 print:gap-4 print:text-black print:text-sm">
+                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black print:text-sm">
                     <span>
                       <strong>Responsável:</strong> {client.responsible_name || 'Não informado'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black">
+                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black print:text-sm">
                     <span>
                       <strong>Contato:</strong> {client.phone || 'Não informado'}
                     </span>
@@ -381,7 +390,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
               {/* Client Action Buttons */}
               <div className="flex md:flex-col lg:flex-row gap-sm pl-md md:pl-0 print:hidden">
                 <button
-                  onClick={() => window.print()}
+                  onClick={handlePrint}
                   className="h-10 px-4 bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
                 >
                   <span className="material-symbols-outlined text-[16px]">print</span>
@@ -406,9 +415,9 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             </div>
 
             {/* Locations (Units) Section */}
-            <div className="space-y-md print:mt-6 print:text-black">
+            <div className="space-y-md print:mt-6 print:text-black print:shadow-none print:bg-transparent print:border-none print:rounded-none print:p-0 print:m-0">
               <div className="flex items-center justify-between">
-                <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black">
+                <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black print:text-sm print:font-semibold">
                   Unidades de Atendimento ({locations.length})
                 </h2>
                 <button
@@ -438,22 +447,22 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-md print:grid print:grid-cols-2 print:gap-4 print:border-b print:border-gray-200 print:pb-4 print:mb-4">
                   {locations.map((loc) => (
                     <article
                       key={loc.id}
-                      className="bg-surface-container-lowest rounded-xl border border-outline/10 p-md flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group print:shadow-none print:text-black print:border-black print:p-0 print:bg-transparent"
+                      className="bg-surface-container-lowest rounded-xl border border-outline/10 p-md flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group print:shadow-none print:text-black print:border-none print:p-0 print:bg-transparent print:rounded-none print:m-0 print:flex print:flex-col print:gap-1"
                     >
                       <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors print:hidden"></div>
                       
                       <div className="pl-xs space-y-sm print:pl-0">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold group-hover:text-primary transition-colors print:text-black">
+                            <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold group-hover:text-primary transition-colors print:text-black print:text-sm print:font-semibold">
                               {loc.name}
                             </h3>
                             {loc.room && (
-                              <span className="inline-block mt-1 px-sm py-base bg-secondary/15 text-secondary text-label-caps font-label-caps rounded print:bg-transparent print:text-black print:border print:border-black/10">
+                              <span className="inline-block mt-1 px-sm py-base bg-secondary/15 text-secondary text-label-caps font-label-caps rounded print:bg-transparent print:text-black print:border print:border-gray-200 print:px-1 print:py-0 print:text-xs">
                                 {loc.room}
                               </span>
                             )}
@@ -479,7 +488,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                         </div>
 
                         {/* Specs of the Location */}
-                        <div className="space-y-base pt-xs border-t border-outline/10 text-body-md text-on-surface-variant font-body-md print:text-black print:border-black/10">
+                        <div className="space-y-base pt-xs border-t border-outline/10 text-body-md text-on-surface-variant font-body-md print:text-black print:border-none print:p-0 print:text-sm print:flex print:flex-col print:gap-1">
                           {loc.address && (
                             <p className="flex items-start gap-xs">
                               <span><strong>Endereço:</strong> {loc.address}</span>
