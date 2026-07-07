@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { DBWorkOrder, DBWorkNote } from '@/lib/types';
+import { DBWorkOrder, DBWorkNote, DBSettings } from '@/lib/types';
 
 interface OSDetailsUIProps {
   initialWorkOrder: DBWorkOrder;
@@ -15,7 +15,22 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
   const router = useRouter();
   const [workOrder, setWorkOrder] = useState<DBWorkOrder>(initialWorkOrder);
   const [workNotes, setWorkNotes] = useState<DBWorkNote[]>(initialWorkNotes);
+  const [settings, setSettings] = useState<DBSettings | null>(null);
 
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const resRaw = await fetch('/api/settings');
+        const res = await resRaw.json();
+        if (res.success && res.data) {
+          setSettings(res.data);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar configurações para impressão:', err);
+      }
+    }
+    fetchSettings();
+  }, []);
 
   // Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -210,6 +225,30 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
     }
   };
 
+  const renderDate = (dateStr?: string) => {
+    if (!dateStr) return 'N/A';
+    try {
+      const date = new Date(dateStr);
+      const datePart = date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+      const timePart = date.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      return (
+        <>
+          <span>{datePart}</span>
+          <span className="print:hidden"> às {timePart}</span>
+        </>
+      );
+    } catch {
+      return dateStr;
+    }
+  };
+
   const clientName = workOrder.clients?.name || 'Cliente Geral';
   const equipmentName = workOrder.equipments?.name || 'Equipamento Geral';
   const serialNumber = workOrder.equipments?.serial_number || 'N/A';
@@ -265,21 +304,28 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
           </div>
         </div>
 
-        {/* Cabeçalho de Impressão (Exclusivo para PDF) */}
-        <div className="hidden print:flex items-center justify-between border-b-2 border-black pb-md mb-lg">
-          <div className="flex items-center space-x-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon-512x512.png" alt="Logo TecBull" className="w-16 h-16 object-cover" />
-            <div>
-              <h2 className="text-xl font-bold text-black tracking-wide font-headline-lg">TecBull</h2>
-              <p className="text-xs text-gray-600">Serviços e Manutenção de Equipamentos Odontológicos</p>
-              <p className="text-[10px] text-gray-500 mt-1">Contato: suporte@tecbull.com | (11) 99999-9999</p>
+        {/* Cabeçalho de Impressão Dinâmico (Exclusivo para PDF) */}
+        <div className="hidden print:block print:mb-8 print:border-b print:pb-4 text-black">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-wide uppercase font-headline-lg">
+                {settings?.companyName || 'OdontoTech Bull'}
+              </h1>
+              {settings?.ownerName && (
+                <p className="text-sm font-semibold">Proprietário: {settings.ownerName}</p>
+              )}
+              <p className="text-xs text-gray-600">
+                {settings?.phone && <span>Telefone: {settings.phone}</span>}
+                {settings?.email && <span>{settings.phone ? ' | ' : ''}E-mail: {settings.email}</span>}
+              </p>
+              {settings?.address && (
+                <p className="text-xs text-gray-500 mt-1">{settings.address}</p>
+              )}
             </div>
-          </div>
-          <div className="text-right">
-            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block font-label-caps">ORDEM DE SERVIÇO</span>
-            <span className="text-xl font-extrabold text-black block mt-1">{workOrder.code}</span>
-            <span className="text-xs text-gray-600 block mt-1">Status: {workOrder.status}</span>
+            <div className="text-right">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block font-label-caps">ORDEM DE SERVIÇO</span>
+              <span className="text-2xl font-extrabold block mt-1">{workOrder.code}</span>
+            </div>
           </div>
         </div>
 
@@ -326,7 +372,7 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md pt-md border-t border-outline/5 print:border-black print:text-black">
               <div className="space-y-base">
                 <p className="text-body-md text-on-surface-variant">
-                  <span><strong>Data de Abertura:</strong> {formatDate(workOrder.created_at)}</span>
+                  <span><strong>Data de Abertura:</strong> {renderDate(workOrder.created_at)}</span>
                 </p>
                 <p className="text-body-md text-on-surface-variant">
                   <span><strong>Cliente:</strong> {clientName}</span>

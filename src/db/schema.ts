@@ -1,4 +1,4 @@
-import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
 export const clients = sqliteTable('clients', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -50,10 +50,12 @@ export const workOrders = sqliteTable('work_orders', {
 });
 
 export const settings = sqliteTable('settings', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  key: text('key').notNull().unique(),
-  value: text('value'),
-  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
+  id: integer('id').primaryKey(),
+  companyName: text('company_name'),
+  ownerName: text('owner_name'),
+  phone: text('phone'),
+  email: text('email'),
+  address: text('address'),
 });
 
 export const workNotes = sqliteTable('work_notes', {

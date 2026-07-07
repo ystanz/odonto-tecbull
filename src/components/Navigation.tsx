@@ -91,6 +91,16 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
             <span className="material-symbols-outlined">location_city</span>
             <span className="font-body-md text-body-md">Clientes e Locais</span>
           </Link>
+
+          <Link
+            prefetch={false}
+            href="/configuracoes"
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${currentTab === 'settings' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
+              }`}
+          >
+            <span className="material-symbols-outlined">settings</span>
+            <span className="font-body-md text-body-md">Configurações</span>
+          </Link>
         </div>
 
         <div className="mt-auto pt-lg">
