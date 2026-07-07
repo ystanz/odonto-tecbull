@@ -328,6 +328,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
               </span>
             </div>
           </div>
+          <h2 className="text-lg font-bold mt-4 mb-2 uppercase border-b border-gray-300 pb-1">Histórico de Serviço</h2>
         </div>
 
         {/* Toast Alert */}
@@ -418,7 +419,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             <div className="space-y-md print:mt-6 print:text-black print:shadow-none print:bg-transparent print:border-none print:rounded-none print:p-0 print:m-0">
               <div className="flex items-center justify-between">
                 <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black print:text-sm print:font-semibold">
-                  Unidades de Atendimento ({locations.length})
+                  Unidades de Atendimento
                 </h2>
                 <button
                   onClick={() => {
