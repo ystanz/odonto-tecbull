@@ -1,7 +1,6 @@
 export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
@@ -9,16 +8,13 @@ export async function POST(request: Request) {
     const adminPassword = process.env.ADMIN_PASSWORD || 'tecbull2026';
 
     if (password === adminPassword) {
-      const cookieStore = await cookies();
-      cookieStore.set('tecbull_auth', 'true', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7, // 1 semana
-      });
-
-      return NextResponse.json({ success: true });
+      const response = NextResponse.json({ success: true });
+      const secureFlag = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+      response.headers.set(
+        'Set-Cookie',
+        `tecbull_auth=true; Path=/; HttpOnly; SameSite=Strict; Max-Age=604800${secureFlag}`
+      );
+      return response;
     }
 
     return NextResponse.json({ success: false, error: 'Senha incorreta.' }, { status: 401 });
