@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import Header from './Header';
 
 interface NavigationProps {
@@ -11,7 +12,17 @@ interface NavigationProps {
 }
 
 export default function Navigation({ children, currentTab }: NavigationProps) {
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST' });
+      router.push('/login');
+    } catch (err) {
+      console.error('Erro ao efetuar logout:', err);
+    }
+  };
 
   return (
     <div className="min-h-screen text-black bg-[#FAF8F4] antialiased pb-24 md:pb-0 md:pl-80 print:pl-0 print:pb-0 print:bg-white">
@@ -103,7 +114,7 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
           </Link>
         </div>
 
-        <div className="mt-auto pt-lg">
+        <div className="mt-auto pt-lg space-y-sm">
           <Link
             prefetch={false}
             href="/os/nova"
@@ -112,6 +123,13 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
             <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>add_circle</span>
             <span>Nova OS</span>
           </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full h-touch-target bg-surface-container-high border border-outline/10 text-on-surface hover:bg-error/10 hover:text-error hover:border-error/20 transition-colors rounded-lg flex items-center justify-center space-x-2 cursor-pointer font-label-caps text-label-caps"
+          >
+            <span className="material-symbols-outlined">logout</span>
+            <span>Sair</span>
+          </button>
         </div>
       </aside>
 
