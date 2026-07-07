@@ -16,8 +16,11 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
   const [workOrder, setWorkOrder] = useState<DBWorkOrder>(initialWorkOrder);
   const [workNotes, setWorkNotes] = useState<DBWorkNote[]>(initialWorkNotes);
   const [settings, setSettings] = useState<DBSettings | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
     async function fetchSettings() {
       try {
         const resRaw = await fetch('/api/settings');
@@ -254,6 +257,10 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
   const serialNumber = workOrder.equipments?.serial_number || 'N/A';
   const manufacturer = workOrder.equipments?.manufacturer || 'N/A';
 
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <Navigation currentTab="service">
       <main className="flex-1 overflow-y-auto px-md py-lg pb-32 max-w-4xl mx-auto w-full space-y-lg">
@@ -419,7 +426,7 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
                 </div>
               )}
 
-              {workOrder.image_url && (
+              {workOrder.image_url && workOrder.image_url.startsWith('data:image/') && (
                 <div className="pt-sm print:hidden">
                   <span className="text-xs font-semibold text-outline block mb-1">Anexo / Imagem do chamado:</span>
                   <a href={workOrder.image_url} target="_blank" rel="noopener noreferrer" className="inline-block overflow-hidden rounded-lg border border-outline/10 hover:border-primary transition-colors">

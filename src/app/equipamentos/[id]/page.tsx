@@ -300,7 +300,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
                 <div className="relative z-10 w-6 h-6 rounded-full bg-surface-container-lowest border-2 border-primary flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
                   <span className="material-symbols-outlined text-[14px] text-primary">{item.icon}</span>
                 </div>
-                <Link href={`/os/${item.id}`} className="flex-1 block hover:no-underline">
+                <a href={`/os/${item.id}`} className="flex-1 block hover:no-underline">
                   <div className="bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(30,42,45,0.05)] p-sm border border-outline/10 hover:border-primary/50 transition-colors">
                     <div className="flex justify-between items-start mb-1">
                       <span className="font-technical-code text-technical-code text-on-surface-variant">{item.date}</span>
@@ -317,7 +317,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
                       </div>
                     )}
                   </div>
-                </Link>
+                </a>
               </div>
             ))}
           </div>

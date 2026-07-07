@@ -295,8 +295,7 @@ export default function ClientesPage() {
           <div className="space-y-md animate-fade-in">
             {filteredClients.map((client) => {
               return (
-                <Link
-                  prefetch={false}
+                <a
                   key={client.id}
                   href={`/clientes/${client.id}`}
                   className="block bg-surface-container-lowest rounded-xl shadow-sm border border-outline/10 overflow-hidden hover:shadow-md hover:border-primary/20 transition-all cursor-pointer active:scale-[0.99] relative group"
@@ -316,7 +315,7 @@ export default function ClientesPage() {
                       <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                     </div>
                   </div>
-                </Link>
+                </a>
               );
             })}
 

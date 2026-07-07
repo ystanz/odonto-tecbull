@@ -220,9 +220,9 @@ export default function WorkOrdersPage() {
 
               return (
                 <div key={wo.id}>
-                  <Link prefetch={false} href={`/os/${wo.id}`} className="block h-full">
+                  <a href={`/os/${wo.id}`} className="block h-full">
                     {cardContent}
-                  </Link>
+                  </a>
                 </div>
               );
             })}

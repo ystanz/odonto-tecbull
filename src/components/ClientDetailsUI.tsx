@@ -21,6 +21,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
   const [locations, setLocations] = useState<DBLocation[]>(initialLocations);
   const [workOrders, setWorkOrders] = useState<DBWorkOrder[]>([]);
   const [settings, setSettings] = useState<DBSettings | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -87,6 +88,8 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
   // Carregar configurações comerciais
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
     async function fetchSettings() {
       try {
         const resRaw = await fetch('/api/settings');
@@ -301,6 +304,10 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
     window.print();
     setTimeout(() => { document.title = originalTitle; }, 100);
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Navigation currentTab="clients">

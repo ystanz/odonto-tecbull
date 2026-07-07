@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Navigation from '@/components/Navigation';
-import Link from 'next/link';
 // no actions imported
 import { DBEquipment, DBClient, DBLocation } from '@/lib/types';
 import { compressImage } from '@/lib/imageCompression';
@@ -298,7 +297,7 @@ export default function EquipamentosPage() {
               }
 
               return (
-                <Link prefetch={false} key={eq.id} href={`/equipamentos/${eq.id}`} className="group">
+                <a key={eq.id} href={`/equipamentos/${eq.id}`} className="group">
                   <article className="bg-surface-container-lowest rounded-xl shadow-sm border border-outline/10 p-md flex flex-col justify-between h-full hover:shadow-md hover:border-primary/20 transition-all cursor-pointer relative overflow-hidden group active:scale-[0.99]">
                     <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors"></div>
 
@@ -314,7 +313,7 @@ export default function EquipamentosPage() {
                     <div className="pl-xs flex-1 mb-md flex gap-md items-start">
                       {eq.imageData && (
                         <div className="w-16 h-16 bg-surface-container-high rounded-lg overflow-hidden border border-outline/10 flex-shrink-0 relative">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={eq.imageData} alt={eq.name} className="w-full h-full object-cover" />
                         </div>
                       )}
@@ -348,7 +347,7 @@ export default function EquipamentosPage() {
                       </div>
                     </div>
                   </article>
-                </Link>
+                </a>
               );
             })}
 
