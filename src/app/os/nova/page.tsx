@@ -131,12 +131,20 @@ export default function NovaOSPage() {
   const handleUploadImage = async (file: File): Promise<string | null> => {
     try {
       setUploadProgress(20);
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       setUploadProgress(60);
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      
+      const base64String = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
+
       setUploadProgress(100);
-      // Generate a local blob URL valid for the browser session
-      return URL.createObjectURL(file);
+      return base64String;
     } catch (err) {
       console.error('Erro no upload de imagem:', err);
       return null;
