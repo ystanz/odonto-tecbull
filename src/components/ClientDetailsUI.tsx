@@ -307,16 +307,16 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                 <p className="text-sm font-semibold">{settings.ownerName}</p>
               )}
               <p className="text-xs text-gray-600">
-                {settings?.phone && <span>Telefone: {settings.phone}</span>}
-                {settings?.email && <span>{settings.phone ? ' | ' : ''}E-mail: {settings.email}</span>}
+                {settings?.phone && <span>Contato: {settings.phone}</span>}
               </p>
               {settings?.address && (
                 <p className="text-xs text-gray-500 mt-1">{settings.address}</p>
               )}
             </div>
             <div className="text-right">
-              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block font-label-caps">RELATÓRIO DE HISTÓRICO</span>
-              <span className="text-2xl font-extrabold block mt-1">Histórico de Serviço</span>
+              <span className="text-sm font-semibold text-gray-700 block">
+                Emissão: {new Date().toLocaleDateString('pt-BR')}
+              </span>
             </div>
           </div>
         </div>
@@ -358,30 +358,21 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
               
               <div className="space-y-sm pl-md print:pl-0">
                 <div className="flex items-center gap-sm">
-                  <span className="material-symbols-outlined text-primary text-3xl print:hidden">domain</span>
                   <h1 className="font-headline-md text-headline-md text-on-surface font-bold print:text-black">
                     {client.name}
                   </h1>
                 </div>
  
                 {/* Client Contact Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-sm pt-xs print:text-black">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-sm pt-xs print:text-black print:grid-cols-2">
                   <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black">
-                    <span className="material-symbols-outlined text-outline text-[18px] print:hidden">person</span>
                     <span>
                       <strong>Responsável:</strong> {client.responsible_name || 'Não informado'}
                     </span>
                   </div>
                   <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black">
-                    <span className="material-symbols-outlined text-outline text-[18px] print:hidden">call</span>
                     <span>
-                      <strong>Telefone:</strong> {client.phone || 'Não informado'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black">
-                    <span className="material-symbols-outlined text-outline text-[18px] print:hidden">mail</span>
-                    <span>
-                      <strong>E-mail:</strong> {client.email || 'Não informado'}
+                      <strong>Contato:</strong> {client.phone || 'Não informado'}
                     </span>
                   </div>
                 </div>
@@ -418,7 +409,6 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             <div className="space-y-md print:mt-6 print:text-black">
               <div className="flex items-center justify-between">
                 <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black">
-                  <span className="material-symbols-outlined text-primary print:hidden">location_on</span>
                   Unidades de Atendimento ({locations.length})
                 </h2>
                 <button
@@ -439,7 +429,6 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
               {locations.length === 0 ? (
                 <div className="text-center py-12 text-on-surface-variant font-body-md bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm flex flex-col items-center justify-center gap-sm print:border-black print:text-black">
-                  <span className="material-symbols-outlined text-outline text-5xl print:hidden">location_off</span>
                   <span>Nenhuma unidade cadastrada para esta clínica parceira.</span>
                   <button
                     onClick={() => setIsAddLocationModalOpen(true)}
@@ -453,7 +442,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                   {locations.map((loc) => (
                     <article
                       key={loc.id}
-                      className="bg-surface-container-lowest rounded-xl border border-outline/10 p-md flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group print:shadow-none print:text-black print:border-black print:p-0"
+                      className="bg-surface-container-lowest rounded-xl border border-outline/10 p-md flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group print:shadow-none print:text-black print:border-black print:p-0 print:bg-transparent"
                     >
                       <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors print:hidden"></div>
                       
@@ -464,7 +453,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                               {loc.name}
                             </h3>
                             {loc.room && (
-                              <span className="inline-block mt-1 px-sm py-base bg-secondary/15 text-secondary text-label-caps font-label-caps rounded print:bg-gray-100 print:text-black print:border print:border-black/10">
+                              <span className="inline-block mt-1 px-sm py-base bg-secondary/15 text-secondary text-label-caps font-label-caps rounded print:bg-transparent print:text-black print:border print:border-black/10">
                                 {loc.room}
                               </span>
                             )}
@@ -493,19 +482,11 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                         <div className="space-y-base pt-xs border-t border-outline/10 text-body-md text-on-surface-variant font-body-md print:text-black print:border-black/10">
                           {loc.address && (
                             <p className="flex items-start gap-xs">
-                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px] print:hidden">home_pin</span>
                               <span><strong>Endereço:</strong> {loc.address}</span>
                             </p>
                           )}
-                          {loc.contact && (
-                            <p className="flex items-start gap-xs">
-                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px] print:hidden">contact_phone</span>
-                              <span><strong>Contato:</strong> {loc.contact}</span>
-                            </p>
-                          )}
                           {loc.notes && (
-                            <p className="flex items-start gap-xs bg-surface-container-low/50 p-xs rounded border border-outline/5 print:bg-white print:border-0 print:p-0">
-                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px] print:hidden">notes</span>
+                            <p className="flex items-start gap-xs bg-surface-container-low/50 p-xs rounded border border-outline/5 print:bg-transparent print:border-0 print:p-0">
                               <span className="italic"><strong>Notas:</strong> {loc.notes}</span>
                             </p>
                           )}
@@ -531,19 +512,18 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             {/* Tabela de Histórico de Manutenção */}
             <div className="space-y-md print:mt-6 print:text-black">
               <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black">
-                <span className="material-symbols-outlined text-primary print:hidden">history</span>
                 Histórico de Manutenção ({workOrders.length})
               </h2>
 
               {workOrders.length === 0 ? (
-                <div className="text-center py-8 text-on-surface-variant font-body-md bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm print:border-black print:text-black">
+                <div className="text-center py-8 text-on-surface-variant font-body-md bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm print:border-black print:text-black print:bg-transparent">
                   Nenhum chamado de manutenção registrado para esta clínica.
                 </div>
               ) : (
-                <div className="overflow-x-auto bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm print:shadow-none print:border-black print:text-black">
-                  <table className="w-full text-left border-collapse print:text-black">
+                <div className="overflow-x-auto bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm print:shadow-none print:border-gray-200 print:text-black print:bg-transparent">
+                  <table className="w-full text-left border-collapse print:text-black print:text-sm">
                     <thead>
-                      <tr className="bg-surface-container-high text-on-surface font-semibold text-sm border-b border-outline/10 print:bg-gray-100 print:text-black print:border-black">
+                      <tr className="bg-surface-container-high text-on-surface font-semibold text-sm border-b border-outline/10 print:bg-transparent print:text-black print:border-gray-200">
                         <th className="p-md">Código OS</th>
                         <th className="p-md">Equipamento</th>
                         <th className="p-md">Defeito / Sintoma</th>
@@ -554,7 +534,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                     </thead>
                     <tbody>
                       {workOrders.map((wo) => (
-                        <tr key={wo.id} className="border-b border-outline/5 hover:bg-surface-container-low transition-colors print:border-black print:text-black">
+                        <tr key={wo.id} className="border-b border-outline/5 hover:bg-surface-container-low transition-colors print:border-gray-200 print:text-black print:bg-transparent">
                           <td className="p-md font-bold text-primary print:text-black">{wo.code}</td>
                           <td className="p-md">{wo.equipments?.name || 'Equipamento Geral'}</td>
                           <td className="p-md text-sm">{wo.defect_reported}</td>
@@ -567,7 +547,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                             ) : 'N/A'}
                           </td>
                           <td className="p-md text-xs">
-                            <span className={`px-sm py-base rounded text-xs font-semibold print:p-0 print:font-normal ${
+                            <span className={`px-sm py-base rounded text-xs font-semibold print:p-0 print:font-normal print:bg-transparent print:text-black ${
                               wo.status === 'CONCLUÍDA' ? 'bg-tertiary/15 text-tertiary print:text-black' :
                               wo.status === 'EM ANDAMENTO' ? 'bg-secondary/15 text-secondary print:text-black' :
                               wo.status === 'AGUARDANDO PEÇA' ? 'bg-orange-500/15 text-orange-700 print:text-black' :
