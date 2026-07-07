@@ -5,7 +5,7 @@ import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 // no actions imported
-import { DBClient, DBLocation } from '@/lib/types';
+import { DBClient, DBLocation, DBSettings, DBWorkOrder } from '@/lib/types';
 
 interface ClientDetailsUIProps {
   client: DBClient;
@@ -19,6 +19,8 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
   // Data States
   const [client, setClient] = useState<DBClient>(initialClient);
   const [locations, setLocations] = useState<DBLocation[]>(initialLocations);
+  const [workOrders, setWorkOrders] = useState<DBWorkOrder[]>([]);
+  const [settings, setSettings] = useState<DBSettings | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -82,6 +84,41 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
       setLoading(false);
     }
   }, [id, refreshTrigger, showToast]);
+
+  // Carregar configurações comerciais
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const resRaw = await fetch('/api/settings');
+        const res = await resRaw.json();
+        if (res.success && res.data) {
+          setSettings(res.data);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar configurações para relatório:', err);
+      }
+    }
+    fetchSettings();
+  }, []);
+
+  // Carregar ordens de serviço do cliente
+  const loadWorkOrders = useCallback(async () => {
+    try {
+      const resRaw = await fetch('/api/ordens-servico');
+      const res = await resRaw.json();
+      if (res.success && res.data) {
+        const clientWos = (res.data || []).filter((wo: DBWorkOrder) => wo.client_id === id);
+        setWorkOrders(clientWos);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar ordens de serviço para relatório:', err);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadWorkOrders();
+  }, [loadWorkOrders, refreshTrigger]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -259,6 +296,31 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
   return (
     <Navigation currentTab="clients">
       <main className="flex-1 overflow-y-auto px-md py-lg pb-32 max-w-4xl mx-auto w-full space-y-lg">
+        {/* Cabeçalho de Impressão Dinâmico (Exclusivo para PDF) */}
+        <div className="hidden print:block print:mb-8 print:border-b print:pb-4 text-black">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-wide uppercase font-headline-lg">
+                {settings?.companyName || 'OdontoTech Bull'}
+              </h1>
+              {settings?.ownerName && (
+                <p className="text-sm font-semibold">{settings.ownerName}</p>
+              )}
+              <p className="text-xs text-gray-600">
+                {settings?.phone && <span>Telefone: {settings.phone}</span>}
+                {settings?.email && <span>{settings.phone ? ' | ' : ''}E-mail: {settings.email}</span>}
+              </p>
+              {settings?.address && (
+                <p className="text-xs text-gray-500 mt-1">{settings.address}</p>
+              )}
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block font-label-caps">RELATÓRIO DE HISTÓRICO</span>
+              <span className="text-2xl font-extrabold block mt-1">Histórico de Serviço</span>
+            </div>
+          </div>
+        </div>
+
         {/* Toast Alert */}
         {toast && (
           <div
@@ -273,7 +335,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
         )}
 
         {/* Back Link */}
-        <div className="flex items-center space-x-2 text-on-surface-variant font-body-md">
+        <div className="flex items-center space-x-2 text-on-surface-variant font-body-md print:hidden">
           <Link prefetch={false} href="/clientes" className="hover:text-primary flex items-center">
             <span className="material-symbols-outlined text-md mr-1">arrow_back</span>
             Voltar para Clientes
@@ -291,42 +353,49 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
         {!loading && client && (
           <>
             {/* Client Profile Header Card */}
-            <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-md relative overflow-hidden group">
-              <div className="absolute inset-y-0 left-0 w-1.5 bg-primary"></div>
+            <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-md relative overflow-hidden group print:shadow-none print:text-black print:border-black print:p-0">
+              <div className="absolute inset-y-0 left-0 w-1.5 bg-primary print:hidden"></div>
               
-              <div className="space-y-sm pl-md">
+              <div className="space-y-sm pl-md print:pl-0">
                 <div className="flex items-center gap-sm">
-                  <span className="material-symbols-outlined text-primary text-3xl">domain</span>
-                  <h1 className="font-headline-md text-headline-md text-on-surface font-bold">
+                  <span className="material-symbols-outlined text-primary text-3xl print:hidden">domain</span>
+                  <h1 className="font-headline-md text-headline-md text-on-surface font-bold print:text-black">
                     {client.name}
                   </h1>
                 </div>
-
+ 
                 {/* Client Contact Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-sm pt-xs">
-                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md">
-                    <span className="material-symbols-outlined text-outline text-[18px]">person</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-sm pt-xs print:text-black">
+                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black">
+                    <span className="material-symbols-outlined text-outline text-[18px] print:hidden">person</span>
                     <span>
                       <strong>Responsável:</strong> {client.responsible_name || 'Não informado'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md">
-                    <span className="material-symbols-outlined text-outline text-[18px]">call</span>
+                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black">
+                    <span className="material-symbols-outlined text-outline text-[18px] print:hidden">call</span>
                     <span>
                       <strong>Telefone:</strong> {client.phone || 'Não informado'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md">
-                    <span className="material-symbols-outlined text-outline text-[18px]">mail</span>
+                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black">
+                    <span className="material-symbols-outlined text-outline text-[18px] print:hidden">mail</span>
                     <span>
                       <strong>E-mail:</strong> {client.email || 'Não informado'}
                     </span>
                   </div>
                 </div>
               </div>
-
+ 
               {/* Client Action Buttons */}
-              <div className="flex md:flex-col lg:flex-row gap-sm pl-md md:pl-0">
+              <div className="flex md:flex-col lg:flex-row gap-sm pl-md md:pl-0 print:hidden">
+                <button
+                  onClick={() => window.print()}
+                  className="h-10 px-4 bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
+                >
+                  <span className="material-symbols-outlined text-[16px]">print</span>
+                  Gerar Relatório
+                </button>
                 <button
                   onClick={() => setIsEditClientModalOpen(true)}
                   className="h-10 px-4 bg-surface-container-high border border-outline/10 text-on-surface font-label-caps text-label-caps rounded-xl hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
@@ -346,10 +415,10 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             </div>
 
             {/* Locations (Units) Section */}
-            <div className="space-y-md">
+            <div className="space-y-md print:mt-6 print:text-black">
               <div className="flex items-center justify-between">
-                <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs">
-                  <span className="material-symbols-outlined text-primary">location_on</span>
+                <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black">
+                  <span className="material-symbols-outlined text-primary print:hidden">location_on</span>
                   Unidades de Atendimento ({locations.length})
                 </h2>
                 <button
@@ -361,7 +430,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                     setLocNotes('');
                     setIsAddLocationModalOpen(true);
                   }}
-                  className="h-10 px-4 bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm font-semibold"
+                  className="h-10 px-4 bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm font-semibold print:hidden"
                 >
                   <span className="material-symbols-outlined text-[16px]">add_location</span>
                   Nova Unidade
@@ -369,12 +438,12 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
               </div>
 
               {locations.length === 0 ? (
-                <div className="text-center py-12 text-on-surface-variant font-body-md bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm flex flex-col items-center justify-center gap-sm">
-                  <span className="material-symbols-outlined text-outline text-5xl">location_off</span>
+                <div className="text-center py-12 text-on-surface-variant font-body-md bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm flex flex-col items-center justify-center gap-sm print:border-black print:text-black">
+                  <span className="material-symbols-outlined text-outline text-5xl print:hidden">location_off</span>
                   <span>Nenhuma unidade cadastrada para esta clínica parceira.</span>
                   <button
                     onClick={() => setIsAddLocationModalOpen(true)}
-                    className="mt-2 text-primary font-bold hover:underline"
+                    className="mt-2 text-primary font-bold hover:underline print:hidden"
                   >
                     Cadastre a primeira agora.
                   </button>
@@ -384,25 +453,25 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                   {locations.map((loc) => (
                     <article
                       key={loc.id}
-                      className="bg-surface-container-lowest rounded-xl border border-outline/10 p-md flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group"
+                      className="bg-surface-container-lowest rounded-xl border border-outline/10 p-md flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group print:shadow-none print:text-black print:border-black print:p-0"
                     >
-                      <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors"></div>
+                      <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors print:hidden"></div>
                       
-                      <div className="pl-xs space-y-sm">
+                      <div className="pl-xs space-y-sm print:pl-0">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold group-hover:text-primary transition-colors">
+                            <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold group-hover:text-primary transition-colors print:text-black">
                               {loc.name}
                             </h3>
                             {loc.room && (
-                              <span className="inline-block mt-1 px-sm py-base bg-secondary/15 text-secondary text-label-caps font-label-caps rounded">
+                              <span className="inline-block mt-1 px-sm py-base bg-secondary/15 text-secondary text-label-caps font-label-caps rounded print:bg-gray-100 print:text-black print:border print:border-black/10">
                                 {loc.room}
                               </span>
                             )}
                           </div>
                           
                           {/* Unit Cards edit/delete options */}
-                          <div className="flex gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                          <div className="flex gap-1 opacity-60 hover:opacity-100 transition-opacity print:hidden">
                             <button
                               onClick={() => openEditLocationModal(loc)}
                               className="p-1 hover:bg-surface-container-high rounded text-on-surface"
@@ -421,33 +490,33 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                         </div>
 
                         {/* Specs of the Location */}
-                        <div className="space-y-base pt-xs border-t border-outline/10 text-body-md text-on-surface-variant font-body-md">
+                        <div className="space-y-base pt-xs border-t border-outline/10 text-body-md text-on-surface-variant font-body-md print:text-black print:border-black/10">
                           {loc.address && (
                             <p className="flex items-start gap-xs">
-                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px]">home_pin</span>
+                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px] print:hidden">home_pin</span>
                               <span><strong>Endereço:</strong> {loc.address}</span>
                             </p>
                           )}
                           {loc.contact && (
                             <p className="flex items-start gap-xs">
-                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px]">contact_phone</span>
+                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px] print:hidden">contact_phone</span>
                               <span><strong>Contato:</strong> {loc.contact}</span>
                             </p>
                           )}
                           {loc.notes && (
-                            <p className="flex items-start gap-xs bg-surface-container-low/50 p-xs rounded border border-outline/5">
-                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px]">notes</span>
+                            <p className="flex items-start gap-xs bg-surface-container-low/50 p-xs rounded border border-outline/5 print:bg-white print:border-0 print:p-0">
+                              <span className="material-symbols-outlined text-[16px] text-outline mt-[3px] print:hidden">notes</span>
                               <span className="italic"><strong>Notas:</strong> {loc.notes}</span>
                             </p>
                           )}
                         </div>
                       </div>
 
-                      <div className="pl-xs pt-sm mt-md border-t border-outline/10 flex justify-between items-center">
+                      <div className="pl-xs pt-sm mt-md border-t border-outline/10 flex justify-between items-center print:hidden">
                         <Link
                           prefetch={false}
                           href={`/equipamentos?q=${encodeURIComponent(loc.name)}`}
-                          className="text-[12px] text-primary font-label-caps text-label-caps flex items-center gap-xs hover:underline"
+                          className="text-[12px] text-primary font-label-caps text-label-caps flex items-center gap-xs hover:underline print:hidden"
                         >
                           <span>Ver Equipamentos</span>
                           <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
@@ -455,6 +524,62 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                       </div>
                     </article>
                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* Tabela de Histórico de Manutenção */}
+            <div className="space-y-md print:mt-6 print:text-black">
+              <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black">
+                <span className="material-symbols-outlined text-primary print:hidden">history</span>
+                Histórico de Manutenção ({workOrders.length})
+              </h2>
+
+              {workOrders.length === 0 ? (
+                <div className="text-center py-8 text-on-surface-variant font-body-md bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm print:border-black print:text-black">
+                  Nenhum chamado de manutenção registrado para esta clínica.
+                </div>
+              ) : (
+                <div className="overflow-x-auto bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm print:shadow-none print:border-black print:text-black">
+                  <table className="w-full text-left border-collapse print:text-black">
+                    <thead>
+                      <tr className="bg-surface-container-high text-on-surface font-semibold text-sm border-b border-outline/10 print:bg-gray-100 print:text-black print:border-black">
+                        <th className="p-md">Código OS</th>
+                        <th className="p-md">Equipamento</th>
+                        <th className="p-md">Defeito / Sintoma</th>
+                        <th className="p-md">Solução / Observações</th>
+                        <th className="p-md">Data do Serviço</th>
+                        <th className="p-md">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {workOrders.map((wo) => (
+                        <tr key={wo.id} className="border-b border-outline/5 hover:bg-surface-container-low transition-colors print:border-black print:text-black">
+                          <td className="p-md font-bold text-primary print:text-black">{wo.code}</td>
+                          <td className="p-md">{wo.equipments?.name || 'Equipamento Geral'}</td>
+                          <td className="p-md text-sm">{wo.defect_reported}</td>
+                          <td className="p-md text-sm">{wo.work_notes || 'Sem observações técnicas'}</td>
+                          <td className="p-md text-sm">
+                            {wo.service_date ? (
+                              new Date(wo.service_date).toLocaleDateString('pt-BR')
+                            ) : wo.created_at ? (
+                              new Date(wo.created_at).toLocaleDateString('pt-BR')
+                            ) : 'N/A'}
+                          </td>
+                          <td className="p-md text-xs">
+                            <span className={`px-sm py-base rounded text-xs font-semibold print:p-0 print:font-normal ${
+                              wo.status === 'CONCLUÍDA' ? 'bg-tertiary/15 text-tertiary print:text-black' :
+                              wo.status === 'EM ANDAMENTO' ? 'bg-secondary/15 text-secondary print:text-black' :
+                              wo.status === 'AGUARDANDO PEÇA' ? 'bg-orange-500/15 text-orange-700 print:text-black' :
+                              'bg-primary/15 text-primary print:text-black'
+                            }`}>
+                              {wo.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>

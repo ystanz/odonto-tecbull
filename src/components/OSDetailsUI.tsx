@@ -312,7 +312,7 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
                 {settings?.companyName || 'OdontoTech Bull'}
               </h1>
               {settings?.ownerName && (
-                <p className="text-sm font-semibold">Proprietário: {settings.ownerName}</p>
+                <p className="text-sm font-semibold">{settings.ownerName}</p>
               )}
               <p className="text-xs text-gray-600">
                 {settings?.phone && <span>Telefone: {settings.phone}</span>}

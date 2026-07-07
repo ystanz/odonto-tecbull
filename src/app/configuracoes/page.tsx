@@ -81,9 +81,8 @@ export default function ConfiguracoesPage() {
         {/* Toast Notification */}
         {toast && (
           <div
-            className={`fixed top-4 right-4 z-[100] px-md py-sm rounded-lg shadow-lg text-white font-body-md animate-fade-in flex items-center gap-xs ${
-              toast.type === 'error' ? 'bg-error' : 'bg-tertiary'
-            }`}
+            className={`fixed top-4 right-4 z-[100] px-md py-sm rounded-lg shadow-lg text-white font-body-md animate-fade-in flex items-center gap-xs ${toast.type === 'error' ? 'bg-error' : 'bg-tertiary'
+              }`}
           >
             <span className="material-symbols-outlined">
               {toast.type === 'error' ? 'error' : 'check_circle'}
@@ -111,7 +110,7 @@ export default function ConfiguracoesPage() {
           <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm animate-fade-in">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
+
                 {/* Nome da Empresa */}
                 <div className="flex flex-col gap-1 md:col-span-2">
                   <label htmlFor="company-name" className="font-label-caps text-label-caps text-on-surface-variant">
@@ -120,7 +119,7 @@ export default function ConfiguracoesPage() {
                   <input
                     id="company-name"
                     type="text"
-                    placeholder="Ex: OdontoTech Bull Ltda"
+                    placeholder="Ex: TecBull"
                     className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
@@ -165,7 +164,7 @@ export default function ConfiguracoesPage() {
                   <input
                     id="email"
                     type="email"
-                    placeholder="Ex: suporte@odontotechbull.com"
+                    placeholder="Ex: suporte@tecbull.com"
                     className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -180,7 +179,7 @@ export default function ConfiguracoesPage() {
                   <textarea
                     id="address"
                     rows={3}
-                    placeholder="Ex: Av. Paulista, 1000 - Bela Vista, São Paulo - SP"
+                    placeholder="Ex: Centro, 1234 - Petrópolis, Rio de Janeiro - RJ"
                     className="w-full p-md bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm resize-none"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
