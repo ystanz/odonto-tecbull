@@ -49,7 +49,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#1e2a2d" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
-      <body className="min-h-full flex flex-col bg-[#FAF8F4] text-on-background">
+      <body className="min-h-full flex flex-col bg-background text-foreground">
         <NetworkStatus />
         <AuthGuard>{children}</AuthGuard>
       </body>

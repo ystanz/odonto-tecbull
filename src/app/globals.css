@@ -1,55 +1,76 @@
 @import "tailwindcss";
 
-@theme {
-  --color-black: #111d20;
-  --color-on-secondary-fixed-variant: #6c3a00;
-  --color-tertiary-container: #1c4e2f;
-  --color-surface-container-lowest: #ffffff;
-  --color-on-error-container: #93000a;
-  --color-inverse-primary: #9bcee6;
-  --color-on-primary-container: #88bad1;
-  --color-tertiary-fixed-dim: #9ed3aa;
-  --color-surface-container-high: #ddeaee;
-  --color-surface-container-low: #e9f6fa;
-  --color-surface: #effbff;
-  --color-on-primary-fixed: #001f2a;
-  --color-on-tertiary-fixed-variant: #1e5030;
-  --color-on-secondary-fixed: #2e1500;
-  --color-on-background: #111d20;
-  --color-background: #effbff;
-  --color-tertiary-fixed: #b9efc4;
-  --color-on-error: #ffffff;
-  --color-secondary-container: #fd9830;
-  --color-on-tertiary-fixed: #00210d;
-  --color-error-container: #ffdad6;
-  --color-on-tertiary-container: #8abf96;
-  --color-on-surface: #111d20;
-  --color-secondary-fixed: #ffdcc1;
-  --color-surface-container-highest: #d8e5e9;
-  --color-outline: #71787c;
-  --color-secondary: #8f4e00;
-  --color-on-surface-variant: #41484c;
-  --color-on-secondary-container: #683700;
-  --color-surface-container: #e3f0f4;
-  --color-surface-bright: #effbff;
-  --color-primary: #003444;
-  --color-on-primary-fixed-variant: #134d61;
-  --color-surface-variant: #d8e5e9;
-  --color-on-secondary: #ffffff;
-  --color-primary-container: #114b5f;
-  --color-tertiary: #00371a;
-  --color-primary-fixed: #bde9ff;
-  --color-inverse-on-surface: #e6f3f7;
-  --color-on-tertiary: #ffffff;
-  --color-on-primary: #ffffff;
-  --color-surface-dim: #cfdce0;
-  --color-secondary-fixed-dim: #ffb77a;
-  --color-surface-tint: #316479;
-  --color-error: #ba1a1a;
-  --color-primary-fixed-dim: #9bcee6;
-  --color-inverse-surface: #263235;
-  --color-outline-variant: #c0c7cc;
+:root {
+  --background: 244 244 245; /* zinc-100 */
+  --foreground: 9 9 11; /* zinc-950 */
+  
+  --card: 255 255 255; /* white */
+  --card-foreground: 9 9 11;
+  
+  --primary: 37 99 235; /* blue-600 */
+  --primary-foreground: 255 255 255;
+  
+  --secondary: 71 85 105; /* slate-600 */
+  --secondary-foreground: 255 255 255;
+  
+  --tertiary: 22 163 74; /* green-600 */
+  --tertiary-foreground: 255 255 255;
+  
+  --error: 220 38 38; /* red-600 */
+  --error-foreground: 255 255 255;
+  
+  --border: 228 228 231; /* zinc-200 */
+  --outline: 161 161 170; /* zinc-400 */
+  --outline-variant: 228 228 231; /* zinc-200 */
+  
+  --ring: 37 99 235;
+}
 
+@theme {
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+  --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
+  --color-primary: rgb(var(--primary));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-secondary: rgb(var(--secondary));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-tertiary: rgb(var(--tertiary));
+  --color-tertiary-foreground: rgb(var(--tertiary-foreground));
+  --color-error: rgb(var(--error));
+  --color-error-foreground: rgb(var(--error-foreground));
+  --color-border: rgb(var(--border));
+  --color-outline: rgb(var(--outline));
+  --color-outline-variant: rgb(var(--outline-variant));
+  --color-ring: rgb(var(--ring));
+  
+  /* Backward compatibility for M3 on-* colors */
+  --color-on-primary: rgb(var(--primary-foreground));
+  --color-on-secondary: rgb(var(--secondary-foreground));
+  --color-on-tertiary: rgb(var(--tertiary-foreground));
+  --color-on-error: rgb(var(--error-foreground));
+  
+  /* Map MD3 semantic surfaces to clean theme colors */
+  --color-on-background: rgb(var(--foreground));
+  --color-surface: rgb(var(--card));
+  --color-on-surface: rgb(var(--foreground));
+  --color-on-surface-variant: rgb(var(--secondary));
+  
+  --color-surface-container: rgb(var(--background));
+  --color-surface-container-low: rgb(var(--background));
+  --color-surface-container-lowest: rgb(var(--card));
+  --color-surface-container-high: rgb(var(--border));
+  --color-surface-container-highest: rgb(var(--outline));
+  
+  --color-primary-container: rgb(var(--background));
+  --color-on-primary-container: rgb(var(--primary));
+  --color-secondary-container: rgb(var(--background));
+  --color-on-secondary-container: rgb(var(--secondary));
+  --color-tertiary-container: rgb(var(--background));
+  --color-on-tertiary-container: rgb(var(--tertiary));
+  --color-error-container: #fee2e2;
+  --color-on-error-container: rgb(var(--error));
+  
   /* Font Families */
   --font-space-grotesk: "Space Grotesk", sans-serif;
   --font-jetbrains-mono: "JetBrains Mono", monospace;
@@ -71,8 +92,8 @@
 }
 
 body {
-  background-color: #FAF8F4;
-  color: #111d20;
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
   font-family: var(--font-inter);
 }
 
@@ -130,11 +151,11 @@ body {
 }
 
 .shadow-level-1 {
-  box-shadow: 0px 2px 8px rgba(30, 42, 45, 0.05);
+  box-shadow: 0px 1px 3px rgba(9, 9, 11, 0.05), 0px 1px 2px rgba(9, 9, 11, 0.03);
 }
 
 .shadow-level-2 {
-  box-shadow: 0px 8px 24px rgba(30, 42, 45, 0.12);
+  box-shadow: 0px 4px 6px -1px rgba(9, 9, 11, 0.05), 0px 2px 4px -1px rgba(9, 9, 11, 0.03);
 }
 
 /* Tactical Timeline Line */
@@ -145,8 +166,7 @@ body {
   top: 24px;
   bottom: -24px;
   width: 2px;
-  background-color: rgba(113, 120, 124, 0.15);
-  /* outline 15% */
+  background-color: rgba(9, 9, 11, 0.08);
   z-index: 0;
 }
 

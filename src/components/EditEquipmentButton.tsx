@@ -193,17 +193,17 @@ export default function EditEquipmentButton({
       {/* Modal Form: Editar Equipamento */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onClick={() => setIsModalOpen(false)}>
-          <div className="bg-white w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-card border border-border w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-lg flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 overflow-y-auto flex flex-col gap-4">
               
               <div className="flex justify-between items-center">
-                <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                <h3 className="font-headline-sm text-headline-sm text-foreground font-bold">
                   Editar Equipamento
                 </h3>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer transition-colors"
+                  className="p-2 text-secondary hover:bg-background rounded-full cursor-pointer transition-colors"
                 >
                   <span className="material-symbols-outlined">close</span>
                 </button>
@@ -213,7 +213,7 @@ export default function EditEquipmentButton({
                 <div className="grid grid-cols-1 gap-4">
                   {/* Name */}
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-name" className="font-label-caps text-label-caps text-on-surface-variant">
+                    <label htmlFor="edit-eq-name" className="font-label-caps text-label-caps text-secondary">
                       Nome do Equipamento*
                     </label>
                     <input
@@ -221,7 +221,7 @@ export default function EditEquipmentButton({
                       type="text"
                       required
                       placeholder="Ex: Cadeira Gnatus G3"
-                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
@@ -231,14 +231,14 @@ export default function EditEquipmentButton({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Client Dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-client" className="font-label-caps text-label-caps text-on-surface-variant">
+                    <label htmlFor="edit-eq-client" className="font-label-caps text-label-caps text-secondary">
                       Clínica Cliente*
                     </label>
                     <div className="relative w-full">
                       <select
                         id="edit-eq-client"
                         required
-                        className="w-full h-12 px-4 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+                        className="w-full h-12 px-4 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
                         value={selectedClientId}
                         onChange={(e) => {
                           setSelectedClientId(e.target.value);
@@ -252,7 +252,7 @@ export default function EditEquipmentButton({
                           </option>
                         ))}
                       </select>
-                      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
+                      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">
                         arrow_drop_down
                       </span>
                     </div>
@@ -260,14 +260,14 @@ export default function EditEquipmentButton({
 
                   {/* Location Dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-location" className="font-label-caps text-label-caps text-on-surface-variant">
+                    <label htmlFor="edit-eq-location" className="font-label-caps text-label-caps text-secondary">
                       Unidade / Local
                     </label>
                     <div className="relative w-full">
                       <select
                         id="edit-eq-location"
                         disabled={!selectedClientId}
-                        className="w-full h-12 px-4 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="w-full h-12 px-4 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         value={selectedLocationId}
                         onChange={(e) => setSelectedLocationId(e.target.value)}
                       >
@@ -278,7 +278,7 @@ export default function EditEquipmentButton({
                           </option>
                         ))}
                       </select>
-                      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
+                      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">
                         arrow_drop_down
                       </span>
                     </div>
@@ -288,14 +288,14 @@ export default function EditEquipmentButton({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Serial Number */}
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-serial" className="font-label-caps text-label-caps text-on-surface-variant">
+                    <label htmlFor="edit-eq-serial" className="font-label-caps text-label-caps text-secondary">
                       Número de Série
                     </label>
                     <input
                       id="edit-eq-serial"
                       type="text"
                       placeholder="Ex: GN-2023-8942A"
-                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                       value={serialNumber}
                       onChange={(e) => setSerialNumber(e.target.value)}
                     />
@@ -303,14 +303,14 @@ export default function EditEquipmentButton({
 
                   {/* Manufacturer */}
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-manufacturer" className="font-label-caps text-label-caps text-on-surface-variant">
+                    <label htmlFor="edit-eq-manufacturer" className="font-label-caps text-label-caps text-secondary">
                       Fabricante
                     </label>
                     <input
                       id="edit-eq-manufacturer"
                       type="text"
                       placeholder="Ex: Gnatus, Schulz"
-                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                       value={manufacturer}
                       onChange={(e) => setManufacturer(e.target.value)}
                     />
@@ -320,13 +320,13 @@ export default function EditEquipmentButton({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Installation Date */}
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-install" className="font-label-caps text-label-caps text-on-surface-variant">
+                    <label htmlFor="edit-eq-install" className="font-label-caps text-label-caps text-secondary">
                       Data de Instalação
                     </label>
                     <input
                       id="edit-eq-install"
                       type="date"
-                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                       value={installationDate}
                       onChange={(e) => setInstallationDate(e.target.value)}
                     />
@@ -334,13 +334,13 @@ export default function EditEquipmentButton({
 
                   {/* Next Service Date */}
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="edit-eq-service" className="font-label-caps text-label-caps text-on-surface-variant">
+                    <label htmlFor="edit-eq-service" className="font-label-caps text-label-caps text-secondary">
                       Próxima Preventiva
                     </label>
                     <input
                       id="edit-eq-service"
                       type="date"
-                      className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                       value={nextServiceDate}
                       onChange={(e) => setNextServiceDate(e.target.value)}
                     />
@@ -349,7 +349,7 @@ export default function EditEquipmentButton({
 
                 {/* Status Selection */}
                 <div className="flex flex-col gap-1">
-                  <label className="font-label-caps text-label-caps text-on-surface-variant">
+                  <label className="font-label-caps text-label-caps text-secondary">
                     Status do Ativo
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -365,7 +365,7 @@ export default function EditEquipmentButton({
                               : s === 'Pendente'
                               ? 'bg-secondary/15 text-secondary border-secondary font-bold shadow-sm'
                               : 'bg-error/15 text-error border-error font-bold shadow-sm'
-                            : 'bg-surface-container-lowest text-on-surface-variant border-outline/20 hover:bg-surface-container-low'
+                            : 'bg-card text-secondary border-border hover:bg-background'
                         }`}
                       >
                         {s}
@@ -376,11 +376,11 @@ export default function EditEquipmentButton({
 
                 {/* Image Upload Field */}
                 <div className="flex flex-col gap-1">
-                  <span className="font-label-caps text-label-caps text-on-surface-variant">
+                  <span className="font-label-caps text-label-caps text-secondary">
                     Foto do Equipamento (Opcional)
                   </span>
                   {!imagePreview ? (
-                    <label className="border-2 border-dashed border-outline-variant/30 hover:border-primary/50 transition-colors rounded-xl p-md flex flex-col items-center justify-center gap-sm cursor-pointer bg-surface-container-lowest">
+                    <label className="border border-dashed border-border hover:border-primary/50 transition-colors rounded-xl p-md flex flex-col items-center justify-center gap-sm cursor-pointer bg-card">
                       <input
                         type="file"
                         accept="image/*"
@@ -389,7 +389,7 @@ export default function EditEquipmentButton({
                         onChange={handleImageChange}
                         disabled={compressing}
                       />
-                      <span className="material-symbols-outlined text-3xl text-outline-variant">
+                      <span className="material-symbols-outlined text-3xl text-outline">
                         add_a_photo
                       </span>
                       <span className="font-body-md text-body-md font-semibold text-primary">
@@ -397,7 +397,7 @@ export default function EditEquipmentButton({
                       </span>
                     </label>
                   ) : (
-                    <div className="relative rounded-xl overflow-hidden border border-outline/20 bg-surface-container-low p-xs flex items-center justify-center">
+                    <div className="relative rounded-xl overflow-hidden border border-border bg-background p-xs flex items-center justify-center">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={imagePreview}
@@ -431,14 +431,14 @@ export default function EditEquipmentButton({
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                      className="h-12 px-4 rounded-lg text-secondary hover:bg-background transition-colors font-label-caps text-label-caps cursor-pointer"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      className="h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                       {submitting ? 'Salvando...' : 'Salvar'}
                     </button>

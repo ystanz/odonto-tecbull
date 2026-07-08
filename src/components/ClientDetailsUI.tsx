@@ -361,7 +361,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
         {/* Loading Indicator */}
         {loading && (
-          <div className="text-center py-12 text-on-surface-variant font-body-md flex flex-col items-center justify-center gap-sm bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm">
+          <div className="text-center py-12 text-secondary font-body-md flex flex-col items-center justify-center gap-sm bg-card rounded-xl border border-border shadow-sm">
             <span className="material-symbols-outlined animate-spin text-primary text-3xl">sync</span>
             <span>Atualizando dados do cliente...</span>
           </div>
@@ -370,24 +370,24 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
         {!loading && client && (
           <>
             {/* Client Profile Header Card */}
-            <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-md relative overflow-hidden group print:shadow-none print:bg-transparent print:border-none print:rounded-none print:p-0 print:m-0 print:border-b print:border-gray-200 print:pb-4 print:mb-4">
+            <div className="bg-card p-lg rounded-xl border border-border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-md relative overflow-hidden group print:shadow-none print:bg-transparent print:border-none print:rounded-none print:p-0 print:m-0 print:border-b print:border-gray-200 print:pb-4 print:mb-4">
               <div className="absolute inset-y-0 left-0 w-1.5 bg-primary print:hidden"></div>
               
               <div className="space-y-sm pl-md print:pl-0 print:flex print:flex-col print:gap-1 print:text-black">
                 <div className="flex items-center gap-sm">
-                  <h1 className="font-headline-md text-headline-md text-on-surface font-bold print:text-black print:text-lg">
+                  <h1 className="font-headline-md text-headline-md text-foreground font-bold print:text-black print:text-lg">
                     {client.name}
                   </h1>
                 </div>
  
                 {/* Client Contact Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-sm pt-xs print:grid print:grid-cols-2 print:gap-4 print:text-black print:text-sm">
-                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black print:text-sm">
+                  <div className="flex items-center gap-xs text-secondary font-body-md print:text-black print:text-sm">
                     <span>
                       <strong>Responsável:</strong> {client.responsible_name || 'Não informado'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-xs text-on-surface-variant font-body-md print:text-black print:text-sm">
+                  <div className="flex items-center gap-xs text-secondary font-body-md print:text-black print:text-sm">
                     <span>
                       <strong>Contato:</strong> {client.phone || 'Não informado'}
                     </span>
@@ -399,14 +399,14 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
               <div className="flex md:flex-col lg:flex-row gap-sm pl-md md:pl-0 print:hidden">
                 <button
                   onClick={handlePrint}
-                  className="h-10 px-4 bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
+                  className="h-10 px-4 bg-primary text-primary-foreground font-label-caps text-label-caps rounded-xl hover:bg-primary/95 transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
                 >
                   <span className="material-symbols-outlined text-[16px]">print</span>
                   Gerar Relatório
                 </button>
                 <button
                   onClick={() => setIsEditClientModalOpen(true)}
-                  className="h-10 px-4 bg-surface-container-high border border-outline/10 text-on-surface font-label-caps text-label-caps rounded-xl hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
+                  className="h-10 px-4 bg-card border border-border text-foreground font-label-caps text-label-caps rounded-xl hover:bg-background transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm"
                 >
                   <span className="material-symbols-outlined text-[16px]">edit</span>
                   Editar
@@ -414,7 +414,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                 <button
                   onClick={handleDeleteClient}
                   disabled={deletingClient}
-                  className="h-10 px-4 bg-error/10 text-error font-label-caps text-label-caps rounded-xl hover:bg-error/20 transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm disabled:opacity-50"
+                  className="h-10 px-4 bg-error/10 text-error font-label-caps text-label-caps rounded-xl hover:bg-error hover:text-error-foreground hover:border-error transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-[16px]">delete</span>
                   Excluir
@@ -425,7 +425,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             {/* Locations (Units) Section */}
             <div className="space-y-md print:mt-6 print:text-black print:shadow-none print:bg-transparent print:border-none print:rounded-none print:p-0 print:m-0">
               <div className="flex items-center justify-between">
-                <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black print:text-sm print:font-semibold">
+                <h2 className="font-headline-sm text-headline-sm text-foreground font-bold flex items-center gap-xs print:text-black print:text-sm print:font-semibold">
                   Unidades de Atendimento
                 </h2>
                 <button
@@ -437,7 +437,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                     setLocNotes('');
                     setIsAddLocationModalOpen(true);
                   }}
-                  className="h-10 px-4 bg-primary text-on-primary font-label-caps text-label-caps rounded-xl hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm font-semibold print:hidden"
+                  className="h-10 px-4 bg-primary text-primary-foreground font-label-caps text-label-caps rounded-xl hover:bg-primary/95 transition-colors flex items-center justify-center gap-xs shadow-sm cursor-pointer text-sm font-semibold print:hidden"
                 >
                   <span className="material-symbols-outlined text-[16px]">add_location</span>
                   Nova Unidade
@@ -445,7 +445,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
               </div>
 
               {locations.length === 0 ? (
-                <div className="text-center py-12 text-on-surface-variant font-body-md bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm flex flex-col items-center justify-center gap-sm print:border-black print:text-black">
+                <div className="text-center py-12 text-secondary font-body-md bg-card rounded-xl border border-border shadow-sm flex flex-col items-center justify-center gap-sm print:border-black print:text-black">
                   <span>Nenhuma unidade cadastrada para esta clínica parceira.</span>
                   <button
                     onClick={() => setIsAddLocationModalOpen(true)}
@@ -459,14 +459,14 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                   {locations.map((loc) => (
                     <article
                       key={loc.id}
-                      className="bg-surface-container-lowest rounded-xl border border-outline/10 p-md flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group print:shadow-none print:text-black print:border-none print:p-0 print:bg-transparent print:rounded-none print:m-0 print:flex print:flex-col print:gap-1"
+                      className="bg-card rounded-xl border border-border p-md flex flex-col justify-between hover:shadow-sm transition-all relative overflow-hidden group print:shadow-none print:text-black print:border-none print:p-0 print:bg-transparent print:rounded-none print:m-0 print:flex print:flex-col print:gap-1"
                     >
-                      <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors print:hidden"></div>
+                      <div className="absolute inset-y-0 left-0 w-1 bg-border group-hover:bg-primary transition-colors print:hidden"></div>
                       
                       <div className="pl-xs space-y-sm print:pl-0">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold group-hover:text-primary transition-colors print:text-black print:text-sm print:font-semibold">
+                            <h3 className="font-headline-sm text-headline-sm text-foreground font-bold group-hover:text-primary transition-colors print:text-black print:text-sm print:font-semibold">
                               {loc.name}
                             </h3>
                             {loc.room && (
@@ -480,7 +480,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                           <div className="flex gap-1 opacity-60 hover:opacity-100 transition-opacity print:hidden">
                             <button
                               onClick={() => openEditLocationModal(loc)}
-                              className="p-1 hover:bg-surface-container-high rounded text-on-surface"
+                              className="p-1 hover:bg-background rounded text-foreground"
                               title="Editar Unidade"
                             >
                               <span className="material-symbols-outlined text-[18px]">edit</span>
@@ -496,21 +496,21 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                         </div>
 
                         {/* Specs of the Location */}
-                        <div className="space-y-base pt-xs border-t border-outline/10 text-body-md text-on-surface-variant font-body-md print:text-black print:border-none print:p-0 print:text-sm print:flex print:flex-col print:gap-1">
+                        <div className="space-y-base pt-xs border-t border-border text-body-md text-secondary font-body-md print:text-black print:border-none print:p-0 print:text-sm print:flex print:flex-col print:gap-1">
                           {loc.address && (
                             <p className="flex items-start gap-xs">
                               <span><strong>Endereço:</strong> {loc.address}</span>
                             </p>
                           )}
                           {loc.notes && (
-                            <p className="flex items-start gap-xs bg-surface-container-low/50 p-xs rounded border border-outline/5 print:bg-transparent print:border-0 print:p-0">
+                            <p className="flex items-start gap-xs bg-background p-xs rounded border border-border print:bg-transparent print:border-0 print:p-0">
                               <span className="italic"><strong>Notas:</strong> {loc.notes}</span>
                             </p>
                           )}
                         </div>
                       </div>
 
-                      <div className="pl-xs pt-sm mt-md border-t border-outline/10 flex justify-between items-center print:hidden">
+                      <div className="pl-xs pt-sm mt-md border-t border-border flex justify-between items-center print:hidden">
                         <Link
                           prefetch={false}
                           href={`/equipamentos?q=${encodeURIComponent(loc.name)}`}
@@ -528,19 +528,19 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
             {/* Tabela de Histórico de Manutenção */}
             <div className="space-y-md print:mt-6 print:text-black">
-              <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-xs print:text-black">
+              <h2 className="font-headline-sm text-headline-sm text-foreground font-bold flex items-center gap-xs print:text-black">
                 Histórico de Manutenção ({workOrders.length})
               </h2>
 
               {workOrders.length === 0 ? (
-                <div className="text-center py-8 text-on-surface-variant font-body-md bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm print:border-black print:text-black print:bg-transparent">
+                <div className="text-center py-8 text-secondary font-body-md bg-card rounded-xl border border-border shadow-sm print:border-black print:text-black print:bg-transparent">
                   Nenhum chamado de manutenção registrado para esta clínica.
                 </div>
               ) : (
-                <div className="overflow-x-auto bg-surface-container-lowest rounded-xl border border-outline/10 shadow-sm print:shadow-none print:border-gray-200 print:text-black print:bg-transparent">
+                <div className="overflow-x-auto bg-card rounded-xl border border-border shadow-sm print:shadow-none print:border-gray-200 print:text-black print:bg-transparent">
                   <table className="w-full text-left border-collapse print:text-black print:text-sm">
                     <thead>
-                      <tr className="bg-surface-container-high text-on-surface font-semibold text-sm border-b border-outline/10 print:bg-transparent print:text-black print:border-gray-200">
+                      <tr className="bg-background text-foreground font-semibold text-sm border-b border-border print:bg-transparent print:text-black print:border-gray-200">
                         <th className="p-md">Código OS</th>
                         <th className="p-md">Equipamento</th>
                         <th className="p-md">Defeito / Sintoma</th>
@@ -551,7 +551,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                     </thead>
                     <tbody>
                       {workOrders.map((wo) => (
-                        <tr key={wo.id} className="border-b border-outline/5 hover:bg-surface-container-low transition-colors print:border-gray-200 print:text-black print:bg-transparent">
+                        <tr key={wo.id} className="border-b border-border hover:bg-background transition-colors print:border-gray-200 print:text-black print:bg-transparent">
                           <td className="p-md font-bold text-primary print:text-black">{wo.code}</td>
                           <td className="p-md">{wo.equipments?.name || 'Equipamento Geral'}</td>
                           <td className="p-md text-sm">{wo.defect_reported}</td>
@@ -584,15 +584,15 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             {/* MODAL: Editar Clínica Cliente */}
             {isEditClientModalOpen && (
               <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onClick={() => setIsEditClientModalOpen(false)}>
-                <div className="bg-white w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
+                <div className="bg-card border border-border w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-lg flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
                   <div className="p-6 overflow-y-auto flex flex-col gap-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                      <h3 className="font-headline-sm text-headline-sm text-foreground font-bold">
                         Editar Clínica Cliente
                       </h3>
                       <button
                         onClick={() => setIsEditClientModalOpen(false)}
-                        className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer transition-colors"
+                        className="p-2 text-secondary hover:bg-background rounded-full cursor-pointer transition-colors"
                       >
                         <span className="material-symbols-outlined">close</span>
                       </button>
@@ -600,7 +600,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
                     <form onSubmit={handleEditClientSubmit} className="flex flex-col gap-4">
                       <div className="flex flex-col gap-1">
-                        <label htmlFor="edit-client-name" className="font-label-caps text-label-caps text-on-surface-variant">
+                        <label htmlFor="edit-client-name" className="font-label-caps text-label-caps text-secondary">
                           Nome da Clínica*
                         </label>
                         <input
@@ -608,21 +608,21 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                           type="text"
                           required
                           placeholder="Ex: Clínica OdontoVida"
-                          className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                          className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                           value={clientName}
                           onChange={(e) => setClientName(e.target.value)}
                         />
                       </div>
 
                       <div className="flex flex-col gap-1">
-                        <label htmlFor="edit-client-responsible" className="font-label-caps text-label-caps text-on-surface-variant">
+                        <label htmlFor="edit-client-responsible" className="font-label-caps text-label-caps text-secondary">
                           Responsável da Clínica
                         </label>
                         <input
                           id="edit-client-responsible"
                           type="text"
                           placeholder="Ex: Dr. Roberto Santos"
-                          className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                          className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                           value={clientResponsibleName}
                           onChange={(e) => setClientResponsibleName(e.target.value)}
                         />
@@ -630,28 +630,28 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="edit-client-phone" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="edit-client-phone" className="font-label-caps text-label-caps text-secondary">
                             Telefone de Contato
                           </label>
                           <input
                             id="edit-client-phone"
                             type="text"
                             placeholder="Ex: (11) 99999-9999"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={clientPhone}
                             onChange={(e) => setClientPhone(e.target.value)}
                           />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="edit-client-email" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="edit-client-email" className="font-label-caps text-label-caps text-secondary">
                             E-mail de Contato
                           </label>
                           <input
                             id="edit-client-email"
                             type="email"
                             placeholder="Ex: contato@sorriso.com"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={clientEmail}
                             onChange={(e) => setClientEmail(e.target.value)}
                           />
@@ -662,14 +662,14 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                         <button
                           type="button"
                           onClick={() => setIsEditClientModalOpen(false)}
-                          className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                          className="h-12 px-4 rounded-lg text-secondary hover:bg-background transition-colors font-label-caps text-label-caps cursor-pointer"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
                           disabled={submittingClient}
-                          className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          className="h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                           {submittingClient ? 'Salvando...' : 'Salvar Alterações'}
                         </button>
@@ -683,15 +683,15 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             {/* MODAL: Nova Unidade / Local */}
             {isAddLocationModalOpen && (
               <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onClick={() => setIsAddLocationModalOpen(false)}>
-                <div className="bg-white w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
+                <div className="bg-card border border-border w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-lg flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
                   <div className="p-6 overflow-y-auto flex flex-col gap-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                      <h3 className="font-headline-sm text-headline-sm text-foreground font-bold">
                         Cadastrar Nova Unidade / Local
                       </h3>
                       <button
                         onClick={() => setIsAddLocationModalOpen(false)}
-                        className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer transition-colors"
+                        className="p-2 text-secondary hover:bg-background rounded-full cursor-pointer transition-colors"
                       >
                         <span className="material-symbols-outlined">close</span>
                       </button>
@@ -700,7 +700,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                     <form onSubmit={handleAddLocationSubmit} className="flex flex-col gap-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="loc-name" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="loc-name" className="font-label-caps text-label-caps text-secondary">
                             Nome da Unidade*
                           </label>
                           <input
@@ -708,21 +708,21 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                             type="text"
                             required
                             placeholder="Ex: Unidade Centro, Bloco B"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={locName}
                             onChange={(e) => setLocName(e.target.value)}
                           />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="loc-room" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="loc-room" className="font-label-caps text-label-caps text-secondary">
                             Sala / Consultório (Opcional)
                           </label>
                           <input
                             id="loc-room"
                             type="text"
                             placeholder="Ex: Consultório 1, Esterilização"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={locRoom}
                             onChange={(e) => setLocRoom(e.target.value)}
                           />
@@ -730,14 +730,14 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                       </div>
 
                       <div className="flex flex-col gap-1">
-                        <label htmlFor="loc-address" className="font-label-caps text-label-caps text-on-surface-variant">
+                        <label htmlFor="loc-address" className="font-label-caps text-label-caps text-secondary">
                           Endereço Completo
                         </label>
                         <input
                           id="loc-address"
                           type="text"
                           placeholder="Ex: Av. Paulista, 1000, Cj 52 - Bela Vista, São Paulo - SP"
-                          className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                          className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                           value={locAddress}
                           onChange={(e) => setLocAddress(e.target.value)}
                         />
@@ -745,28 +745,28 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="loc-contact" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="loc-contact" className="font-label-caps text-label-caps text-secondary">
                             Contato da Unidade
                           </label>
                           <input
                             id="loc-contact"
                             type="text"
                             placeholder="Ex: Falar com Mariana (Recepção)"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={locContact}
                             onChange={(e) => setLocContact(e.target.value)}
                           />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="loc-notes" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="loc-notes" className="font-label-caps text-label-caps text-secondary">
                             Notas / Observações
                           </label>
                           <input
                             id="loc-notes"
                             type="text"
                             placeholder="Ex: Estacionamento conveniado no local"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={locNotes}
                             onChange={(e) => setLocNotes(e.target.value)}
                           />
@@ -777,14 +777,14 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                         <button
                           type="button"
                           onClick={() => setIsAddLocationModalOpen(false)}
-                          className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                          className="h-12 px-4 rounded-lg text-secondary hover:bg-background transition-colors font-label-caps text-label-caps cursor-pointer"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
                           disabled={submittingLocation || !locName.trim()}
-                          className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          className="h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                           {submittingLocation ? 'Salvando...' : 'Salvar Unidade'}
                         </button>
@@ -798,10 +798,10 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
             {/* MODAL: Editar Unidade / Local */}
             {isEditLocationModalOpen && editingLocation && (
               <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onClick={() => setIsEditLocationModalOpen(false)}>
-                <div className="bg-white w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
+                <div className="bg-card border border-border w-[90vw] min-w-[320px] max-w-2xl rounded-xl shadow-lg flex flex-col max-h-[90vh] animate-scale-up" onClick={(e) => e.stopPropagation()}>
                   <div className="p-6 overflow-y-auto flex flex-col gap-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                      <h3 className="font-headline-sm text-headline-sm text-foreground font-bold">
                         Editar Unidade / Local
                       </h3>
                       <button
@@ -809,7 +809,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                           setIsEditLocationModalOpen(false);
                           setEditingLocation(null);
                         }}
-                        className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full cursor-pointer transition-colors"
+                        className="p-2 text-secondary hover:bg-background rounded-full cursor-pointer transition-colors"
                       >
                         <span className="material-symbols-outlined">close</span>
                       </button>
@@ -818,7 +818,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                     <form onSubmit={handleEditLocationSubmit} className="flex flex-col gap-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="edit-loc-name" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="edit-loc-name" className="font-label-caps text-label-caps text-secondary">
                             Nome da Unidade*
                           </label>
                           <input
@@ -826,21 +826,21 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                             type="text"
                             required
                             placeholder="Ex: Unidade Centro, Bloco B"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={locName}
                             onChange={(e) => setLocName(e.target.value)}
                           />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="edit-loc-room" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="edit-loc-room" className="font-label-caps text-label-caps text-secondary">
                             Sala / Consultório (Opcional)
                           </label>
                           <input
                             id="edit-loc-room"
                             type="text"
                             placeholder="Ex: Consultório 1, Esterilização"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={locRoom}
                             onChange={(e) => setLocRoom(e.target.value)}
                           />
@@ -848,14 +848,14 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                       </div>
 
                       <div className="flex flex-col gap-1">
-                        <label htmlFor="edit-loc-address" className="font-label-caps text-label-caps text-on-surface-variant">
+                        <label htmlFor="edit-loc-address" className="font-label-caps text-label-caps text-secondary">
                           Endereço Completo
                         </label>
                         <input
                           id="edit-loc-address"
                           type="text"
                           placeholder="Ex: Av. Paulista, 1000, Cj 52 - Bela Vista, São Paulo - SP"
-                          className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                          className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                           value={locAddress}
                           onChange={(e) => setLocAddress(e.target.value)}
                         />
@@ -863,28 +863,28 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="edit-loc-contact" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="edit-loc-contact" className="font-label-caps text-label-caps text-secondary">
                             Contato da Unidade
                           </label>
                           <input
                             id="edit-loc-contact"
                             type="text"
                             placeholder="Ex: Falar com Mariana (Recepção)"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={locContact}
                             onChange={(e) => setLocContact(e.target.value)}
                           />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                          <label htmlFor="edit-loc-notes" className="font-label-caps text-label-caps text-on-surface-variant">
+                          <label htmlFor="edit-loc-notes" className="font-label-caps text-label-caps text-secondary">
                             Notas / Observações
                           </label>
                           <input
                             id="edit-loc-notes"
                             type="text"
                             placeholder="Ex: Estacionamento conveniado no local"
-                            className="w-full px-4 h-12 bg-surface-container-lowest border border-outline/20 rounded-lg font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            className="w-full px-4 h-12 bg-card border border-border rounded-lg font-body-lg text-body-lg text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
                             value={locNotes}
                             onChange={(e) => setLocNotes(e.target.value)}
                           />
@@ -898,14 +898,14 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                             setIsEditLocationModalOpen(false);
                             setEditingLocation(null);
                           }}
-                          className="h-12 px-4 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps cursor-pointer"
+                          className="h-12 px-4 rounded-lg text-secondary hover:bg-background transition-colors font-label-caps text-label-caps cursor-pointer"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
                           disabled={submittingLocation || !locName.trim()}
-                          className="h-12 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          className="h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                           {submittingLocation ? 'Salvando...' : 'Salvar Alterações'}
                         </button>

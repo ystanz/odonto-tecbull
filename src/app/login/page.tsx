@@ -67,7 +67,7 @@ export default function LoginPage() {
             />
           </div>
           <h1 className="font-headline-sm text-headline-sm font-bold text-black mt-xs">
-            OdontoTech Bull
+            Marcelo Bull
           </h1>
           <p className="text-on-surface-variant font-body-md text-body-md">
             Gerenciamento Técnico de Clínicas e Equipamentos
@@ -86,7 +86,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-md">
           <div className="flex flex-col gap-xs">
             <label htmlFor="login-password" className="font-label-caps text-label-caps text-on-surface-variant">
-              Senha Administrativa
+              Senha
             </label>
             <div className="relative">
               <input

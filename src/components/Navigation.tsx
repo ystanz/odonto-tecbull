@@ -25,13 +25,13 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
   };
 
   return (
-    <div className="min-h-screen text-black bg-[#FAF8F4] antialiased pb-24 md:pb-0 md:pl-80 print:pl-0 print:pb-0 print:bg-white">
+    <div className="min-h-screen text-foreground bg-background antialiased pb-24 md:pb-0 md:pl-80 print:pl-0 print:pb-0 print:bg-white">
       {/* Header unificado de pesquisa e topo */}
       <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
 
       {/* NavigationDrawer (Desktop & Mobile drawer overlay) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-[60] h-full w-80 rounded-r-xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col p-md transition-transform duration-300 ease-in-out md:translate-x-0 print:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-[60] h-full w-80 bg-card border-r border-border flex flex-col p-md transition-transform duration-300 ease-in-out md:translate-x-0 print:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex items-center justify-between mb-lg p-sm">
@@ -46,7 +46,7 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
               />
             </div>
             <div>
-              <h2 className="font-headline-sm text-headline-sm text-black dark:text-primary-fixed">
+              <h2 className="font-headline-sm text-headline-sm text-foreground">
                 Marcelo Bull
               </h2>
             </div>
@@ -55,7 +55,7 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
           {isMobileMenuOpen && (
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="md:hidden text-black p-1 rounded-full hover:bg-surface-container-high cursor-pointer"
+              className="md:hidden text-foreground p-1 rounded-full hover:bg-background cursor-pointer"
             >
               <span className="material-symbols-outlined">close</span>
             </button>
@@ -66,7 +66,7 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
           <Link
             prefetch={false}
             href="/"
-            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${currentTab === 'dashboard' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-background active:translate-x-1 transition-all ${currentTab === 'dashboard' ? 'bg-primary text-primary-foreground font-semibold shadow-sm' : 'text-secondary hover:text-foreground'
               }`}
           >
             <span className="material-symbols-outlined">dashboard</span>
@@ -76,7 +76,7 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
           <Link
             prefetch={false}
             href="/ordens-servico"
-            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${currentTab === 'service' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-background active:translate-x-1 transition-all ${currentTab === 'service' ? 'bg-primary text-primary-foreground font-semibold shadow-sm' : 'text-secondary hover:text-foreground'
               }`}
           >
             <span className="material-symbols-outlined">handyman</span>
@@ -86,7 +86,7 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
           <Link
             prefetch={false}
             href="/equipamentos"
-            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${currentTab === 'equipment' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-background active:translate-x-1 transition-all ${currentTab === 'equipment' ? 'bg-primary text-primary-foreground font-semibold shadow-sm' : 'text-secondary hover:text-foreground'
               }`}
           >
             <span className="material-symbols-outlined">precision_manufacturing</span>
@@ -96,7 +96,7 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
           <Link
             prefetch={false}
             href="/clientes"
-            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${currentTab === 'clients' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-background active:translate-x-1 transition-all ${currentTab === 'clients' ? 'bg-primary text-primary-foreground font-semibold shadow-sm' : 'text-secondary hover:text-foreground'
               }`}
           >
             <span className="material-symbols-outlined">location_city</span>
@@ -106,7 +106,7 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
           <Link
             prefetch={false}
             href="/configuracoes"
-            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-surface-container-high active:translate-x-1 transition-all ${currentTab === 'settings' ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant'
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-background active:translate-x-1 transition-all ${currentTab === 'settings' ? 'bg-primary text-primary-foreground font-semibold shadow-sm' : 'text-secondary hover:text-foreground'
               }`}
           >
             <span className="material-symbols-outlined">settings</span>
@@ -118,14 +118,14 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
           <Link
             prefetch={false}
             href="/os/nova"
-            className="w-full h-touch-target bg-primary text-on-primary font-headline-sm text-headline-sm rounded-lg shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center justify-center space-x-2"
+            className="w-full h-touch-target bg-primary text-primary-foreground font-headline-sm text-headline-sm rounded-lg shadow-sm hover:bg-primary/95 transition-colors flex items-center justify-center space-x-2"
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>add_circle</span>
             <span>Nova OS</span>
           </Link>
           <button
             onClick={handleLogout}
-            className="w-full h-touch-target bg-surface-container-high border border-outline/10 text-on-surface hover:bg-error/10 hover:text-error hover:border-error/20 transition-colors rounded-lg flex items-center justify-center space-x-2 cursor-pointer font-label-caps text-label-caps"
+            className="w-full h-touch-target bg-card border border-border text-foreground hover:bg-error hover:text-error-foreground hover:border-error transition-colors rounded-lg flex items-center justify-center space-x-2 cursor-pointer font-label-caps text-label-caps"
           >
             <span className="material-symbols-outlined">logout</span>
             <span>Sair</span>
@@ -145,13 +145,13 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
       {children}
 
       {/* BottomNavBar (Mobile) */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full h-touch-target flex justify-around items-center px-sm pb-safe bg-surface dark:bg-surface-container-lowest shadow-[0_-2px_8px_rgba(30,42,45,0.05)] rounded-t-xl z-50 print:hidden">
+      <nav className="md:hidden fixed bottom-0 left-0 w-full h-touch-target flex justify-around items-center px-sm pb-safe bg-card border-t border-border shadow-sm z-50 print:hidden">
         <Link
           prefetch={false}
           href="/"
-          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 hover:text-primary ${currentTab === 'dashboard'
-            ? 'bg-secondary-container text-on-secondary-container rounded-full'
-            : 'text-on-surface-variant'
+          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 ${currentTab === 'dashboard'
+            ? 'bg-primary text-primary-foreground rounded-lg'
+            : 'text-secondary hover:text-foreground'
             }`}
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: currentTab === 'dashboard' ? '"FILL" 1' : undefined }}>dashboard</span>
@@ -161,9 +161,9 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
         <Link
           prefetch={false}
           href="/ordens-servico"
-          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 hover:text-primary ${currentTab === 'service'
-            ? 'bg-secondary-container text-on-secondary-container rounded-full'
-            : 'text-on-surface-variant'
+          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 ${currentTab === 'service'
+            ? 'bg-primary text-primary-foreground rounded-lg'
+            : 'text-secondary hover:text-foreground'
             }`}
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: currentTab === 'service' ? '"FILL" 1' : undefined }}>handyman</span>
@@ -173,9 +173,9 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
         <Link
           prefetch={false}
           href="/equipamentos"
-          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 hover:text-primary ${currentTab === 'equipment'
-            ? 'bg-secondary-container text-on-secondary-container rounded-full'
-            : 'text-on-surface-variant'
+          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 ${currentTab === 'equipment'
+            ? 'bg-primary text-primary-foreground rounded-lg'
+            : 'text-secondary hover:text-foreground'
             }`}
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: currentTab === 'equipment' ? '"FILL" 1' : undefined }}>precision_manufacturing</span>
@@ -185,9 +185,9 @@ export default function Navigation({ children, currentTab }: NavigationProps) {
         <Link
           prefetch={false}
           href="/clientes"
-          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 hover:text-primary ${currentTab === 'clients'
-            ? 'bg-secondary-container text-on-secondary-container rounded-full'
-            : 'text-on-surface-variant'
+          className={`flex flex-col items-center justify-center px-4 py-1 transition-all duration-200 active:scale-90 ${currentTab === 'clients'
+            ? 'bg-primary text-primary-foreground rounded-lg'
+            : 'text-secondary hover:text-foreground'
             }`}
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: currentTab === 'clients' ? '"FILL" 1' : undefined }}>location_city</span>
