@@ -5,9 +5,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const { password } = await request.json();
-    const adminPassword = process.env.ADMIN_PASSWORD || 'tecbull2026';
-
-    if (password === adminPassword) {
+    if (password === (process.env.ADMIN_PASSWORD || 'tecbull2026')) {
       const response = NextResponse.json({ success: true });
       const secureFlag = process.env.NODE_ENV === 'production' ? '; Secure' : '';
       response.headers.set(
