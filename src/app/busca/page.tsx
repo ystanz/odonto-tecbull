@@ -125,7 +125,7 @@ function BuscaResultados() {
                     {results.clients.map((c) => (
                       <tr
                         key={c.id}
-                        onClick={() => router.push(`/clientes/${c.id}`)}
+                        onClick={() => router.push(`/clientes/detalhes?id=${c.id}`)}
                         className="hover:bg-surface-container-lowest/50 transition-colors cursor-pointer group"
                       >
                         <td className="py-md text-sm text-primary font-semibold group-hover:underline">{c.name}</td>
@@ -165,7 +165,7 @@ function BuscaResultados() {
                     {results.equipments.map((e) => (
                       <tr
                         key={e.id}
-                        onClick={() => router.push(`/equipamentos/${e.id}`)}
+                        onClick={() => router.push(`/equipamentos/detalhes?id=${e.id}`)}
                         className="hover:bg-surface-container-lowest/50 transition-colors cursor-pointer group"
                       >
                         <td className="py-md text-sm text-primary font-semibold group-hover:underline">{e.name}</td>
@@ -221,7 +221,7 @@ function BuscaResultados() {
                       return (
                         <tr
                           key={wo.id}
-                          onClick={() => router.push(`/os/${wo.id}`)}
+                          onClick={() => router.push(`/os/detalhes?id=${wo.id}`)}
                           className="hover:bg-surface-container-lowest/50 transition-colors cursor-pointer group"
                         >
                           <td className="py-md text-sm text-primary font-semibold group-hover:underline font-technical-code">{wo.code}</td>

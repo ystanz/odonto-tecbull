@@ -202,7 +202,7 @@ export default function NovaOSPage() {
 
       // Redirect to equipment detail page
       setTimeout(() => {
-        router.push(`/equipamentos/${selectedEquipmentId}`);
+        router.push(`/equipamentos/detalhes?id=${selectedEquipmentId}`);
       }, 1500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erro de conexão com o banco.';

@@ -220,7 +220,7 @@ export default function WorkOrdersPage() {
 
               return (
                 <div key={wo.id}>
-                  <a href={`/os/${wo.id}`} className="block h-full">
+                  <a href={`/os/detalhes?id=${wo.id}`} className="block h-full">
                     {cardContent}
                   </a>
                 </div>

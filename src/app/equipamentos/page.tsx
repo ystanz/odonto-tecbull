@@ -297,7 +297,7 @@ export default function EquipamentosPage() {
               }
 
               return (
-                <a key={eq.id} href={`/equipamentos/${eq.id}`} className="group">
+                <a key={eq.id} href={`/equipamentos/detalhes?id=${eq.id}`} className="group">
                   <article className="bg-surface-container-lowest rounded-xl shadow-sm border border-outline/10 p-md flex flex-col justify-between h-full hover:shadow-md hover:border-primary/20 transition-all cursor-pointer relative overflow-hidden group active:scale-[0.99]">
                     <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors"></div>
 

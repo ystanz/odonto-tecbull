@@ -250,7 +250,7 @@ export default function DashboardPage() {
                         return (
                           <tr
                             key={wo.id}
-                            onClick={() => router.push(`/os/${wo.id}`)}
+                            onClick={() => router.push(`/os/detalhes?id=${wo.id}`)}
                             className="hover:bg-surface-container-lowest/50 transition-colors cursor-pointer group"
                           >
                             <td className="py-md font-technical-code text-sm">

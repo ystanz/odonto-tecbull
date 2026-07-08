@@ -297,7 +297,7 @@ export default function ClientesPage() {
               return (
                 <a
                   key={client.id}
-                  href={`/clientes/${client.id}`}
+                  href={`/clientes/detalhes?id=${client.id}`}
                   className="block bg-surface-container-lowest rounded-xl shadow-sm border border-outline/10 overflow-hidden hover:shadow-md hover:border-primary/20 transition-all cursor-pointer active:scale-[0.99] relative group"
                 >
                   <div className="absolute inset-y-0 left-0 w-1 bg-outline/20 group-hover:bg-primary transition-colors"></div>
