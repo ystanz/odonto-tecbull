@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import NetworkStatus from "@/components/NetworkStatus";
+import AuthGuard from "@/components/AuthGuard";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -50,7 +51,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#FAF8F4] text-on-background">
         <NetworkStatus />
-        {children}
+        <AuthGuard>{children}</AuthGuard>
       </body>
     </html>
   );
