@@ -8,6 +8,14 @@ import { DBEquipment } from '@/lib/types';
 export async function GET() {
   try {
     const db = getDb();
+    
+    // Buscar OSs abertas para saber quais equipamentos possuem chamados abertos
+    const openWos = await db
+      .select({ equipmentId: schema.workOrders.equipmentId })
+      .from(schema.workOrders)
+      .where(eq(schema.workOrders.status, 'ABERTA'));
+    const openWoEquipIds = new Set(openWos.map(wo => wo.equipmentId).filter(Boolean) as string[]);
+
     const rows = await db
       .select()
       .from(schema.equipments)
@@ -26,6 +34,7 @@ export async function GET() {
       next_service_date: row.equipments.nextServiceDate,
       image_data: row.equipments.imageData,
       created_at: row.equipments.createdAt || undefined,
+      hasOpenOS: openWoEquipIds.has(row.equipments.id),
       locations: row.locations ? {
         id: row.locations.id,
         client_id: row.locations.clientId || '',

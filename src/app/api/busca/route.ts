@@ -83,12 +83,17 @@ export async function GET(request: Request) {
       status: e.status,
     }));
 
+    const formattedOsList = osList.map(wo => ({
+      ...wo,
+      code: wo.code ? wo.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : '',
+    }));
+
     return NextResponse.json({
       success: true,
       data: {
         clients: formattedClients,
         equipments: formattedEquipments,
-        os: osList
+        os: formattedOsList
       }
     });
   } catch (err) {

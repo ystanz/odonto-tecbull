@@ -255,7 +255,7 @@ export default function DashboardPage() {
                           >
                             <td className="py-md font-technical-code text-sm">
                               <span className="block text-primary hover:underline font-semibold">
-                                {wo.code}
+                                {wo.code ? wo.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : ''}
                               </span>
                             </td>
                             <td className="py-md font-body-md text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">

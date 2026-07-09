@@ -40,13 +40,18 @@ export async function GET() {
       .orderBy(desc(schema.workOrders.createdAt))
       .limit(5);
 
+    const recentWosFormatted = recentWos.map((wo) => ({
+      ...wo,
+      code: wo.code ? wo.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : '',
+    }));
+
     return NextResponse.json({
       success: true,
       data: {
         totalClients,
         totalEquipments,
         activeWorkOrders,
-        recentWorkOrders: recentWos,
+        recentWorkOrders: recentWosFormatted,
       },
     });
   } catch (err) {

@@ -31,7 +31,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     const formatted: DBWorkOrder = {
       id: row.work_orders.id,
-      code: row.work_orders.code,
+      code: row.work_orders.code ? row.work_orders.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : '',
       client_id: row.work_orders.clientId || '',
       equipment_id: row.work_orders.equipmentId || '',
       status: row.work_orders.status as 'ABERTA' | 'EM ANDAMENTO' | 'CONCLUÍDA',

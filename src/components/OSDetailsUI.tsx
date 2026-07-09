@@ -331,7 +331,7 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
             </div>
             <div className="text-right">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block font-label-caps">ORDEM DE SERVIÇO</span>
-              <span className="text-2xl font-extrabold block mt-1">{workOrder.code}</span>
+              <span className="text-2xl font-extrabold block mt-1">{workOrder.code ? workOrder.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : ''}</span>
             </div>
           </div>
         </div>
@@ -343,7 +343,7 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
             <div className="flex flex-wrap items-center justify-between gap-sm print:hidden">
               <div className="flex items-center gap-sm">
                 <h1 className="font-headline-md text-headline-md text-foreground font-bold">
-                  Ordem de Serviço {workOrder.code}
+                  Ordem de Serviço {workOrder.code ? workOrder.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : ''}
                 </h1>
               </div>
               <div className="flex gap-xs items-center">
@@ -524,7 +524,7 @@ export default function OSDetailsUI({ initialWorkOrder, initialWorkNotes }: OSDe
               <div className="p-6 overflow-y-auto flex flex-col gap-4">
                 <div className="flex justify-between items-center">
                   <h3 className="font-headline-sm text-headline-sm text-foreground font-bold">
-                    Editar Ordem de Serviço {workOrder.code}
+                    Editar Ordem de Serviço {workOrder.code ? workOrder.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : ''}
                   </h3>
                   <button
                     onClick={() => setIsEditModalOpen(false)}

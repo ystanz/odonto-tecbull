@@ -552,7 +552,7 @@ export default function ClientDetailsUI({ client: initialClient, locations: init
                     <tbody>
                       {workOrders.map((wo) => (
                         <tr key={wo.id} className="border-b border-border hover:bg-background transition-colors print:border-gray-200 print:text-black print:bg-transparent">
-                          <td className="p-md font-bold text-primary print:text-black">{wo.code}</td>
+                          <td className="p-md font-bold text-primary print:text-black">{wo.code ? wo.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : ''}</td>
                           <td className="p-md">{wo.equipments?.name || 'Equipamento Geral'}</td>
                           <td className="p-md text-sm">{wo.defect_reported}</td>
                           <td className="p-md text-sm">{wo.work_notes || 'Sem observações técnicas'}</td>

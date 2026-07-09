@@ -19,6 +19,7 @@ interface EquipmentSpecs {
   status: string;
   nextServiceDate: string;
   imageData?: string | null;
+  hasOpenOS?: boolean;
 }
 
 interface TimelineItem {
@@ -165,10 +166,9 @@ function EquipmentDetailsLoader() {
               )}
             </div>
             <div className="flex flex-col justify-center py-xs">
-              <div className={`inline-flex items-center px-sm py-base rounded-full ${equipment.status === 'Ativo' ? 'bg-tertiary/15 text-tertiary' : 'bg-secondary-container/15 text-secondary'
-                } mb-xs w-max`}>
-                <span className={`w-2 h-2 rounded-full ${equipment.status === 'Ativo' ? 'bg-tertiary' : 'bg-secondary'} mr-2`}></span>
-                <span className="font-label-caps text-label-caps">{equipment.status}</span>
+              <div className={`inline-flex items-center px-sm py-base rounded-full ${equipment.hasOpenOS ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                } mb-xs w-max text-xs font-semibold`}>
+                <span>{equipment.hasOpenOS ? 'Ordem aberta' : 'OK'}</span>
               </div>
               <h1 className="font-headline-sm text-headline-sm text-on-surface mb-1">
                 {equipment.name}

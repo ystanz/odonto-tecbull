@@ -105,6 +105,8 @@ export async function GET(request: Request, { params }: RouteParams) {
       icon: wo.status === 'CONCLUÍDA' ? 'check_circle' : 'build'
     }));
 
+    const hasOpenOS = dbWos.some((wo) => wo.status === 'ABERTA');
+
     return NextResponse.json({
       success: true,
       data: {
@@ -121,7 +123,8 @@ export async function GET(request: Request, { params }: RouteParams) {
           imageData: dbEq.imageData,
           locationName: dbEq.locationName
             ? `${dbEq.clientName || ''} > ${dbEq.locationName}${dbEq.locationRoom ? ` - ${dbEq.locationRoom}` : ''}`
-            : 'Unidade Geral'
+            : 'Unidade Geral',
+          hasOpenOS
         },
         timeline,
         clients: clientsList,

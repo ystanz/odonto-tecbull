@@ -189,7 +189,7 @@ export default function WorkOrdersPage() {
                         {wo.equipmentName}
                       </h3>
                       <div className="font-technical-code text-technical-code text-outline mt-1">
-                        ID: {wo.code}
+                        ID: {wo.code ? wo.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : ''}
                       </div>
                     </div>
                     <span className={`inline-flex items-center px-2 py-1 rounded-sm font-label-caps text-[10px] ${statusBadgeClass}`}>

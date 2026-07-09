@@ -16,6 +16,7 @@ interface FormattedEquipment {
   status: string;
   nextServiceDate: string;
   imageData?: string | null;
+  hasOpenOS?: boolean;
 }
 
 export default function EquipamentosPage() {
@@ -132,6 +133,7 @@ export default function EquipamentosPage() {
             status: eq.status || 'Ativo',
             nextServiceDate: eq.next_service_date || 'N/A',
             imageData: eq.image_data,
+            hasOpenOS: eq.hasOpenOS,
           };
         });
 
@@ -282,18 +284,12 @@ export default function EquipamentosPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md animate-fade-in">
             {filteredEquipments.map((eq) => {
               // Determine status styles
-              let badgeClass = 'bg-outline-variant/20 text-on-surface-variant';
-              let dotClass = 'bg-outline';
+              let badgeClass = 'bg-emerald-100 text-emerald-800';
+              let statusText = 'OK';
 
-              if (eq.status === 'Ativo') {
-                badgeClass = 'bg-tertiary/15 text-tertiary';
-                dotClass = 'bg-tertiary';
-              } else if (eq.status === 'Pendente') {
-                badgeClass = 'bg-secondary/15 text-secondary';
-                dotClass = 'bg-secondary';
-              } else if (eq.status === 'Inativo' || eq.status === 'Parado') {
-                badgeClass = 'bg-error/15 text-error';
-                dotClass = 'bg-error';
+              if (eq.hasOpenOS) {
+                badgeClass = 'bg-amber-100 text-amber-800';
+                statusText = 'Ordem aberta';
               }
 
               return (
@@ -303,9 +299,8 @@ export default function EquipamentosPage() {
 
                     {/* Top row status */}
                     <div className="flex justify-end items-center pl-xs mb-sm">
-                      <span className={`inline-flex items-center px-sm py-base rounded-full font-label-caps text-label-caps ${badgeClass}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${dotClass}`}></span>
-                        {eq.status}
+                      <span className={`inline-flex items-center px-sm py-base rounded-full text-xs font-semibold ${badgeClass}`}>
+                        {statusText}
                       </span>
                     </div>
 

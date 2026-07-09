@@ -224,7 +224,7 @@ function BuscaResultados() {
                           onClick={() => router.push(`/os/detalhes?id=${wo.id}`)}
                           className="hover:bg-surface-container-lowest/50 transition-colors cursor-pointer group"
                         >
-                          <td className="py-md text-sm text-primary font-semibold group-hover:underline font-technical-code">{wo.code}</td>
+                          <td className="py-md text-sm text-primary font-semibold group-hover:underline font-technical-code">{wo.code ? wo.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : ''}</td>
                           <td className="py-md text-sm text-on-surface-variant">{wo.clientName || 'Cliente Geral'}</td>
                           <td className="py-md text-sm text-on-surface-variant">{wo.equipmentName || 'Equipamento'}</td>
                           <td className="py-md text-sm text-right">

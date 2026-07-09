@@ -17,7 +17,7 @@ export async function GET() {
 
     const formatted: DBWorkOrder[] = rows.map((row) => ({
       id: row.work_orders.id,
-      code: row.work_orders.code,
+      code: row.work_orders.code ? row.work_orders.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : '',
       client_id: row.work_orders.clientId || '',
       equipment_id: row.work_orders.equipmentId || '',
       status: row.work_orders.status as 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA',
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
 
     const formatted: DBWorkOrder = {
       id: newWorkOrder.id,
-      code: newWorkOrder.code,
+      code: newWorkOrder.code ? newWorkOrder.code.replace('#OS-', 'OS').replace('#OS- ', 'OS') : '',
       client_id: newWorkOrder.clientId || '',
       equipment_id: newWorkOrder.equipmentId || '',
       status: newWorkOrder.status as 'ABERTA' | 'EM ANDAMENTO' | 'AGUARDANDO PEÇA' | 'CONCLUÍDA',

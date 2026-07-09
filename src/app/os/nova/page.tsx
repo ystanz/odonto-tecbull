@@ -172,7 +172,7 @@ export default function NovaOSPage() {
       const clientId = selectedLoc ? selectedLoc.client_id : '';
 
       // 3. Generate OS Code
-      const code = `#OS-${Math.floor(1000 + Math.random() * 9000)}`;
+      const code = `OS${Math.floor(1000 + Math.random() * 9000)}`;
 
 
       // 5. Insert Record via REST API

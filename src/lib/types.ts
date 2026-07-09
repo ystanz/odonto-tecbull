@@ -31,6 +31,7 @@ export interface DBEquipment {
   image_data?: string | null;
   created_at?: string;
   locations?: DBLocation; // Para joins do Supabase
+  hasOpenOS?: boolean;
 }
 
 export interface DBWorkOrder {
